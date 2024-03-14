@@ -6,6 +6,7 @@ import com.backend.wear.domain.chat.ChatRoom;
 import com.backend.wear.domain.count.Count;
 import com.backend.wear.domain.wish.Wish;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -26,32 +27,41 @@ public class Product extends BaseEntity {
     private Long id;
 
     //상품 이름, 제목
+    @NotNull
+    @Column(name="product_name")
     private String productName;
 
     //상품 가격
+    @NotNull
     private Integer price;
 
-    //상품 이미지, 5개까지
-    private String productImage1;
-    private String productImage2;
-    private String productImage3;
-    private String productImage4;
-    private String productImage5;
+    //상품 이미지
+    @NotNull
+    @Column(name="product_image")
+    private String productImage;
 
     //상품 내용, 설명
+    @NotNull
+    @Column(name="product_content")
     private String productContent;
 
     //상품 상태
+    @NotNull
+    @Column(name="product_status")
     private String productStatus;
 
     //거래 상태
-    private boolean postStatus;
+    @NotNull
+    @Column(name="post_status")
+    private String postStatus;
 
     //거래 장소
+    @NotNull
     private String place;
 
     //상품 숨김 여부
-    private boolean isPrivate;
+    @Column(name="is_private")
+    private boolean isPrivate=false;
 
     //카테고리
     @ManyToOne
@@ -69,7 +79,7 @@ public class Product extends BaseEntity {
     @ToString.Exclude
     private Count count;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<ChatRoom> chatRoomList=new ArrayList<>();
 }

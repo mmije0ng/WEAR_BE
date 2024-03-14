@@ -2,6 +2,7 @@ package com.backend.wear.domain.user;
 
 import com.backend.wear.domain.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -19,11 +20,17 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
     private Long id;
 
     //닉네임
+    @NotNull
+    @Column(name="nick_name",unique = true)
     private String nickName;
 
     //환경 레벨
+    @NotNull
+    @Column(name="environment_level")
     private String environmentLevel;
 
     //프로필 이미지
+    @NotNull
+    @Column(name="profile_image")
     private String profileImage;
 }

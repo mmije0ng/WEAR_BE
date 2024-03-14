@@ -1,9 +1,9 @@
 package com.backend.wear.domain.donation;
 
-
 import com.backend.wear.domain.BaseEntity;
 import com.backend.wear.domain.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -27,14 +27,21 @@ public class Donation extends BaseEntity {
     private User user;
 
     //기부 번호
+    @NotNull
+    @Column(name="donation_number")
     private Integer donationNumber;
 
     //기부 장소
+    @NotNull
+    @Column(name="donation_place")
     private String donationPlace;
 
-    //기부 상태, 완료/미완료
-    private boolean donationStatus;
-
     //기부 인증 이미지
+    @NotNull
+    @Column(name="donation_image")
     private String donationImage;
+
+    //기부 상태, 완료/미완료
+    @Column(name="donation_status")
+    private boolean donationStatus=false;
 }

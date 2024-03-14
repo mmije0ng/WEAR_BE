@@ -22,10 +22,11 @@ public class Category extends BaseEntity {
     private Long id;
 
     //카테고리명
+    @Column(name="category-name")
     private String categoryName;
 
     //카테고리별 상품 리스트
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Product> productList;
 }

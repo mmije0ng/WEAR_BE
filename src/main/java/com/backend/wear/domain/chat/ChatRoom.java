@@ -23,6 +23,7 @@ public class ChatRoom extends BaseEntity {
     private Long id;
 
     //채팅 방 번호
+    @Column(name="chat_room_number")
     private Integer chatRoomNumber;
 
     @ManyToOne

@@ -20,10 +20,12 @@ public class Count extends BaseEntity {
     private Long id;
 
     //찜 개수
-    private int wishCount;
+    @Column(name="wish_count")
+    private Integer wishCount;
 
     //조회수
-    private int postCount;
+    @Column(name="post_count")
+    private Integer postCount;
 
     //상품
     @OneToOne

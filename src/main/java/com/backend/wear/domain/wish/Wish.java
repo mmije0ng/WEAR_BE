@@ -4,6 +4,7 @@ import com.backend.wear.domain.product.Product;
 import com.backend.wear.domain.user.User;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -14,12 +15,14 @@ import lombok.*;
 @Table(name="wish_list")
 @Entity
 public class Wish extends Serializers.Base {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //아이디
 
     //찜 여부
-    private boolean isSelected;
+    @Column(name="is_selected")
+    private boolean isSelected=false;
 
     //사용자
     @ManyToOne

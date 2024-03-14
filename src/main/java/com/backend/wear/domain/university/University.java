@@ -23,7 +23,9 @@ public class University extends BaseEntity {
     private Long id;
 
     //대학교 학생들
-    @OneToMany(mappedBy = "university")
+    @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<User> userList = new ArrayList<>();
+
+    //대학교 환경 점수, 기부 횟수, 등..
 }

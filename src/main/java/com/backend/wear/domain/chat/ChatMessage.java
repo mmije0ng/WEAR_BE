@@ -2,6 +2,7 @@ package com.backend.wear.domain.chat;
 
 import com.backend.wear.domain.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -17,6 +18,7 @@ public class ChatMessage {
     private Long id;
 
     //채팅 메시지
+    @NotNull
     private String message;
 
     //메시지 보낸 사람
@@ -35,5 +37,6 @@ public class ChatMessage {
     private ChatRoom chatRoom;
 
     //읽음 여부
-    private boolean isChecked;
+    @Column(name="is_chekced")
+    private boolean isChecked=false;
 }
