@@ -12,9 +12,6 @@
         <module name="com.backend.wear.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="17">
-      <module name="wear.main" target="17" />
-      <module name="wear.test" target="17" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="17" />
   </component>
 </project>
