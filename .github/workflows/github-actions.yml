@@ -65,9 +65,11 @@ jobs:
           echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
         shell: bash
 
-       #gradle build
+      #gradle build
       - name: Build with Gradle
-        run: bash gradlew build -x test
+        run: |
+          chmod +x gradlew  # 실행 권한을 부여합니다.
+          ./gradlew clean build -x test
 
       # make zip file
       - name: Make zip file
