@@ -1,7 +1,5 @@
-package com.backend.wear.domain.university;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

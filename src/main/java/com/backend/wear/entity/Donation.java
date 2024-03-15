@@ -1,7 +1,5 @@
-package com.backend.wear.domain.donation;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

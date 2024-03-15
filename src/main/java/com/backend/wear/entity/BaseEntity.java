@@ -1,4 +1,4 @@
-package com.backend.wear.domain;
+package com.backend.wear.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -1,10 +1,9 @@
-package com.backend.wear.domain.wish;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.product.Product;
-import com.backend.wear.domain.user.User;
+import com.backend.wear.entity.Product;
+import com.backend.wear.entity.User;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter

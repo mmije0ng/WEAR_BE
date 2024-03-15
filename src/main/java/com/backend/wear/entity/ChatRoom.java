@@ -1,12 +1,8 @@
-package com.backend.wear.domain.chat;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.product.Product;
-import com.backend.wear.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,10 +1,5 @@
-package com.backend.wear.domain.product;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.category.Category;
-import com.backend.wear.domain.chat.ChatRoom;
-import com.backend.wear.domain.count.Count;
-import com.backend.wear.domain.wish.Wish;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -51,7 +46,7 @@ public class Product extends BaseEntity {
     private String productStatus;
 
     //거래 상태
-    @NotNull
+    //null이면 거래 완료, onSale이면 판매 중
     @Column(name="post_status")
     private String postStatus;
 
@@ -79,6 +74,7 @@ public class Product extends BaseEntity {
     @ToString.Exclude
     private Count count;
 
+    //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<ChatRoom> chatRoomList=new ArrayList<>();

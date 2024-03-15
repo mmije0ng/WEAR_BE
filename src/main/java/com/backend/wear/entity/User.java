@@ -1,10 +1,6 @@
-package com.backend.wear.domain.user;
+package com.backend.wear.entity;
 
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.donation.Donation;
-import com.backend.wear.domain.university.University;
-import com.backend.wear.domain.wish.Wish;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

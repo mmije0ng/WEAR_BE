@@ -1,7 +1,5 @@
-package com.backend.wear.domain.count;
+package com.backend.wear.entity;
 
-import com.backend.wear.domain.BaseEntity;
-import com.backend.wear.domain.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
