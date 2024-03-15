@@ -7,6 +7,16 @@ plugins {
 group = 'com.backend'
 version = '0.0.1-SNAPSHOT'
 
+bootJar{
+    archivesBaseName = 'Wear'
+    archiveFileName = 'wear.jar'
+    archiveVersion = "0.0.1"
+}
+
+jar {
+    enabled = false
+}
+
 java {
     sourceCompatibility = '17'
 }
