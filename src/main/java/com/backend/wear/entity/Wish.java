@@ -15,7 +15,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
-@Table(name="wish_list")
+@Table(name="wish")
 @Entity
 public class Wish extends Serializers.Base {
 
@@ -25,7 +25,7 @@ public class Wish extends Serializers.Base {
 
     //찜 여부
     @Column(name="is_selected",columnDefinition = "boolean default false")
-    private boolean isSelected=false;
+    private boolean isSelected;
 
     //사용자
     @ManyToOne

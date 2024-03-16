@@ -26,26 +26,30 @@ public class ProductService {
 
     //전체, 최신순
     @Transactional
-    public Page<ProductResponseDto> findAllProducts(Pageable pageable) {
+    public Page<ProductResponseDto> findAllProducts(Integer pageNumber) {
+        Pageable pageable= PageRequest.of(pageNumber,12,
+                Sort.by("updatedAt").descending());
+
         Page<Product> productsPage = productRepository.findAll(pageable);
         return productsPage.map(this::mapToProductResponseDto);
     }
 
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected=wishRepository.findByProductId(product.getId()).get().isSelected();
+        System.out.println("선택: "+isSelected);
         return ProductResponseDto.builder()
                 .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())
                 .postStatus(product.getPostStatus())
                 .isSelected(isSelected)
-                .productImage(product.getProductImage().get(0))
+                .productImage(product.getProductImage())
                 .build();
     }
 
     //카테고리별, 최신순
     @Transactional
-    public Page<ProductResponseDto> findProductByCategory(String categoryName, String postStatus, Integer pageNumber ){
+    public Page<ProductResponseDto> findProductsByCategory(String categoryName, String postStatus, Integer pageNumber ){
 
         //최신순 페이징
         Pageable pageable= PageRequest.of(pageNumber,12,
@@ -56,7 +60,7 @@ public class ProductService {
 
     //카테고리별, 판매중, 최신순
     @Transactional
-    public Page<ProductResponseDto> findProductByCategoryNotNull(String categoryName, String postStatus, Integer pageNumber ){
+    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
 
         //최신순 페이징
         Pageable pageable= PageRequest.of(pageNumber,12,

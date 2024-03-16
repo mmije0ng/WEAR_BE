@@ -66,7 +66,7 @@ public class User extends BaseEntity {
     private EnvironmentLevel environmentLevel;
 
     //프로필 이미지
-    @Column(name="profile_image")
+    @Column(name="profile_image", columnDefinition = "varchar(255) default 'default_image' ")
     private String profileImage;
 
     //대학교

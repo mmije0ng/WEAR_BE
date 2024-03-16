@@ -35,10 +35,16 @@ public class Product extends BaseEntity {
     private Integer price;
 
     //상품 이미지
-    @NotNull
+ /*   @NotNull
     @ElementCollection
     @Column(name="product_image")
     private List<String> productImage = new ArrayList<>();
+
+*/
+
+    @NotNull
+    @Column(name="product_image")
+    private String productImage;
 
     //상품 내용, 설명
     @NotNull
