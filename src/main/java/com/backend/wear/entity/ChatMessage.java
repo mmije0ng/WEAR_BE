@@ -2,10 +2,14 @@ package com.backend.wear.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @DynamicInsert
 @Entity
 @Table(name = "chatMessage")
@@ -36,6 +40,6 @@ public class ChatMessage {
     private ChatRoom chatRoom;
 
     //읽음 여부
-    @Column(name="is_chekced")
-    private boolean isChecked=false;
+    @Column(name="is_checked", columnDefinition = "boolean default false")
+    private boolean isChecked;
 }

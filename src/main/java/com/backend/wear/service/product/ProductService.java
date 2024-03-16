@@ -1,7 +1,9 @@
 package com.backend.wear.service.product;
 
 import com.backend.wear.dto.ProductResponseDto;
+import com.backend.wear.entity.Product;
 import com.backend.wear.repository.ProductRepository;
+import com.backend.wear.repository.WishRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,21 +14,34 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProductService {
+
     private final ProductRepository productRepository;
+    private final WishRepository wishRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository){
         this.productRepository=productRepository;
+        this.wishRepository=wishRepository;
     }
 
-    //최신순
-   @Transactional
-   public Page<ProductResponseDto> selectAllProduct(Integer pageNumber){
-       Pageable pageable= PageRequest.of(pageNumber,12,
-               Sort.by("updatedAt").descending());
+    //전체, 최신순
+    @Transactional
+    public Page<ProductResponseDto> findAllProducts(Pageable pageable) {
+        Page<Product> productsPage = productRepository.findAll(pageable);
+        return productsPage.map(this::mapToProductResponseDto);
+    }
 
-       return productRepository.findAllProducts(pageable);
-   }
+    private ProductResponseDto mapToProductResponseDto(Product product) {
+        boolean isSelected=wishRepository.findByProductId(product.getId()).get().isSelected();
+        return ProductResponseDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .postStatus(product.getPostStatus())
+                .isSelected(isSelected)
+                .productImage(product.getProductImage().get(0))
+                .build();
+    }
 
     //카테고리별, 최신순
     @Transactional
@@ -51,5 +66,4 @@ public class ProductService {
     }
 
     //상품 등록하기
-
 }

@@ -1,8 +1,6 @@
 package com.backend.wear.product;
 
-import com.backend.wear.dto.CategoryResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
-import com.backend.wear.repository.CategoryRepository;
 import com.backend.wear.repository.ProductRepository;
 import com.backend.wear.service.product.ProductService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +19,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ProductRepositoryTest {
+class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -31,12 +29,6 @@ class ProductRepositoryTest {
 
     @InjectMocks
     private ProductService productService;
-
-    //카테고리별 최신순
-    @Test
-    void findByCategory_CategoryNameTest(){
-        
-    }
 
     //카테고리별 판매중 최신순
     @Test

@@ -11,11 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ProductResponseDto{
+
     //상품 조회 시 응답  dto
     private Long id;
     private Integer price;
     private String productName;
     private String postStatus;
-    private Wish wish;
+    private boolean isSelected;
     private String productImage;
 }

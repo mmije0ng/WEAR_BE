@@ -11,10 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    //모든 상품 조회
-    @Query("SELECT new com.backend.wear.dto.ProductResponseDto(p.id, p.price, p.productName, p.productStatus,p.wish,p.productImage) FROM Product p")
-    Page<ProductResponseDto> findAllProducts(Pageable pageable);
-
     //카테고리별 조회
     Page<ProductResponseDto> findByCategory_CategoryName(String categoryName, Pageable pageable);
 

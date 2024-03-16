@@ -3,12 +3,16 @@ package com.backend.wear.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@DynamicInsert
+@DynamicUpdate
 @Table(name="blocked_users")
 @Entity
 public class BlockedUser extends BaseEntity { //차단된 사용자
@@ -25,7 +29,7 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
 
     //환경 레벨
     @NotNull
-    @Column(name="environment_level")
+    @Column(name="environment_level", columnDefinition = "varchar(255) default '새싹'")
     private String environmentLevel;
 
     //프로필 이미지

@@ -2,14 +2,18 @@ package com.backend.wear.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@DynamicInsert
+@DynamicUpdate
 @Table(name="category")
 @Entity
 public class Category extends BaseEntity {
@@ -20,7 +24,7 @@ public class Category extends BaseEntity {
     private Long id;
 
     //카테고리명
-    @Column(name="category-name")
+    @Column(name = "category_name", columnDefinition = "varchar(255) default '전체'")
     private String categoryName;
 
     //카테고리별 상품 리스트

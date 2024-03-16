@@ -3,12 +3,16 @@ package com.backend.wear.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@DynamicInsert
+@DynamicUpdate
 @Table(name="donation")
 @Entity
 public class Donation extends BaseEntity {
@@ -40,6 +44,6 @@ public class Donation extends BaseEntity {
     private String donationImage;
 
     //기부 상태, 완료/미완료
-    @Column(name="donation_status")
-    private boolean donationStatus=false;
+    @Column(name="donation_status", columnDefinition = "boolean default false")
+    private boolean donationStatus;
 }

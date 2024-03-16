@@ -2,13 +2,17 @@ package com.backend.wear.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Table(name="chatRoom")
 @Entity
 public class ChatRoom extends BaseEntity {
@@ -18,8 +22,8 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //채팅 방 번호
-    @Column(name="chat_room_number")
+    //채팅 방 번호 (인덱스)
+    @Column(name="chat_room_number",columnDefinition = "integer default 0")
     private Integer chatRoomNumber;
 
     @ManyToOne
