@@ -24,12 +24,6 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @Mock
-    private CategoryRepository categoryRepository;
-
-    @InjectMocks
-    private ProductService productService;
-
     //카테고리별 판매중 최신순
     @Test
     void findByProductStatusAndCategory_CategoryNameTest() {
