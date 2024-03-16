@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     //카테고리별 조회
-    Page<ProductResponseDto> findByCategory_CategoryName(String categoryName, Pageable pageable);
+    Page<Product> findByCategory_CategoryName(String categoryName, Pageable pageable);
 
     //카테고리별 판매중 조회
-    Page<ProductResponseDto> findByPostStatusAndCategory_CategoryName(String postStatus, String categoryName, Pageable pageable);
+    Page<Product> findByPostStatusAndCategory_CategoryName(String postStatus, String categoryName, Pageable pageable);
 
 }

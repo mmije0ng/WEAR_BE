@@ -34,19 +34,6 @@ public class ProductService {
         return productsPage.map(this::mapToProductResponseDto);
     }
 
-    private ProductResponseDto mapToProductResponseDto(Product product) {
-        boolean isSelected=wishRepository.findByProductId(product.getId()).get().isSelected();
-        System.out.println("선택: "+isSelected);
-        return ProductResponseDto.builder()
-                .id(product.getId())
-                .price(product.getPrice())
-                .productName(product.getProductName())
-                .postStatus(product.getPostStatus())
-                .isSelected(isSelected)
-                .productImage(product.getProductImage())
-                .build();
-    }
-
     //카테고리별, 최신순
     @Transactional
     public Page<ProductResponseDto> findProductsByCategory(String categoryName, String postStatus, Integer pageNumber ){
@@ -55,7 +42,8 @@ public class ProductService {
         Pageable pageable= PageRequest.of(pageNumber,12,
                 Sort.by("updatedAt").descending());
 
-        return productRepository.findByCategory_CategoryName(categoryName,pageable);
+        Page<Product> productsPage= productRepository.findByCategory_CategoryName(categoryName,pageable);
+        return productsPage.map(this::mapToProductResponseDto);
     }
 
     //카테고리별, 판매중, 최신순
@@ -66,7 +54,21 @@ public class ProductService {
         Pageable pageable= PageRequest.of(pageNumber,12,
                 Sort.by("updatedAt").descending());
 
-        return productRepository.findByPostStatusAndCategory_CategoryName(postStatus,categoryName,pageable);
+        Page<Product> productsPage= productRepository.findByPostStatusAndCategory_CategoryName(postStatus,categoryName,pageable);
+        return productsPage.map(this::mapToProductResponseDto);
+    }
+
+    private ProductResponseDto mapToProductResponseDto(Product product) {
+        boolean isSelected=wishRepository.findByProductId(product.getId()).get().isSelected();
+
+        return ProductResponseDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .postStatus(product.getPostStatus())
+                .isSelected(isSelected)
+                .productImage(product.getProductImage())
+                .build();
     }
 
     //상품 등록하기

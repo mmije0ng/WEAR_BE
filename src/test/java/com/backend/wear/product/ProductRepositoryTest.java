@@ -1,6 +1,7 @@
 package com.backend.wear.product;
 
 import com.backend.wear.dto.ProductResponseDto;
+import com.backend.wear.entity.Product;
 import com.backend.wear.repository.ProductRepository;
 import com.backend.wear.service.product.ProductService;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class ProductServiceTest {
         when(productRepository.findByPostStatusAndCategory_CategoryName(eq(categoryName),eq(productStatus), any())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // when
-        Page<ProductResponseDto> result = productRepository.findByPostStatusAndCategory_CategoryName(categoryName,productStatus, pageable);
+        Page<Product> result = productRepository.findByPostStatusAndCategory_CategoryName(categoryName,productStatus, pageable);
 
         // then
         assertThat(result).isNotNull();

@@ -65,6 +65,11 @@ public class User extends BaseEntity {
     @Column(name="environment_level", columnDefinition = "varchar(10) default 'SEED'")
     private EnvironmentLevel environmentLevel;
 
+    //스타일
+    @Enumerated(EnumType.STRING)
+    @Column(name="style", columnDefinition = "varchar(10) default 'VINTAGE'")
+    private Style style;
+
     //프로필 이미지
     @Column(name="profile_image", columnDefinition = "varchar(255) default 'default_image' ")
     private String profileImage;

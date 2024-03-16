@@ -35,7 +35,7 @@ public class ProductController {
         List<ProductResponseDto> productList=new ArrayList<>();
         Page page;
 
-        if(postStatus.equals("onale")){
+        if(postStatus.equals("onSale")){
             page=productService.findProductsByCategoryOnSale(categoryName,postStatus,pageNumber);
         }
 
