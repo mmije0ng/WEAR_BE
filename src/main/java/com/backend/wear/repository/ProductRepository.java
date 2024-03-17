@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -19,5 +21,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByPostStatusAndCategory_CategoryName(String postStatus, String categoryName, Pageable pageable);
 
     //사용자 아이디로 판매자 조회
-    User findByUserId(String userId);
+    Optional<User> findUserById(Long productId);
 }

@@ -39,10 +39,15 @@ public class User extends BaseEntity {
     @Column(name="user_password",unique = true)
     private String userPassword;
 
-    //이름
+    //이름 (실명)
     @NotNull
     @Column(name="user_name",unique = true)
     private String userName;
+
+    //닉네임
+    @NotNull
+    @Column(name="nick_name",unique = true)
+    private String nickName;
 
     //대학교 이메일
     @NotNull

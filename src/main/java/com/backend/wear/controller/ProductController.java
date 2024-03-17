@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+    //예외 처리 필요
 
     private final ProductService productService;
 
@@ -40,18 +38,17 @@ public class ProductController {
         }
 
         else{ //판애 완료
-            page=productService.findProductsByCategory(categoryName, postStatus,pageNumber);
+            page=productService.findProductsByCategory(categoryName, pageNumber);
         }
 
         return page;
     }
 
     //상품 상세 페이지 불러오기
-//    @GetMapping("/products/{productId}")
-//    public Page<ProductPostResponseDto> getProductPost(@PathVariable("productId")){
-//        Page page;
-//
-//
-//        return page;
-//    }
+    @GetMapping("/{productId}")
+    public ProductPostResponseDto getProductPost(@PathVariable("productId") Long productId){
+        ProductPostResponseDto produtPost=productService.getProductPost(productId);
+
+        return  produtPost;
+    }
 }
