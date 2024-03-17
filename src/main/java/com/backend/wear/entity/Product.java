@@ -69,6 +69,11 @@ public class Product extends BaseEntity {
     @Column(name="is_private",columnDefinition = "boolean default false")
     private boolean isPrivate;
 
+    //판매자
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
     //카테고리
     @ManyToOne
     @JoinColumn(name="category_id")

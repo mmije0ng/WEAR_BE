@@ -1,5 +1,6 @@
 package com.backend.wear.controller;
 
+import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,4 +45,13 @@ public class ProductController {
 
         return page;
     }
+
+    //상품 상세 페이지 불러오기
+//    @GetMapping("/products/{productId}")
+//    public Page<ProductPostResponseDto> getProductPost(@PathVariable("productId")){
+//        Page page;
+//
+//
+//        return page;
+//    }
 }

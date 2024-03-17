@@ -51,14 +51,14 @@ public class User extends BaseEntity {
 
     //환경 점수
     @Size(min = 0, max = 100)
-    @Column(name="environment_point",columnDefinition = "integer default 0")
-    private Integer environmentPoint;
+    @Column(name="point",columnDefinition = "integer default 0")
+    private Integer point;
 
     //환경 레벨
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name="environment_level", columnDefinition = "varchar(10) default 'SEED'")
-    private EnvironmentLevel environmentLevel;
+    @Column(name="level", columnDefinition = "varchar(10) default 'SEED'")
+    private EnvironmentLevel level;
 
     //스타일
     //리스트로 수정 필요_
@@ -75,6 +75,11 @@ public class User extends BaseEntity {
     @JoinColumn(name="university_id")
     @ToString.Exclude
     University university;
+
+    //판매 내역
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<Product> productList = new ArrayList<>();
 
     //기부 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)

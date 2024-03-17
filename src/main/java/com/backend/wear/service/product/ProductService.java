@@ -1,8 +1,11 @@
 package com.backend.wear.service.product;
 
+import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.entity.Product;
+import com.backend.wear.entity.User;
 import com.backend.wear.repository.ProductRepository;
+import com.backend.wear.repository.UserRepository;
 import com.backend.wear.repository.WishRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,14 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository,
+                          UserRepository userRepository){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
+        this.userRepository=userRepository;
     }
 
     //전체, 최신순
@@ -58,6 +64,12 @@ public class ProductService {
         return productsPage.map(this::mapToProductResponseDto);
     }
 
+    //상품 상세 조회
+//    @Transactional
+//    public Page<ProductPostResponseDto> getProductPost(Integer productId){
+//        User seller = productRepository.findByUserId()
+//    }
+
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected=wishRepository.findByProductId(product.getId()).get().isSelected();
 
@@ -70,6 +82,4 @@ public class ProductService {
                 .productImage(product.getProductImage())
                 .build();
     }
-
-    //상품 등록하기
 }
