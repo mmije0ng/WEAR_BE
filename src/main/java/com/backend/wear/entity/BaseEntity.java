@@ -1,4 +1,4 @@
-package com.backend.wear.domain;
+package com.backend.wear.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(value = {AuditingEntityListener.class})
 public class BaseEntity {
+
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
