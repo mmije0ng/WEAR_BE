@@ -16,4 +16,9 @@ public class TestController {
         return "Hello World";
     }
 
+    @GetMapping("users/{userId}")
+    public String testControllerMethod(@PathVariable("userId") Long id){
+        return "userId: "+id;
+    }
+
 }
