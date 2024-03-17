@@ -16,6 +16,7 @@ public class ProductResponseDto{
     private Long id;
     private Integer price;
     private String productName;
+    private String productStatus;
     private String postStatus;
     private boolean isSelected;
     private String productImage;

@@ -12,7 +12,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @DynamicInsert
 @Entity
-@Table(name = "chatMessage")
+@Table(name = "chat_message")
 public class ChatMessage {
 
     //아이디
@@ -42,4 +42,7 @@ public class ChatMessage {
     //읽음 여부
     @Column(name="is_checked", columnDefinition = "boolean default false")
     private boolean isChecked;
+
+    @Column(name="is_alert", columnDefinition = "boolean default true" )
+    private boolean isAlert;
 }

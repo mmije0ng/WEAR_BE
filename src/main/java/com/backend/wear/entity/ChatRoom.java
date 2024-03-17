@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name="chatRoom")
+@Table(name="chat_room")
 @Entity
 public class ChatRoom extends BaseEntity {
 
@@ -36,12 +36,11 @@ public class ChatRoom extends BaseEntity {
     @ToString.Exclude
     private User customer;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @OneToMany(mappedBy = "chat_room", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private Product product;
+    private List<Product> productList=new ArrayList<>();
 
     //채팅 메시지
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chat_room", cascade = CascadeType.ALL)
     private List<ChatMessage> messageList = new ArrayList<>();
 }

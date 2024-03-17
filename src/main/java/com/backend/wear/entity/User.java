@@ -41,13 +41,8 @@ public class User extends BaseEntity {
 
     //이름
     @NotNull
-    @Column(unique = true)
-    private String name;
-
-    //닉네임
-    @NotNull
-    @Column(name="nick_name",unique = true)
-    private String nickName;
+    @Column(name="user_name",unique = true)
+    private String userName;
 
     //대학교 이메일
     @NotNull
@@ -66,6 +61,7 @@ public class User extends BaseEntity {
     private EnvironmentLevel environmentLevel;
 
     //스타일
+    //리스트로 수정 필요_
     @Enumerated(EnumType.STRING)
     @Column(name="style", columnDefinition = "varchar(10) default 'VINTAGE'")
     private Style style;
@@ -89,4 +85,8 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Wish> wishList=new ArrayList<>();
+
+    //차단한 사용자 이름
+//    @Column(name="blocked_user_name")
+//    private List <String> blockedUserNameList=new ArrayList<>();
 }

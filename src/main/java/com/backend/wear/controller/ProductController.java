@@ -22,29 +22,30 @@ public class ProductController {
 
     //전체 상품 최신순 조회
     @GetMapping()
-    public List<ProductResponseDto> findAllProductsPage(@RequestParam Integer pageNumber){
+    public Page<ProductResponseDto> findAllProductsPage(@RequestParam Integer pageNumber){
         Page page = productService.findAllProducts(pageNumber);
-        List<ProductResponseDto> productList=page.getContent();
 
-        return productList;
+        return page;
     }
 
+    //카테고리별 최신순, 판매 상태
     @GetMapping("/category")
-    public List<ProductResponseDto> findProductsByCategoryName(@RequestParam String categoryName,
+    public Page<ProductResponseDto> findProductsByCategoryName(@RequestParam String categoryName,
                                                                @RequestParam String postStatus, @RequestParam Integer pageNumber ){
-        List<ProductResponseDto> productList=new ArrayList<>();
         Page page;
 
-        if(postStatus.equals("onSale")){
+        if(postStatus.equals("onSale")){ //판매 중
             page=productService.findProductsByCategoryOnSale(categoryName,postStatus,pageNumber);
         }
 
-        else{
+        else{ //판애 완료
             page=productService.findProductsByCategory(categoryName, postStatus,pageNumber);
         }
 
-        productList=page.getContent();
-
-        return productList;
+        return page;
     }
+
+    //상품 상제 정보 불러오기
+    @GetMapping("/products")
+    public
 }
