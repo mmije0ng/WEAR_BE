@@ -5,11 +5,7 @@ name: CI/CD using Github Actions & AWS CodeDeploy
 # main이나 develop 브랜치에 push가 되었을 때 실행
 on:
   push:
-<<<<<<< HEAD
-    branches: [ "master", "feature" ]
-=======
     branches: [ "master" ]
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
 
 permissions:
   contents: read
@@ -41,12 +37,9 @@ jobs:
       # 환경별 yml 파일 생성(1) - application.yml
       - name: make application.yml
         if: |
-<<<<<<< HEAD
           contains(github.ref, 'master') ||
           contains(github.ref, 'feature')
-=======
           contains(github.ref, 'master')
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
         run: |
           mkdir ./src/main/resources # resources 폴더 생성
           cd ./src/main/resources # resources 폴더로 이동
@@ -54,7 +47,6 @@ jobs:
           echo "${{ secrets.YML }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기
         shell: bash
 
-<<<<<<< HEAD
       # 환경별 yml 파일 생성(2) - dev
       #- name: make application-dev.yml
       #  if: contains(github.ref, 'develop')
@@ -62,7 +54,6 @@ jobs:
         #  cd ./src/main/resources
          # touch ./application-dev.yml
          # echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
-=======
           # 환경별 yml 파일 생성(2) - dev
           #- name: make application-dev.yml
           #  if: contains(github.ref, 'develop')
@@ -70,7 +61,6 @@ jobs:
           #  cd ./src/main/resources
           # touch ./application-dev.yml
         # echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
         #shell: bash
 
       # 환경별 yml 파일 생성(3) - prod
