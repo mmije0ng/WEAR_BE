@@ -88,5 +88,5 @@ public class Product extends BaseEntity {
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList=new ArrayList<>();
+    private List<ProductChatRoom> chatRoomList=new ArrayList<>();
 }

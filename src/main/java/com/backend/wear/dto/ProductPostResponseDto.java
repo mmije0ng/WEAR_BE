@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ProductPostResponseDto {
-
+    private Long id;
 }

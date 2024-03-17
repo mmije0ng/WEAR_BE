@@ -1,6 +1,5 @@
 package com.backend.wear.dto;
 
-import com.backend.wear.entity.Wish;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

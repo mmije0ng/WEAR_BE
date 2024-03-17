@@ -36,11 +36,12 @@ public class ChatRoom extends BaseEntity {
     @ToString.Exclude
     private User customer;
 
-    @OneToMany(mappedBy = "chat_room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Product> productList=new ArrayList<>();
+    private List<ProductChatRoom> productList=new ArrayList<>();
 
     //채팅 메시지
-    @OneToMany(mappedBy = "chat_room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<ChatMessage> messageList = new ArrayList<>();
 }

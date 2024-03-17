@@ -44,8 +44,4 @@ public class ProductController {
 
         return page;
     }
-
-    //상품 상제 정보 불러오기
-    @GetMapping("/products")
-    public
 }

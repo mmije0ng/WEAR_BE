@@ -36,7 +36,7 @@ public class ChatMessage {
 
     //채팅 방
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     //읽음 여부
