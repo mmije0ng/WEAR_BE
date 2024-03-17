@@ -7,10 +7,7 @@ plugins {
 group = 'com.backend'
 version = '0.0.1-SNAPSHOT'
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
 bootJar{
     archivesBaseName = 'wear'
     archiveFileName = 'wear.jar'
@@ -21,10 +18,6 @@ jar {
     enabled = false
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
 java {
     sourceCompatibility = '17'
 }
@@ -64,13 +57,6 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // test
-<<<<<<< HEAD
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-=======
-     //  testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    //   testImplementation 'org.springframework.security:spring-security-test'
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
