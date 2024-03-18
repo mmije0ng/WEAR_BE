@@ -21,7 +21,7 @@ public class Style extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //대학교 이름
+    //스타일 태그 이름
     @Column(name="style_name")
     private String styleName;
 
