@@ -25,6 +25,16 @@ public class TestController {
 
     @PostMapping("api/products/new/{userId}")
     public String testProuctPost(@PathVariable("userId") Long id){
-        return "Post: api/products/new/"+id;
+        return "api/products/new/"+id;
+    }
+
+    @GetMapping("api/users/profile/{userId}")
+    public String testGetprofile(@PathVariable("userId") Long id){
+        return "GET: api/users/profile/"+id;
+    }
+
+    @PostMapping("api/users/profile/{userId}")
+    public String testPostProfile(@PathVariable("userId") Long id){
+        return "POST: api/users/profile/"+id;
     }
 }
