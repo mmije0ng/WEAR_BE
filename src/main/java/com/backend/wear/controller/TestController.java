@@ -21,4 +21,8 @@ public class TestController {
         return "userId: "+id;
     }
 
+    @GetMapping("api/products/new/{userId}")
+    public String testProuct(@PathVariable("userId") Long id){
+        return "api/products/new/"+id;
+    }
 }
