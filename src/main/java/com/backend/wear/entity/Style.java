@@ -1,18 +1,31 @@
 package com.backend.wear.entity;
 
-public enum Style {
-    VINTAGE("빈티지"),
-    FEMININ("페미닌"),
-    CASUAL("캐쥬얼");
-    // 다른 환경 레벨 값들을 추가할 수 있음
 
-    private final String label;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
-    Style(String label) {
-        this.label = label;
-    }
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode(callSuper = true)
+@DynamicInsert //save할 때 null 값을 배제하고 insert
+@DynamicUpdate
+@Table(name="style")
+@Entity
+public class Style extends BaseEntity {
 
-    public String getLabel() {
-        return label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    //대학교 이름
+    @Column(name="style_name")
+    private String styleName;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    User user;
 }

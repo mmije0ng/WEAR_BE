@@ -24,6 +24,10 @@ public class University extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //대학교 이름
+    @Column(name="university_name")
+    private String universityName;
+
     //대학교 학생들
     @OneToMany(mappedBy = "university", fetch = FetchType.LAZY)
     @ToString.Exclude

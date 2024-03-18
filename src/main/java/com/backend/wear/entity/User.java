@@ -66,10 +66,9 @@ public class User extends BaseEntity {
     private EnvironmentLevel level;
 
     //스타일
-    //리스트로 수정 필요_
-    @Enumerated(EnumType.STRING)
-    @Column(name="style", columnDefinition = "varchar(10) default 'VINTAGE'")
-    private Style style;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<Style> style = new ArrayList<>();
 
     //프로필 이미지
     @Column(name="profile_image", columnDefinition = "varchar(255) default 'default_image' ")

@@ -1,4 +1,4 @@
-package com.backend.wear.service.product;
+package com.backend.wear.service;
 
 import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;

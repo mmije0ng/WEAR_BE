@@ -2,7 +2,7 @@ package com.backend.wear.controller;
 
 import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
-import com.backend.wear.service.product.ProductService;
+import com.backend.wear.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;

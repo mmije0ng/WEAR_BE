@@ -13,11 +13,6 @@ public class TestController {
         return "Hello World";
     }
 
-    @GetMapping("/api/users/{userId}")
-    public String testControllerMethod(@PathVariable("userId") Long id){
-        return "userId: "+id;
-    }
-
     @GetMapping("api/products/new/{userId}")
     public String testProuct(@PathVariable("userId") Long id){
         return "api/products/new/"+id;
