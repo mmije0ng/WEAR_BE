@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 //사용자에 대한 응답 dto
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserResponseDto {
     private String userName; //사용자 이름
     private String nickName;

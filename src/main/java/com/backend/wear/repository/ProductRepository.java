@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -19,6 +20,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     //카테고리별 판매중 조회
     Page<Product> findByPostStatusAndCategory_CategoryName(String postStatus, String categoryName, Pageable pageable);
+
+    //판매중인 상품만 조회
+    Page<Product> findByPostStatus(String postStatus, Pageable pageable);
 
     //사용자 아이디로 판매자 조회
     Optional<User> findUserById(Long productId);

@@ -1,6 +1,8 @@
 package com.backend.wear.dto;
 
 import com.backend.wear.entity.EnvironmentLevel;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserPostResponseDto {
     //상품 상세 페이지에서 사용자 정보 dto
 

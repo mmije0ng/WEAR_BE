@@ -1,5 +1,7 @@
 package com.backend.wear.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductResponseDto{
 
     //상품 조회 시 응답  dto
@@ -17,6 +20,6 @@ public class ProductResponseDto{
     private String productName;
     private String productStatus;
     private String postStatus;
-    private boolean isSelected;
     private String productImage;
+    private boolean isSelected;
 }
