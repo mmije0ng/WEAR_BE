@@ -1,9 +1,6 @@
 package com.backend.wear.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -24,5 +21,10 @@ public class TestController {
     @GetMapping("api/products/new/{userId}")
     public String testProuct(@PathVariable("userId") Long id){
         return "api/products/new/"+id;
+    }
+
+    @PostMapping("api/products/new/{userId}")
+    public String testProuctPost(@PathVariable("userId") Long id){
+        return "Post: api/products/new/"+id;
     }
 }
