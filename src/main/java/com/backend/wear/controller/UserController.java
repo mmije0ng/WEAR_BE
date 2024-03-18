@@ -23,6 +23,7 @@ public class UserController {
         this.userService=userService;
     }
 
+    //마이페이지 사용자 정보
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable Long userId) {
         UserResponseDto userResponseDto=userService.getMyPageUserResponseDto(userId);
@@ -33,5 +34,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("서버 오류가 발생했습니다. 나중에 다시 시도해주세요.");
     }
-
 }
