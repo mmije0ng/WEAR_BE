@@ -27,12 +27,15 @@ public class UserController {
     //api/users/{userId}
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable Long userId) {
-        UserResponseDto userResponseDto=userService.getMyPageUserResponseDto(userId);
+        UserResponseDto userResponseDto;
 
-        if (userResponseDto != null)
-            return ResponseEntity.ok(userResponseDto);
-        else
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("서버 오류가 발생했습니다. 나중에 다시 시도해주세요.");
+        try{
+            userResponseDto=userService.getMyPageUserResponseDto(userId);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(userResponseDto);
     }
 }
