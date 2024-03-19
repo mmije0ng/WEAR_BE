@@ -1,7 +1,7 @@
 package com.backend.wear.controller;
 
+
 import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
@@ -64,7 +64,7 @@ public class ProductController {
     // api/products/{productId}
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId){
-        ProductPostResponseDto productPost;
+        ProductResponseDto productPost;
         try {
             productPost = productService.getProductPost(productId);
         } catch (IllegalArgumentException e) {

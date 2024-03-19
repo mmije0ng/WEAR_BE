@@ -14,6 +14,7 @@ import java.util.List;
 
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -89,6 +90,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Donation> donationList=new ArrayList<>();
+
+    //기부 신청 내역
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<DonationApply> donationApplyList=new ArrayList<>();
 
     //찜목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
