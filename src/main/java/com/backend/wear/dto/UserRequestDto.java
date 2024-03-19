@@ -1,6 +1,5 @@
 package com.backend.wear.dto;
 
-import com.backend.wear.entity.Style;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -20,5 +19,5 @@ public class UserRequestDto {
     private String userName; //사용자 이름
     private String nickName;
     private  String profileImage;
-    private StyleDto style; //스타일 태그
+    private List<String> style; //스타일 태그 이름 리스트
 }

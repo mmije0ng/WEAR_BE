@@ -21,7 +21,7 @@ public class UserResponseDto {
     private String userName; //사용자 이름
     private String nickName;
     private String universityName;
-    private List<Style> style; //스타일 태그
+    private List<String> style; //스타일 태그 이름 리스트
     private String profileImage;
     private String level;
     private String nextLevel;

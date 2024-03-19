@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -28,4 +29,8 @@ public class Style extends BaseEntity {
     @ManyToOne
     @JoinColumn(name="user_id")
     User user;
+
+    public Style(String styleName){
+        this.styleName=styleName;
+    }
 }

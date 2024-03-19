@@ -12,20 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UniversityRepository universityRepository;
     private final StyleRepository styleRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, UniversityRepository universityRepository,
+    public UserService(UserRepository userRepository,
                        StyleRepository styleRepository){
         this.userRepository=userRepository;
-        this.universityRepository=universityRepository;
         this.styleRepository=styleRepository;
     }
 
@@ -56,7 +55,7 @@ public class UserService {
         user.setUserName(userRequestDto.getUserName());
         user.setNickName(userRequestDto.getNickName());
         user.setProfileImage(userRequestDto.getProfileImage());
-  //      user.setStyle(userRequestDto.getStyle());
+        setProfileStyle(user,userRequestDto.getStyle());
 
         try {
             userRepository.save(user); // 변경된 엔티티를 저장
@@ -65,9 +64,10 @@ public class UserService {
         }
     }
 
+    //마이페이지 응답 dto
     private UserResponseDto mapToUserResponseDtoMyPage(User user, Long userId) {
         String universityName = getUniversityNameByUser(userId); //대학 이름
-        List<Style> styleList = getUserStyleList(userId); //스타일 리스트
+        List<String> style = getUserStyleList(userId); //스타일 리스트
 
         String level=getCurrentLevel(userId); //현재 레벨
         String nextLevel=getNextLevel(level); //다음 레벨
@@ -78,7 +78,7 @@ public class UserService {
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
-                .style(styleList)
+                .style(style)
                 .profileImage(user.getProfileImage())
                 .level(level)
                 .nextLevel(nextLevel)
@@ -87,8 +87,9 @@ public class UserService {
                 .build();
     }
 
+    //사용자 프로필 응답 dto
     private UserResponseDto mapToUserResponseDtoProfile(User user, Long userId) {
-        List<Style> styleList = getUserStyleList(userId); //스타일 리스트
+        List<String> styleList = getUserStyleList(userId); //스타일 리스트
 
         return UserResponseDto.builder()
                 .userName(user.getUserName())
@@ -98,17 +99,42 @@ public class UserService {
                 .build();
     }
 
-//    private
-
     //대학교 이름 조회
     private String getUniversityNameByUser(Long id){
         return userRepository.findById(id).get().
                 getUniversity().getUniversityName();
     }
 
-    //스타일 조회
-    private List getUserStyleList(Long userId){
-        return styleRepository.findAllByUserId(userId);
+    //스타일 태그 이름으로 Style 저장
+    private void setProfileStyle (User user, List<String> style){
+        List<Style> newStyles = new ArrayList<>();
+        for (String styleName : style) {
+            // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
+            Style s = styleRepository.findByStyleName(styleName)
+                    .orElse(new Style(styleName));
+
+            // Style 객체와 User 객체의 연관 관계 설정
+            s.setUser(user);
+            newStyles.add(s);
+        }
+
+        // 기존의 Style을 삭제하고 새로운 Style을 설정
+        user.setStyle(newStyles);
+    }
+
+
+    //스타일 태그 이름만 조회
+    private List<String> getUserStyleList(Long userId){
+        List<Style> allStyle = styleRepository.findByUserId(userId);
+
+        //Style 태그에서 styleName만 추출
+        List<String> style = new ArrayList<>();
+
+        for(Style s: allStyle){
+            style.add(s.getStyleName());
+        }
+
+        return style;
     }
 
     //현재 레벨 조회

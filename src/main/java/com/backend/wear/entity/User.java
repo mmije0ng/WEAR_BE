@@ -101,6 +101,13 @@ public class User extends BaseEntity {
     @ToString.Exclude
     private List<Wish> wishList=new ArrayList<>();
 
+
+    // 스타일 필드를 갱신하는 메서드
+    public void updateStyle(List<Style> newStyleList) {
+        this.style.clear(); // 현재 스타일 목록 비우기
+        this.style.addAll(newStyleList); // 새로운 스타일 목록 추가
+    }
+
     //차단한 사용자 이름
 //    @Column(name="blocked_user_name")
 //    private List <String> blockedUserNameList=new ArrayList<>();

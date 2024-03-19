@@ -17,5 +17,5 @@ import java.util.List;
 public class StyleDto {
     //스타일 태그 이름만 dto로
 
-    private List<String> styleList;
+    private List<String> style;
 }
