@@ -24,6 +24,7 @@ public class UserController {
     }
 
     //마이페이지 사용자 정보
+    //api/users/{userId}
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable Long userId) {
         UserResponseDto userResponseDto=userService.getMyPageUserResponseDto(userId);
