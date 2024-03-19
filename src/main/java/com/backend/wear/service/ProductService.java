@@ -7,7 +7,9 @@ import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
 import com.backend.wear.entity.Wish;
 import com.backend.wear.repository.ProductRepository;
+import com.backend.wear.repository.UserRepository;
 import com.backend.wear.repository.WishRepository;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -89,7 +91,7 @@ public class ProductService {
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected = wishRepository.findByProductId(product.getId())
                 .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
-                .orElse(false); // 기본값으로 false를 반환
+                .orElse(false); // 기본값으로 false를 반 환
 
         return ProductResponseDto.builder()
                 .id(product.getId())
