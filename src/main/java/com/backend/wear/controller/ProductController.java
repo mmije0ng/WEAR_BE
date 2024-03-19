@@ -70,4 +70,17 @@ public class ProductController {
         }
         return ResponseEntity.ok(productPost);
     }
+
+    @PostMapping("/new/{userId}")
+    public ResponseEntity postProductPost(@PathVariable("userId") Long userId){
+        ProductPostRequestDto productPost;
+        try {
+            productPost = productService.getProductPost(productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(productPost);
+
+    }
 }
