@@ -1,5 +1,6 @@
 package com.backend.wear.service;
 
+import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.dto.UserResponseDto;
 import com.backend.wear.entity.Product;
@@ -17,16 +18,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+
+
+
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
+    private final UserRepository userRepository;
+
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
+        this.userRepository = userRepository;
     }
 
     //카테고리별, 최신순
@@ -130,4 +137,30 @@ public class ProductService {
         return PageRequest.of(pageNumber,12,
                 Sort.by("updatedAt").descending());
     }
+
+    //상품 등록하기
+
+    @Transactional
+    public void createProductPost(ProductPostRequestDto requestDTO, Long userId) throws Exception {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+            // Create a new Product object using data from the provided Product object
+            Product newProduct = Product.builder()
+                    .productName(requestDTO.getProductName())
+                    .price(requestDTO.getPrice())
+                    .productImage(requestDTO.getProductImage())
+                    .productContent(requestDTO.getProductContent())
+                    .productStatus(requestDTO.getProductStatus())
+                    .place(requestDTO.getPlace())
+                    .user(user)
+                    .category(requestDTO.getCategory())
+                    .build();
+
+            productRepository.save(newProduct);
+
+    }
+
+
 }
