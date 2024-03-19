@@ -77,7 +77,7 @@ public class ProductService {
     @Transactional
     public ProductPostResponseDto getProductPost(Long productId){
         Product product  = productRepository.findById(productId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
 
         return mapToProductPostResponseDto(product);

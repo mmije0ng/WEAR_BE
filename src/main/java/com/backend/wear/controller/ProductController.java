@@ -61,12 +61,13 @@ public class ProductController {
     // api/products/{productId}
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId){
-        ProductPostResponseDto produtPost=productService.getProductPost(productId);
-
-        if(produtPost!=null)
-            return ResponseEntity.ok(produtPost);
-        else
-           return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("상품을 찾지 못하였습니다.");
+        ProductPostResponseDto productPost;
+        try {
+            productPost = productService.getProductPost(productId);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ex.getMessage());
+        }
+        return ResponseEntity.ok(productPost);
     }
 }
