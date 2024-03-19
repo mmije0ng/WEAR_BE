@@ -15,11 +15,15 @@ import lombok.NoArgsConstructor;
 public class ProductResponseDto{
 
     //상품 조회 시 응답  dto
-    private Long id;
+    private Long id;  //상품 아이디
     private Integer price;
     private String productName;
     private String productStatus;
     private String postStatus;
     private String productImage;
     private boolean isSelected;
+
+    private UserResponseDto seller; //판매자
+    private String productContent;
+    private String place; //거래 장소
 }

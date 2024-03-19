@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserResponseDto {
+    private Long id; //pk
     private String userName; //사용자 이름
     private String nickName;
     private String universityName;
