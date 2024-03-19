@@ -18,10 +18,10 @@ public class TestController {
         return "api/products/new/"+id;
     }
 
-    @PostMapping("api/products/new/{userId}")
+   /* @PostMapping("api/products/new/{userId}")
     public String testProuctPost(@PathVariable("userId") Long id){
         return "api/products/new/"+id;
-    }
+    }*/
 
     @GetMapping("api/users/profile/{userId}")
     public String testGetprofile(@PathVariable("userId") Long id){

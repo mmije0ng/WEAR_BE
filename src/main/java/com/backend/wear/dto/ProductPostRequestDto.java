@@ -35,4 +35,6 @@ public class ProductPostRequestDto {
     private User user;
     //카테고리
     private Category category;
+
+
 }

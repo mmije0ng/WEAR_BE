@@ -1,12 +1,15 @@
 package com.backend.wear.controller;
 
+import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -72,15 +75,14 @@ public class ProductController {
     }
 
     @PostMapping("/new/{userId}")
-    public ResponseEntity postProductPost(@PathVariable("userId") Long userId){
-        ProductPostRequestDto productPost;
+    public ResponseEntity<?> postProductPost(@PathVariable Long userId ,@RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
         try {
-            productPost = productService.getProductPost(productId);
+            productService.createProductPost(requestDTO,userId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        return ResponseEntity.ok(productPost);
+        return ResponseEntity.ok(HttpStatus.CREATED);
 
     }
 }

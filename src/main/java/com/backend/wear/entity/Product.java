@@ -94,4 +94,21 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<ProductChatRoom> chatRoomList=new ArrayList<>();
+
+    @Builder
+    public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category, Wish wish, Count count) {
+        this.productName = productName;
+        this.price = price;
+        this.productImage = productImage;
+        this.productContent = productContent;
+        this.productStatus = productStatus;
+        this.postStatus = postStatus;
+        this.place = place;
+        this.isPrivate = isPrivate;
+        this.user = user;
+        this.category = category;
+        this.wish = wish;
+        this.count = count;
+    }
+
 }
