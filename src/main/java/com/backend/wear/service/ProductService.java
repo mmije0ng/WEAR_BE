@@ -20,9 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 
-import static com.backend.wear.entity.Product.*;
 
 @Service
 public class ProductService {
@@ -92,7 +90,7 @@ public class ProductService {
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected = wishRepository.findByProductId(product.getId())
                 .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
-                .orElse(false); // 기본값으로 false를 반환
+                .orElse(false); // 기본값으로 false를 반 환
 
         return ProductResponseDto.builder()
                 .id(product.getId())
