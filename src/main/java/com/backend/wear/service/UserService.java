@@ -1,9 +1,7 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.ProductPostResponseDto;
-import com.backend.wear.dto.UserPostResponseDto;
+import com.backend.wear.dto.UserRequestDto;
 import com.backend.wear.dto.UserResponseDto;
-import com.backend.wear.entity.Product;
 import com.backend.wear.entity.Style;
 import com.backend.wear.entity.User;
 import com.backend.wear.repository.StyleRepository;
@@ -11,12 +9,10 @@ import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -35,14 +31,41 @@ public class UserService {
 
     //마이페이지 사용자 정보
     @Transactional
-    public UserResponseDto getMyPageUserResponseDto(Long userId){
+    public UserResponseDto getMyPageUserService(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        return mapToUserPostResponseDto(user, userId);
+        return mapToUserResponseDtoProfile(user, userId);
     }
 
-    private UserResponseDto mapToUserPostResponseDto(User user, Long userId) {
+    //마이페이지 프로필
+    @Transactional
+    public UserResponseDto getUserProfileService(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return mapToUserResponseDtoProfile(user, userId);
+    }
+
+    //마이페이지 프로필 수정
+    @Transactional
+    public void updateUserProfile(Long userId, UserRequestDto userRequestDto){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setUserName(userRequestDto.getUserName());
+        user.setNickName(userRequestDto.getNickName());
+        user.setProfileImage(userRequestDto.getProfileImage());
+  //      user.setStyle(userRequestDto.getStyle());
+
+        try {
+            userRepository.save(user); // 변경된 엔티티를 저장
+        } catch (DataAccessException e) {
+            throw new IllegalStateException("회원 정보 변경에 실패했습니다.");
+        }
+    }
+
+    private UserResponseDto mapToUserResponseDtoMyPage(User user, Long userId) {
         String universityName = getUniversityNameByUser(userId); //대학 이름
         List<Style> styleList = getUserStyleList(userId); //스타일 리스트
 
@@ -63,6 +86,19 @@ public class UserService {
                 .remainLevelPoint(remainLevelPoint)
                 .build();
     }
+
+    private UserResponseDto mapToUserResponseDtoProfile(User user, Long userId) {
+        List<Style> styleList = getUserStyleList(userId); //스타일 리스트
+
+        return UserResponseDto.builder()
+                .userName(user.getUserName())
+                .nickName(user.getNickName())
+                .style(styleList)
+                .profileImage(user.getProfileImage())
+                .build();
+    }
+
+//    private
 
     //대학교 이름 조회
     private String getUniversityNameByUser(Long id){

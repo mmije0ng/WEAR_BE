@@ -1,13 +1,11 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
-import com.backend.wear.dto.UserPostResponseDto;
+import com.backend.wear.dto.UserResponseDto;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
 import com.backend.wear.entity.Wish;
 import com.backend.wear.repository.ProductRepository;
-import com.backend.wear.repository.UserRepository;
 import com.backend.wear.repository.WishRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -75,7 +71,7 @@ public class ProductService {
 
     //상품 상세 조회
     @Transactional
-    public ProductPostResponseDto getProductPost(Long productId){
+    public ProductResponseDto getProductPost(Long productId){
         Product product  = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
@@ -99,15 +95,15 @@ public class ProductService {
     }
 
     //상세 페이지 상품 dto
-    private ProductPostResponseDto mapToProductPostResponseDto(Product product) {
+    private ProductResponseDto mapToProductPostResponseDto(Product product) {
         User user = productRepository.findUserById(product.getId())
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         //판매자
-        UserPostResponseDto seller =mapToUserPostResponseDto(user);
+        UserResponseDto seller =mapToUserPostResponseDto(user);
 
         //상품
-        return ProductPostResponseDto.builder()
+        return ProductResponseDto.builder()
                 .id(product.getId())
                 .seller(seller)
                 .price(product.getPrice())
@@ -120,12 +116,12 @@ public class ProductService {
     }
 
     //상품 상세 페이지에서 사용자 정보
-    private UserPostResponseDto mapToUserPostResponseDto(User user){
-        return UserPostResponseDto.builder()
+    private UserResponseDto mapToUserPostResponseDto(User user){
+        return UserResponseDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
                 .profileImage(user.getProfileImage())
-                .level(user.getLevel())
+                .level(user.getLevel().getLabel())
                 .build();
     }
 

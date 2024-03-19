@@ -1,6 +1,5 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.ProductPostResponseDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,7 @@ public class ProductController {
     // api/products/{productId}
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId){
-        ProductPostResponseDto productPost;
+        ProductResponseDto productPost;
         try {
             productPost = productService.getProductPost(productId);
         } catch (IllegalArgumentException e) {
