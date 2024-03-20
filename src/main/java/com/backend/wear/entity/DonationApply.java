@@ -26,11 +26,12 @@ public class DonationApply extends BaseEntity {
     private User user; //기부 신청자
 
     //기부 단체
-    @Column(name="charity_name")
-    private Integer charityName;
+    @Column(name="charity_number")
+    private Integer charityNumber;
 
     //신청자 이름
-    private String name;
+    @Column(name="user_name")
+    private String userName;
 
     //방문 주소
     private String address;
@@ -56,4 +57,18 @@ public class DonationApply extends BaseEntity {
     //박스 수량
     @Column(name="box_count")
     private Integer boxCount;
+
+    @Builder
+    public DonationApply(User user, Integer charityNumber, String userName, String address, String phone,
+                         String donationItem, Integer clothesCount, Integer fashionCount, Integer boxCount){
+        this.user=user;
+        this.charityNumber=charityNumber;
+        this.userName=userName;
+        this.address=address;
+        this.phone=phone;
+        this.donationItem=donationItem;
+        this.clothesCount=clothesCount;
+        this.fashionCount=fashionCount;
+        this.boxCount=boxCount;
+    }
 }
