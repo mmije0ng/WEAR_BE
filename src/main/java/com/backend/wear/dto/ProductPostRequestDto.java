@@ -34,7 +34,7 @@ public class ProductPostRequestDto {
     //판매자
     private User user;
     //카테고리
-    private Category category;
+    private Long categoryId;
 
 
 }

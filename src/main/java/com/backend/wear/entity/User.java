@@ -50,7 +50,7 @@ public class User extends BaseEntity {
     private String nickName;
 
     //대학교 이메일
-    @NotNull
+
     @Column(name="university_email",unique = true)
     private String universityEmail;
 
