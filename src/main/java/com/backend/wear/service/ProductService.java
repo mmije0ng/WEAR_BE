@@ -3,9 +3,11 @@ package com.backend.wear.service;
 import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.dto.UserResponseDto;
+import com.backend.wear.entity.Category;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
 import com.backend.wear.entity.Wish;
+import com.backend.wear.repository.CategoryRepository;
 import com.backend.wear.repository.ProductRepository;
 import com.backend.wear.repository.UserRepository;
 import com.backend.wear.repository.WishRepository;
@@ -29,13 +31,15 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,CategoryRepository categoryRepository){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     //카테고리별, 최신순
@@ -148,6 +152,9 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
+        Category category = categoryRepository.findById(requestDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾지 못하였습니다."));
+
             // Create a new Product object using data from the provided Product object
             Product newProduct = Product.builder()
                     .productName(requestDTO.getProductName())
@@ -157,7 +164,7 @@ public class ProductService {
                     .productStatus(requestDTO.getProductStatus())
                     .place(requestDTO.getPlace())
                     .user(user)
-                    .category(requestDTO.getCategory())
+                    .category(category)
                     .build();
 
             productRepository.save(newProduct);
