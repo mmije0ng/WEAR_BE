@@ -191,7 +191,7 @@ public class UserService {
                     .date(date)
                     .clothesCount(donationApply.getClothesCount())
                     .fashionCount(donationApply.getFashionCount())
-                    .isDonationComplete(donationApply.isDonationStatus())
+                    .isDonationComplete(donationApply.isDonationComplete())
                     .build();
 
             responseDtoList.add(dto);
@@ -208,7 +208,7 @@ public class UserService {
 
         for(int i=0;i<donationApplyList.size();i++){
             DonationApply donationApply = donationApplyList.get(i);
-            if(!donationApply.isDonationStatus())
+            if(!donationApply.isDonationComplete())
                 continue;;
             String date= donationApply.getCreatedAt()
                     .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
@@ -218,7 +218,7 @@ public class UserService {
                     .date(date)
                     .clothesCount(donationApply.getClothesCount())
                     .fashionCount(donationApply.getFashionCount())
-                    .isDonationComplete(donationApply.isDonationStatus())
+                    .isDonationComplete(donationApply.isDonationComplete())
                     .build();
 
             responseDtoList.add(dto);

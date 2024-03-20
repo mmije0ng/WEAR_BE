@@ -57,8 +57,8 @@ public class DonationApply extends BaseEntity {
     private Integer boxCount;
 
     //기부 상태, 완료/미완료
-    @Column(name="donation_status", columnDefinition = "boolean default false")
-    private boolean donationStatus;
+    @Column(name="is_donation_complete", columnDefinition = "boolean default false")
+    private boolean isDonationComplete;
 
     @Builder
     public DonationApply(User user, Integer charityNumber, String userName, String address, String phone,
@@ -72,6 +72,6 @@ public class DonationApply extends BaseEntity {
         this.clothesCount=clothesCount;
         this.fashionCount=fashionCount;
         this.boxCount=boxCount;
-        this.donationStatus=false;
+        this.isDonationComplete=false;
     }
 }
