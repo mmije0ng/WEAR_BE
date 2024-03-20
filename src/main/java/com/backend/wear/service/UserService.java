@@ -1,9 +1,14 @@
 package com.backend.wear.service;
 
+import com.backend.wear.dto.DonationApplyResponseDto;
+import com.backend.wear.dto.UserPasswordDto;
 import com.backend.wear.dto.UserRequestDto;
 import com.backend.wear.dto.UserResponseDto;
+import com.backend.wear.entity.DonationApply;
 import com.backend.wear.entity.Style;
+import com.backend.wear.entity.University;
 import com.backend.wear.entity.User;
+import com.backend.wear.repository.DonationApplyRepository;
 import com.backend.wear.repository.StyleRepository;
 import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
@@ -12,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +26,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StyleRepository styleRepository;
+    private final UniversityRepository universityRepository;
+
+    private final DonationApplyRepository donationApplyRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository,
-                       StyleRepository styleRepository){
+    public UserService(UserRepository userRepository,StyleRepository styleRepository,
+                       UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
+        this.universityRepository=universityRepository;
+        this.donationApplyRepository=donationApplyRepository;
     }
 
     //마이페이지 사용자 정보
@@ -64,6 +75,61 @@ public class UserService {
         }
     }
 
+    //정보 조회
+    @Transactional
+    public UserResponseDto getUserInfo(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return mapToUserResponseDtoInfo(user,userId);
+    }
+
+    //정보 저장
+    @Transactional
+    public void updateUserInfo(Long userId, UserRequestDto dto){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setUserName(dto.getUserName());
+        user.setUniversityEmail(dto.getUniversityEmail());
+        updateUniversityName(userId, dto.getUniversityName());
+    }
+
+    //비밀번호 변경
+    @Transactional
+    public void updatePassword(Long userId, UserPasswordDto dto){
+        if (!dto.getNewPassword().equals(dto.getCheckPassword()))
+            throw new IllegalArgumentException("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setUserPassword(dto.getCheckPassword());
+        userRepository.save(user);
+    }
+
+    //내 기부 내역
+    @Transactional
+    public List<DonationApplyResponseDto> getMyDonationApplyService(Long userId){
+        List<DonationApplyResponseDto> responseDtoList =mapToDonationApplyResponseDto(userId);
+
+        if(responseDtoList.isEmpty())
+            throw new IllegalArgumentException("현재 기부한 상품이 없습니다. 기부를 통해 환경을 도와주세요.");
+        else
+            return responseDtoList;
+    }
+
+    @Transactional
+    public List<DonationApplyResponseDto> getMyDonationApplyCompleteService(Long userId){
+        List<DonationApplyResponseDto> responseDtoList
+                = mapToDonationApplyResponseDtoComplete(userId);
+        if(responseDtoList.isEmpty())
+            throw new IllegalArgumentException("현재 기부 진행이 완료된 내역이 없습니다.");
+        else
+            return responseDtoList;
+    }
+
     //마이페이지 응답 dto
     private UserResponseDto mapToUserResponseDtoMyPage(User user, Long userId) {
         String universityName = getUniversityNameByUser(userId); //대학 이름
@@ -99,10 +165,79 @@ public class UserService {
                 .build();
     }
 
+    //사용자 정보 info 응답 dto
+    private UserResponseDto mapToUserResponseDtoInfo(User user, Long userId){
+        String universityName=getUniversityNameByUser(userId);
+
+        return UserResponseDto.builder()
+                .userName(user.getUserName())
+                .universityName(universityName)
+                .universityEmail(user.getUniversityEmail())
+                .build();
+    }
+
+    //내 기부 내역 응답 dto
+    private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId){
+        List<DonationApply> donationApplyList=donationApplyRepository.findByUserId(userId);
+        List<DonationApplyResponseDto> responseDtoList = new ArrayList<>();
+
+        for(int i=0;i<donationApplyList.size();i++){
+            DonationApply donationApply = donationApplyList.get(i);
+            String date= donationApply.getCreatedAt()
+                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
+            DonationApplyResponseDto dto= DonationApplyResponseDto.builder()
+                    .id(donationApply.getId())
+                    .date(date)
+                    .clothesCount(donationApply.getClothesCount())
+                    .fashionCount(donationApply.getFashionCount())
+                    .isDonationComplete(donationApply.isDonationStatus())
+                    .build();
+
+            responseDtoList.add(dto);
+        }
+
+        return responseDtoList;
+    }
+
+
+    //기부 내역 중 기부 완료만 보기
+    private List<DonationApplyResponseDto> mapToDonationApplyResponseDtoComplete(Long userId){
+        List<DonationApply> donationApplyList=donationApplyRepository.findByUserId(userId);
+        List<DonationApplyResponseDto> responseDtoList = new ArrayList<>();
+
+        for(int i=0;i<donationApplyList.size();i++){
+            DonationApply donationApply = donationApplyList.get(i);
+            if(!donationApply.isDonationStatus())
+                continue;;
+            String date= donationApply.getCreatedAt()
+                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
+            DonationApplyResponseDto dto= DonationApplyResponseDto.builder()
+                    .id(donationApply.getId())
+                    .date(date)
+                    .clothesCount(donationApply.getClothesCount())
+                    .fashionCount(donationApply.getFashionCount())
+                    .isDonationComplete(donationApply.isDonationStatus())
+                    .build();
+
+            responseDtoList.add(dto);
+        }
+
+        return responseDtoList;
+    }
+
     //대학교 이름 조회
     private String getUniversityNameByUser(Long id){
         return userRepository.findById(id).get().
                 getUniversity().getUniversityName();
+    }
+
+    //대학교 이름 변경 (일단 인증 절차X)
+    private void updateUniversityName(Long userId, String universityName){
+        University university = userRepository.findById(userId).get().getUniversity();
+        university.setUniversityName(universityName);
+        universityRepository.save(university);
     }
 
     //스타일 태그 이름으로 Style 저장

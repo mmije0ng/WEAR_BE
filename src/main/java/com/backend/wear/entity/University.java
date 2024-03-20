@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -30,7 +30,6 @@ public class University extends BaseEntity {
 
     //대학교 학생들
     @OneToMany(mappedBy = "university", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<User> userList = new ArrayList<>();
 
     //대학교 환경 점수, 기부 횟수, 등..

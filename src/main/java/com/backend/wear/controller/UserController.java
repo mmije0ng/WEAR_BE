@@ -1,5 +1,7 @@
 package com.backend.wear.controller;
 
+import com.backend.wear.dto.DonationApplyResponseDto;
+import com.backend.wear.dto.UserPasswordDto;
 import com.backend.wear.dto.UserRequestDto;
 import com.backend.wear.dto.UserResponseDto;
 import com.backend.wear.service.UserService;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -67,5 +70,91 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
+    }
+
+    //계정 정보
+    // api/users/userInfo/{userId}
+    @GetMapping("/userInfo/{userId}")
+    public ResponseEntity<?> getUserInfo(@PathVariable Long userId){
+        UserResponseDto userResponseDto;
+
+        try{
+            userResponseDto=userService.getUserInfo(userId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+    //계정 정보 저장
+    // api/users/userInfo/{userId}
+    @PutMapping("/userInfo/{userId}")
+    public ResponseEntity<?> putUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto userRequestDto){
+        try {
+            userService.updateUserInfo(userId, userRequestDto);
+            return ResponseEntity.ok().body("사용자 이름이 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //비밀번호 변경하기
+    // api/users/password/{userId}
+    @PutMapping ("/password/{userId}")
+    public ResponseEntity<?> putPassword(@PathVariable Long userId, @RequestBody UserPasswordDto userPasswordDto){
+        try {
+            userService.updatePassword(userId, userPasswordDto);
+            return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 내 기부 내역 불러오기
+    // api/users/myDonations/{userId}
+    @GetMapping ("/myDonations/{userId}")
+    public ResponseEntity<?> getMyDonationApply(@PathVariable Long userId){
+        try {;
+            List <DonationApplyResponseDto> responseDtoList
+                    =userService.getMyDonationApplyService(userId);
+            return ResponseEntity.ok().body(responseDtoList);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //내 기부 내역 중 기부 완료 된 상품만 불러오기
+    // api/users/complete/{userId}
+    @GetMapping ("/myDonations/complete/{userId}")
+    public ResponseEntity<?> getMyDonationCompleteApplyComplete(@PathVariable Long userId){
+        try {;
+            List <DonationApplyResponseDto> responseDtoList
+                    =userService.getMyDonationApplyCompleteService(userId);
+            return ResponseEntity.ok().body(responseDtoList);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //문의
+    @GetMapping("/help")
+    public ResponseEntity<?> helpPage(){
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("문의 페이지");
+    }
+
+    //서비스
+    @GetMapping("/service")
+    public ResponseEntity<?> servicePage(){
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body("서비스 페이지");
     }
 }
