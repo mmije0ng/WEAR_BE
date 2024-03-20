@@ -7,15 +7,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class StyleDto {
-    //스타일 태그 이름만 dto로
+public class DonationApplyRequestDto {
 
-    private List<String> style;
+    private String userName; //기부 신청자 이름
+    private String address;
+    private String phone;
+    private String email;
+    private String donationItem; //기부 품목
+    private Integer clothesCount; //의류 수량
+    private Integer fashionCount; //잡화 수량
+    private Integer boxCount; //박스 개수
 }

@@ -145,7 +145,6 @@ public class ProductService {
     }
 
     //상품 등록하기
-
     @Transactional
     public void createProductPost(ProductPostRequestDto requestDTO, Long userId) throws Exception {
 

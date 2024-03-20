@@ -8,7 +8,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -22,15 +21,15 @@ public class DonationApply extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name="user_id")
-    @ToString.Exclude
     private User user; //기부 신청자
 
     //기부 단체
-    @Column(name="charity_name")
-    private Integer charityName;
+    @Column(name="charity_number")
+    private Integer charityNumber;
 
     //신청자 이름
-    private String name;
+    @Column(name="user_name")
+    private String userName;
 
     //방문 주소
     private String address;
@@ -56,4 +55,23 @@ public class DonationApply extends BaseEntity {
     //박스 수량
     @Column(name="box_count")
     private Integer boxCount;
+
+    //기부 상태, 완료/미완료
+    @Column(name="is_donation_complete", columnDefinition = "boolean default false")
+    private boolean isDonationComplete;
+
+    @Builder
+    public DonationApply(User user, Integer charityNumber, String userName, String address, String phone,
+                         String donationItem, Integer clothesCount, Integer fashionCount, Integer boxCount){
+        this.user=user;
+        this.charityNumber=charityNumber;
+        this.userName=userName;
+        this.address=address;
+        this.phone=phone;
+        this.donationItem=donationItem;
+        this.clothesCount=clothesCount;
+        this.fashionCount=fashionCount;
+        this.boxCount=boxCount;
+        this.isDonationComplete=false;
+    }
 }

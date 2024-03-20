@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert //save할 때 null 값을 배제하고 insert
 @DynamicUpdate
@@ -68,7 +67,6 @@ public class User extends BaseEntity {
 
     //스타일
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Style> style = new ArrayList<>();
 
     //프로필 이미지
@@ -78,28 +76,30 @@ public class User extends BaseEntity {
     //대학교
     @ManyToOne
     @JoinColumn(name="university_id")
-    @ToString.Exclude
     University university;
 
     //판매 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Product> productList = new ArrayList<>();
 
     //기부 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Donation> donationList=new ArrayList<>();
 
     //기부 신청 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<DonationApply> donationApplyList=new ArrayList<>();
 
     //찜목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Wish> wishList=new ArrayList<>();
+
+
+    // 스타일 필드를 갱신하는 메서드
+    public void updateStyle(List<Style> newStyleList) {
+        this.style.clear(); // 현재 스타일 목록 비우기
+        this.style.addAll(newStyleList); // 새로운 스타일 목록 추가
+    }
 
     //차단한 사용자 이름
 //    @Column(name="blocked_user_name")

@@ -9,7 +9,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -25,7 +24,6 @@ public class Donation extends BaseEntity {
     //기부한 사람
     @ManyToOne
     @JoinColumn(name="user_id")
-    @ToString.Exclude
     private User user;
 
     //기부 번호
@@ -44,6 +42,6 @@ public class Donation extends BaseEntity {
     private String donationImage;
 
     //기부 상태, 완료/미완료
-    @Column(name="donation_status", columnDefinition = "boolean default false")
-    private boolean donationStatus;
+    @Column(name="is_donation_complete", columnDefinition = "boolean default false")
+    private boolean isDonationComplete;;
 }
