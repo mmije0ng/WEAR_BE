@@ -9,20 +9,26 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
 
 @Getter
-@MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(value = {AuditingEntityListener.class})
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
-    @Column(name = "CREATED_AT", nullable = false, updatable = false)
+    @Column(name = "CREATED_AT", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    //@Column(name = "CREATED_AT", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreatedDate
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
-    @Column(name = "UPDATED_AT", nullable = false)
+    @Column(name = "UPDATED_AT", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
+
+
 }
+
+
