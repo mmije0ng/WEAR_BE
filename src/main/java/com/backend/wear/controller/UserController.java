@@ -1,9 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.DonationApplyResponseDto;
-import com.backend.wear.dto.UserPasswordDto;
-import com.backend.wear.dto.UserRequestDto;
-import com.backend.wear.dto.UserResponseDto;
+import com.backend.wear.dto.*;
 import com.backend.wear.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -113,6 +110,74 @@ public class UserController {
                     .body(e.getMessage());
         }
     }
+
+    //찜한 상품 리스트
+    // api/users/wishList/{userId}
+    @GetMapping("/wishList/{userId}")
+    public ResponseEntity<?> getWishList(@PathVariable Long userId){
+        try {
+            List<ProductResponseDto> wishList = userService.getWishListService(userId);
+            return ResponseEntity.ok(wishList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //판매 중 상품 불러오기
+    // api/users/myProducts/onSale/{userId}
+    @GetMapping("/myProducts/onSale/{userId}")
+    public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId){
+        try{
+            List<ProductResponseDto> myProductList = userService.myProductsService(userId,"onSale");
+            return ResponseEntity.ok(myProductList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //판매 중인 상품 판매 완료하기
+    // api/users/myProducts/onSale/{userId}
+    @PutMapping("/myProducts/onSale/{userId}")
+    public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
+                                                 @RequestBody ProductRequestDto productRequestDto){
+        try{
+            userService.postMyProductStatusService(userId,productRequestDto);
+            return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //판매 완료 상품 불러오기
+    // api/users/myProducts/soldOut/{userId}
+    @GetMapping("/myProducts/soldOut/{userId}")
+    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable Long userId){
+        try{
+            List<ProductResponseDto> myProductList = userService.myProductsService(userId,"soldOut");
+            return ResponseEntity.ok(myProductList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //숨김 처리 상품 불러오기
+    // api/users/myProducts/private/{userId}
+    @GetMapping("/myProducts/private/{userId}")
+    public ResponseEntity<?> getMyProductsPrivate(@PathVariable Long userId){
+
+        try{
+            List<ProductResponseDto> privateList = userService.getMyProductsPrivateService(userId);
+            return ResponseEntity.ok(privateList);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
 
     // 내 기부 내역 불러오기
     // api/users/myDonations/{userId}

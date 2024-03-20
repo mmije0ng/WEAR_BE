@@ -3,6 +3,7 @@ package com.backend.wear.dto;
 
 import com.backend.wear.entity.Category;
 import com.backend.wear.entity.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductPostRequestDto {
     //상품 등록시 요청 dto
