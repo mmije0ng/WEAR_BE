@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-
+import java.util.Optional;
 
 
 @Service
@@ -152,8 +152,11 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
-        Category category = categoryRepository.findById(requestDTO.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾지 못하였습니다."));
+        Category category = categoryRepository.findByCategoryName(requestDTO.getCategoryName());
+
+        if (category == null) {
+            throw new IllegalArgumentException("해당 카테고리를 찾지 못하였습니다.");
+        }
 
             // Create a new Product object using data from the provided Product object
             Product newProduct = Product.builder()
