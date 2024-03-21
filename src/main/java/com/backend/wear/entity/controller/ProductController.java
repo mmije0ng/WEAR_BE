@@ -1,4 +1,4 @@
-package com.backend.wear.controller;
+package com.backend.wear.entity.controller;
 
 import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductResponseDto;

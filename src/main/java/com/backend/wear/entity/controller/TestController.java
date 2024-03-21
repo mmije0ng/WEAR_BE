@@ -1,4 +1,4 @@
-package com.backend.wear.controller;
+package com.backend.wear.entity.controller;
 
 import org.springframework.web.bind.annotation.*;
 
