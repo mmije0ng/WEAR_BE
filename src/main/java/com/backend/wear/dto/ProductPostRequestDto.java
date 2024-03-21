@@ -35,6 +35,8 @@ public class ProductPostRequestDto {
     private String place;
     //판매자
     private User user;
-    //카테고리
-    private Long categoryId;
+    //카테고리 이름
+    private String categoryName;
+
+
 }

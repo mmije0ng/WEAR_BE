@@ -35,4 +35,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // User 클래스의 id와 Product 클래스의 isPrivate 필드가 true
     List<Product> findByUser_IdAndIsPrivateTrue(Long userId);
+
 }
