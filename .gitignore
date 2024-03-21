@@ -1,11 +1,11 @@
 HELP.md
 .gradle
 build/
-<<<<<<< HEAD
+
 !gradle/wrapper/gradle-wrapper.jar
-=======
-!../gradle/wrapper/gradle-wrapper.jar
->>>>>>> 338d23f87f4590bfc2a4b9bee9601b2cc34c0f4a
+
+
+
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -41,13 +41,13 @@ out/
 ### VS Code ###
 .vscode/
 
-<<<<<<< HEAD
+
 
 ### application ###
 /src/main/resources/application-local.yml
-/src/main/resources/application.yml
-=======
-##application##
+/src/main/resources/application-prod.yml
 
-/src/main/resources/
->>>>>>> 3f1fef1f6912bb40ec5bdd899a45b7eed4f0318b
+
+
+
+
