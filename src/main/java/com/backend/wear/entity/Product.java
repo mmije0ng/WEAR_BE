@@ -89,7 +89,7 @@ public class Product extends BaseEntity {
 
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductChatRoom> chatRoomList=new ArrayList<>();
+    private List<ChatRoom> chatRoomList=new ArrayList<>();
 
     @Builder
     public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category, Wish wish, Count count) {
