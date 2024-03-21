@@ -18,9 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -45,19 +48,28 @@ public class ProductService {
         Page<Product> productsPage;
 
         //카테고리가 전체 일 때
-        if(categoryName.equals("전체")){
-            productsPage = productRepository.findAll(pageRequest(pageNumber));
+        if (categoryName.equals("전체")){
+            productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
+            productsPage = PageableExecutionUtils.getPage(
+                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
+                    pageRequest(pageNumber),
+                    productsPage::getTotalElements
+            );
 
             return productsPage.map(this::mapToProductResponseDto);
         }
 
         else{ //카테고리별
-            productsPage = productRepository.findByCategory_CategoryName(categoryName,pageRequest(pageNumber));
+            productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
+            productsPage = PageableExecutionUtils.getPage(
+                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
+                    pageRequest(pageNumber),
+                    productsPage::getTotalElements
+            );
 
             return productsPage.map(this::mapToProductResponseDto);
         }
     }
-
 
     //카테고리별, 판매중, 최신순
     @Transactional
@@ -67,13 +79,23 @@ public class ProductService {
         //전체, 판매중, 최신순
         if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatus(postStatus,pageRequest(pageNumber));
+                    .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
+            productsPage = PageableExecutionUtils.getPage(
+                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
+                    pageRequest(pageNumber),
+                    productsPage::getTotalElements
+            );
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                .findByPostStatusAndCategory_CategoryName(postStatus,categoryName,pageRequest(pageNumber));
+                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
+            productsPage = PageableExecutionUtils.getPage(
+                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
+                    pageRequest(pageNumber),
+                    productsPage::getTotalElements
+            );
         }
 
         return productsPage.map(this::mapToProductResponseDto);
@@ -89,6 +111,7 @@ public class ProductService {
         return mapToProductPostResponseDto(product);
     }
 
+    //카테고리 검색 dto
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected = wishRepository.findByProductId(product.getId())
                 .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
