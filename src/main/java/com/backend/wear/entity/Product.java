@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -77,22 +76,18 @@ public class Product extends BaseEntity {
     //카테고리
     @ManyToOne
     @JoinColumn(name="category_id")
-    @ToString.Exclude
     private Category category;
 
     //찜
     @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Wish wish;
 
     //찜 횟수, 조회수
     @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Count count;
 
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<ProductChatRoom> chatRoomList=new ArrayList<>();
 
     @Builder

@@ -11,9 +11,9 @@ import java.util.List;
 
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -30,7 +30,6 @@ public class University extends BaseEntity {
     private String universityName;
 
     @OneToMany(mappedBy = "university", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<User> userList = new ArrayList<>();
 }
 

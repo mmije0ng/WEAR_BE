@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode(callSuper = true)
 @DynamicInsert
 @DynamicUpdate
@@ -30,7 +29,6 @@ public class Wish extends Serializers.Base {
     //사용자
     @ManyToOne
     @JoinColumn(name="user_id")
-    @ToString.Exclude
     private User user;
 
     //상품

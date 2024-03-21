@@ -7,15 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class StyleDto {
-    //스타일 태그 이름만 dto로
-
-    private List<String> style;
+public class UserPasswordDto {
+    private String newPassword;
+    private String checkPassword;
 }

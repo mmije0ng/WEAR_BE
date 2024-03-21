@@ -1,6 +1,5 @@
 package com.backend.wear.controller;
 
-
 import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.ProductService;
@@ -75,7 +74,7 @@ public class ProductController {
     }
 
     @PostMapping("/new/{userId}")
-    public ResponseEntity<?> postProductPost(@PathVariable Long userId ,@RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
+    public ResponseEntity<?> postProductPost(@PathVariable Long userId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
         try {
             productService.createProductPost(requestDTO,userId);
         } catch (IllegalArgumentException e) {
@@ -85,4 +84,5 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.CREATED);
 
     }
+
 }
