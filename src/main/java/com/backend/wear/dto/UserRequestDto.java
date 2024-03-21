@@ -24,6 +24,7 @@ public class UserRequestDto {
     private List<String> style; //스타일 태그 이름 리스트
     private String universityEmail;
     private String universityName;
+    private String level;
 
     //프로필 dto
     public UserRequestDto(String userName, String nickName,

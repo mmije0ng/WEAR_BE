@@ -1,5 +1,6 @@
 package com.backend.wear.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -7,10 +8,13 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @DynamicInsert
 @DynamicUpdate
 @Table(name="chat_room")
@@ -22,20 +26,20 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //채팅 방 번호 (인덱스)
-    @Column(name="chat_room_number",columnDefinition = "integer default 0")
-    private Integer chatRoomNumber;
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private User seller;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private User customer;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<ProductChatRoom> productList=new ArrayList<>();
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     //채팅 메시지
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
