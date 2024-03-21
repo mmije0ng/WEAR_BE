@@ -50,22 +50,12 @@ public class ProductService {
         //카테고리가 전체 일 때
         if (categoryName.equals("전체")){
             productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
-            productsPage = PageableExecutionUtils.getPage(
-                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
-                    pageRequest(pageNumber),
-                    productsPage::getTotalElements
-            );
 
             return productsPage.map(this::mapToProductResponseDto);
         }
 
         else{ //카테고리별
             productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
-            productsPage = PageableExecutionUtils.getPage(
-                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
-                    pageRequest(pageNumber),
-                    productsPage::getTotalElements
-            );
 
             return productsPage.map(this::mapToProductResponseDto);
         }
@@ -80,22 +70,12 @@ public class ProductService {
         if(categoryName.equals("전체")){
             productsPage=productRepository
                     .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
-            productsPage = PageableExecutionUtils.getPage(
-                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
-                    pageRequest(pageNumber),
-                    productsPage::getTotalElements
-            );
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
                 .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
-            productsPage = PageableExecutionUtils.getPage(
-                    productsPage.stream().filter(product -> !product.isPrivate()).collect(Collectors.toList()),
-                    pageRequest(pageNumber),
-                    productsPage::getTotalElements
-            );
         }
 
         return productsPage.map(this::mapToProductResponseDto);
