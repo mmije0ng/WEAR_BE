@@ -18,11 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -48,19 +51,18 @@ public class ProductService {
         Page<Product> productsPage;
 
         //카테고리가 전체 일 때
-        if(categoryName.equals("all")){
-            productsPage = productRepository.findAll(pageRequest(pageNumber));
+        if (categoryName.equals("전체")){
+            productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
 
             return productsPage.map(this::mapToProductResponseDto);
         }
 
         else{ //카테고리별
-            productsPage = productRepository.findByCategory_CategoryName(categoryName,pageRequest(pageNumber));
+            productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
 
             return productsPage.map(this::mapToProductResponseDto);
         }
     }
-
 
     //카테고리별, 판매중, 최신순
     @Transactional
@@ -68,15 +70,15 @@ public class ProductService {
         Page<Product> productsPage;
 
         //전체, 판매중, 최신순
-        if(categoryName.equals("all")){
+        if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatus(postStatus,pageRequest(pageNumber));
+                    .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                .findByPostStatusAndCategory_CategoryName(postStatus,categoryName,pageRequest(pageNumber));
+                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
         }
 
         return productsPage.map(this::mapToProductResponseDto);
@@ -92,6 +94,7 @@ public class ProductService {
         return mapToProductPostResponseDto(product);
     }
 
+    //카테고리 검색 dto
     private ProductResponseDto mapToProductResponseDto(Product product) {
         boolean isSelected = wishRepository.findByProductId(product.getId())
                 .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
@@ -109,9 +112,7 @@ public class ProductService {
 
     //상세 페이지 상품 dto
     private ProductResponseDto mapToProductPostResponseDto(Product product) {
-        User user = productRepository.findUserById(product.getId())
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        User user=product.getUser();
         //판매자
         UserResponseDto seller =mapToUserPostResponseDto(user);
 
@@ -172,6 +173,5 @@ public class ProductService {
             productRepository.save(newProduct);
 
     }
-
 
 }

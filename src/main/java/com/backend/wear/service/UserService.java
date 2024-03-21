@@ -1,17 +1,8 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.DonationApplyResponseDto;
-import com.backend.wear.dto.UserPasswordDto;
-import com.backend.wear.dto.UserRequestDto;
-import com.backend.wear.dto.UserResponseDto;
-import com.backend.wear.entity.DonationApply;
-import com.backend.wear.entity.Style;
-import com.backend.wear.entity.University;
-import com.backend.wear.entity.User;
-import com.backend.wear.repository.DonationApplyRepository;
-import com.backend.wear.repository.StyleRepository;
-import com.backend.wear.repository.UniversityRepository;
-import com.backend.wear.repository.UserRepository;
+import com.backend.wear.dto.*;
+import com.backend.wear.entity.*;
+import com.backend.wear.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -30,13 +21,20 @@ public class UserService {
 
     private final DonationApplyRepository donationApplyRepository;
 
+    private final WishRepository wishRepository;
+
+    private final ProductRepository productRepository;
+
     @Autowired
     public UserService(UserRepository userRepository,StyleRepository styleRepository,
-                       UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository){
+                       UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
+                       WishRepository wishRepository, ProductRepository productRepository){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
+        this.wishRepository=wishRepository;
+        this.productRepository=productRepository;
     }
 
     //마이페이지 사용자 정보
@@ -68,11 +66,11 @@ public class UserService {
         user.setProfileImage(userRequestDto.getProfileImage());
         setProfileStyle(user,userRequestDto.getStyle());
 
-        try {
-            userRepository.save(user); // 변경된 엔티티를 저장
-        } catch (DataAccessException e) {
-            throw new IllegalStateException("회원 정보 변경에 실패했습니다.");
-        }
+//        try {
+//            userRepository.save(user); // 변경된 엔티티를 저장
+//        } catch (DataAccessException e) {
+//            throw new IllegalStateException("회원 정보 변경에 실패했습니다.");
+//        }
     }
 
     //정보 조회
@@ -106,7 +104,55 @@ public class UserService {
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.setUserPassword(dto.getCheckPassword());
-        userRepository.save(user);
+    //    userRepository.save(user);
+    }
+
+    //찜한 상품 불러오기
+    @Transactional
+    public List<ProductResponseDto> getWishListService(Long userId){
+       List<ProductResponseDto> wishList=  mapToProductResponseWishDto(userId);
+
+       if(wishList.isEmpty())
+           throw new IllegalArgumentException("현재 찜한 상품이 없습니다.");
+       else
+           return wishList;
+    }
+
+    //판매 중, 완료 상품 불러오기
+    @Transactional
+    public List<ProductResponseDto> myProductsService(Long userId, String postStatus){
+        List<ProductResponseDto> productResponseDtoList = mapToProductResponseDtoPostStatus(userId,postStatus);
+
+        if(productResponseDtoList.isEmpty()){
+            if(postStatus.equals("onSale"))
+                throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
+            else
+                throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
+        }
+
+        else
+            return productResponseDtoList;
+    }
+
+    //판매 중 상품 완료로 변경
+    @Transactional
+    public void postMyProductStatusService(Long userId, ProductRequestDto dto){
+        Product product=productRepository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
+        product.setPostStatus(dto.getPostStatus());
+
+        productRepository.save(product);
+    }
+
+    //숨김 처리 상품 보기
+    @Transactional
+    public List<ProductResponseDto> getMyProductsPrivateService(Long userId){
+        List<ProductResponseDto> privateList = mapToProductPostResponseDtoPrivate(userId);
+
+        if(privateList.isEmpty())
+            throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
+        else
+            return privateList;
     }
 
     //내 기부 내역
@@ -176,6 +222,80 @@ public class UserService {
                 .build();
     }
 
+    //찜한 상품
+    private List<ProductResponseDto> mapToProductResponseWishDto(Long userId){
+        //Wish 클래스 반환
+        List<Wish> wishList = wishRepository.findByUserId(userId);
+        List<ProductResponseDto> mywishList = new ArrayList<>();
+
+        for(Wish w: wishList){
+            if(w.isSelected()){
+                Product p=w.getProduct();
+                ProductResponseDto dto=ProductResponseDto.builder()
+                        .id(p.getId())
+                        .price(p.getPrice())
+                        .productName(p.getProductName())
+                        .productStatus(p.getProductStatus())
+                        .postStatus(p.getPostStatus())
+                        .productImage(p.getProductImage())
+                        .isSelected(p.getWish().isSelected())
+                        .build();
+                mywishList.add(dto);
+            }
+        }
+
+        return mywishList;
+    }
+
+    //판매 내역
+    private List<ProductResponseDto> mapToProductResponseDtoPostStatus(Long userId, String postStatus){
+        List<Product> productList= productRepository.findByUserId(userId);
+        List<ProductResponseDto> myProductList = new ArrayList<>();
+
+        for(Product p: productList){
+            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+            if(!p.getPostStatus().equals(postStatus))
+                continue;
+
+            ProductResponseDto dto=ProductResponseDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(p.getProductImage())
+                    .build();
+
+            myProductList.add(dto);
+        }
+
+        return myProductList;
+    }
+
+    //숨김내역
+    private List<ProductResponseDto> mapToProductPostResponseDtoPrivate(Long userId){
+        List<Product> productList = productRepository.findByUser_IdAndIsPrivateTrue(userId);
+        List<ProductResponseDto> privateProductList= new ArrayList<>();
+
+        for(Product p: productList){
+            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+
+            ProductResponseDto dto=ProductResponseDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(p.getProductImage())
+                    .isPrivate(p.isPrivate())
+                    .build();
+
+            privateProductList.add(dto);
+        }
+
+        return privateProductList;
+    }
+
     //내 기부 내역 응답 dto
     private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId){
         List<DonationApply> donationApplyList=donationApplyRepository.findByUserId(userId);
@@ -237,7 +357,6 @@ public class UserService {
     private void updateUniversityName(Long userId, String universityName){
         University university = userRepository.findById(userId).get().getUniversity();
         university.setUniversityName(universityName);
-        universityRepository.save(university);
     }
 
     //스타일 태그 이름으로 Style 저장
@@ -256,7 +375,6 @@ public class UserService {
         // 기존의 Style을 삭제하고 새로운 Style을 설정
         user.setStyle(newStyles);
     }
-
 
     //스타일 태그 이름만 조회
     private List<String> getUserStyleList(Long userId){

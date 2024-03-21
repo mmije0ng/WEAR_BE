@@ -5,8 +5,10 @@ public enum EnvironmentLevel {
     SEED("씨앗"),
     SAPLING("새싹"),
     COTTON("목화"),
-    COMPLETE("천");
-    // 다른 환경 레벨 값들을 추가할 수 있음
+
+    FLOWER("꽃"),
+
+    CLOTHES("옷");
 
     private final String label;
 
