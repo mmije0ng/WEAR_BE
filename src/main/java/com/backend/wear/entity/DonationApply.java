@@ -62,12 +62,13 @@ public class DonationApply extends BaseEntity {
 
     @Builder
     public DonationApply(User user, Integer charityNumber, String userName, String address, String phone,
-                         String donationItem, Integer clothesCount, Integer fashionCount, Integer boxCount){
+                         String email, String donationItem, Integer clothesCount, Integer fashionCount, Integer boxCount){
         this.user=user;
         this.charityNumber=charityNumber;
         this.userName=userName;
         this.address=address;
         this.phone=phone;
+        this.email=email;
         this.donationItem=donationItem;
         this.clothesCount=clothesCount;
         this.fashionCount=fashionCount;
