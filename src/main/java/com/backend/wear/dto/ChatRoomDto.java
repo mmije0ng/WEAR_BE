@@ -35,6 +35,4 @@ public class ChatRoomDto {
     private String customerNickName;
     private String customerProfileImage;
     private String customerLevel;
-
-    private List <ChatMessage> messageList;
 }

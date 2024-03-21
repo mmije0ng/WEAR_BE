@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,5 @@ public class ChatRoomProfileDto {
     private String userNickName;
     private String userProfileImage;
     private String userLevel;
-    private String message;
-    private String sendTime; //몇분전에 메시지 보냈는지
+ //   private LocalDateTime sendTime; //몇분전에 메시지 보냈는지
 }

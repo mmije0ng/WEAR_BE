@@ -14,8 +14,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         // 웹소켓이 handshake를 하기 위해 연결하는 endpoint
-        registry.addEndpoint("/ws/chat")
-              //  .setAllowedOrigins("*")
+        registry.addEndpoint("/ws-stomp")
+                .setAllowedOrigins("*")
                 .withSockJS();
     }
 
@@ -23,8 +23,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
         // 토픽 구독 시 /sub 로 요청
-        registry.enableSimpleBroker("/queue", "/topic"); //구독
+        registry.enableSimpleBroker("/sub"); //구독
         // 도착 경로에 대한 prefix 설정
-        registry.setApplicationDestinationPrefixes("/app"); //메시지 송신
+        registry.setApplicationDestinationPrefixes("/pub"); //메시지 송신
     }
 }
