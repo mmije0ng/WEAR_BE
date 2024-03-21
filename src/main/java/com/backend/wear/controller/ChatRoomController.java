@@ -62,7 +62,7 @@ public class ChatRoomController {
     }
 
     //사용자 모든 채팅방 조회
-    @GetMapping("/room")
+    @GetMapping("/rooms")
     // chat/room?userId={userId}
     public ResponseEntity<?> roomList(@RequestParam Long userId){
 

@@ -93,6 +93,7 @@ public class ChatService {
         return chatRoomDto;
     }
 
+    //채팅 리스트 불러오기
     public List<ChatRoomProfileDto> findAllRoom(Long userId) {
 
         List<ChatRoom> chatRoomList = chatRoomRepository
