@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,6 +26,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByPostStatus(String postStatus, Pageable pageable);
 
     //사용자 아이디로 판매자 조회
-    Optional<User> findUserById(Long productId);
+    User findUserById(Long productId);
 
+    List<Product> findByUserId(Long userId);
+
+    // User 클래스의 id와 Product 클래스의 isPrivate 필드가 true
+    List<Product> findByUser_IdAndIsPrivateTrue(Long userId);
 }

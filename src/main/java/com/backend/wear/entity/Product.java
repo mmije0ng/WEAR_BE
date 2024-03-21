@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -105,5 +106,4 @@ public class Product extends BaseEntity {
         this.wish = wish;
         this.count = count;
     }
-
 }

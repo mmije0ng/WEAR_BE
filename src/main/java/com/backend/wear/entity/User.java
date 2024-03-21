@@ -2,6 +2,8 @@ package com.backend.wear.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -55,7 +57,8 @@ public class User extends BaseEntity {
     private String universityEmail;
 
     //환경 점수
-    @Size(min = 0, max = 100)
+    @Min(value = 0)
+    @Max(value = 100)
     @Column(name="point",columnDefinition = "integer default 0")
     private Integer point;
 

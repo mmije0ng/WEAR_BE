@@ -22,9 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-
-
-
 @Service
 public class ProductService {
 
@@ -48,7 +45,7 @@ public class ProductService {
         Page<Product> productsPage;
 
         //카테고리가 전체 일 때
-        if(categoryName.equals("all")){
+        if(categoryName.equals("전체")){
             productsPage = productRepository.findAll(pageRequest(pageNumber));
 
             return productsPage.map(this::mapToProductResponseDto);
@@ -68,7 +65,7 @@ public class ProductService {
         Page<Product> productsPage;
 
         //전체, 판매중, 최신순
-        if(categoryName.equals("all")){
+        if(categoryName.equals("전체")){
             productsPage=productRepository
                     .findByPostStatus(postStatus,pageRequest(pageNumber));
         }
@@ -109,9 +106,7 @@ public class ProductService {
 
     //상세 페이지 상품 dto
     private ProductResponseDto mapToProductPostResponseDto(Product product) {
-        User user = productRepository.findUserById(product.getId())
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        User user=product.getUser();
         //판매자
         UserResponseDto seller =mapToUserPostResponseDto(user);
 
@@ -169,6 +164,5 @@ public class ProductService {
             productRepository.save(newProduct);
 
     }
-
 
 }

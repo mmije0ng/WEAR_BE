@@ -21,6 +21,7 @@ public class MagazineService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "사용자를 찾지 못하였습니다."));
 
-        user.setPoint(user.getPoint()+score);
+        Integer point= user.getPoint()+score;
+        user.setPoint(point);
     }
 }

@@ -1,5 +1,6 @@
 package com.backend.wear.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductResponseDto{
 
@@ -26,4 +28,6 @@ public class ProductResponseDto{
     private UserResponseDto seller; //판매자
     private String productContent;
     private String place; //거래 장소
+
+    private boolean isPrivate;
 }
