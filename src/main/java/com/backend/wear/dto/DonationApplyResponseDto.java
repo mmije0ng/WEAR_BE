@@ -1,6 +1,7 @@
 package com.backend.wear.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -19,5 +20,7 @@ public class DonationApplyResponseDto {
     private String date;
     private Integer clothesCount; //의류 개수
     private Integer fashionCount; //잡화 개수
+
+    @JsonProperty(value="is_donation_complete")
     private boolean isDonationComplete; //기부 상태 (true, false)
 }

@@ -1,6 +1,7 @@
 package com.backend.wear.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -23,11 +24,13 @@ public class ProductResponseDto{
     private String productStatus;
     private String postStatus;
     private String productImage;
+    @JsonProperty(value="is_selected")
     private boolean isSelected;
 
     private UserResponseDto seller; //판매자
     private String productContent;
     private String place; //거래 장소
 
+    @JsonProperty(value="is_private")
     private boolean isPrivate;
 }
