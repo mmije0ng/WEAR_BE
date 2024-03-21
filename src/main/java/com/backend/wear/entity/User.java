@@ -43,7 +43,7 @@ public class User extends BaseEntity {
 
     //이름 (실명)
     @NotNull
-    @Column(name="user_name",unique = true)
+    @Column(name="user_name")
     private String userName;
 
     //닉네임
