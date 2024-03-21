@@ -24,17 +24,17 @@ public class DonationApplyService {
     }
 
     //기부 신청
-    @Transactional
     public void postDonationApplyService(Long userId, Integer charityNumber, DonationApplyRequestDto dto){
         User applyUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
         DonationApply donationApply=DonationApply.builder()
-            //    .user(applyUser)
+                .user(applyUser)
                 .charityNumber(charityNumber)
                 .userName(dto.getUserName())
                 .address(dto.getAddress())
                 .phone(dto.getPhone())
+                .email(dto.getEmail())
                 .donationItem(dto.getDonationItem())
                 .clothesCount(dto.getClothesCount())
                 .fashionCount(dto.getFashionCount())
@@ -47,5 +47,4 @@ public class DonationApplyService {
         applyUser.setPoint(applyUser.getPoint()+5);
         userRepository.save(applyUser);
     }
-
 }

@@ -58,7 +58,7 @@ public class User extends BaseEntity {
 
     //환경 점수
     @Min(value = 0)
-    @Max(value = 100)
+    @Max(value = 500)
     @Column(name="point",columnDefinition = "integer default 0")
     private Integer point;
 
