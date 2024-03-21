@@ -2,6 +2,7 @@ package com.backend.wear.service;
 
 import com.backend.wear.dto.ChatRoomDto;
 import com.backend.wear.dto.ChatRoomIdDto;
+import com.backend.wear.dto.ChatRoomProfileDto;
 import com.backend.wear.entity.ChatRoom;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
@@ -26,15 +27,15 @@ public class ChatService {
     @Autowired
     public ChatService(ChatRoomRepository chatRoomRepository,
                        ProductRepository productRepository,
-                       UserRepository userRepository){
+                       UserRepository userRepository) {
 
         this.chatRoomRepository = chatRoomRepository;
-        this.productRepository=productRepository;
-        this.userRepository=userRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     //채팅방 생성
-    public  ChatRoomIdDto createRoom(Long productId, Long customerId) {
+    public ChatRoomIdDto createRoom(Long productId, Long customerId) {
 
         //상품
         Product product = productRepository.findById(productId)
@@ -54,7 +55,7 @@ public class ChatService {
 
         chatRoomRepository.save(chatRoom);
 
-        ChatRoomIdDto dto =ChatRoomIdDto.builder()
+        ChatRoomIdDto dto = ChatRoomIdDto.builder()
                 .chatRoomId(chatRoom.getId())
                 .build();
 
@@ -62,18 +63,18 @@ public class ChatService {
     }
 
     //채팅방 입장
-    public ChatRoomDto chatRoom(Long roomId, Long productId){
+    public ChatRoomDto chatRoom(Long roomId, Long productId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
 
-        Product product=productRepository.findById(productId)
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
 
-        User seller= chatRoom.getSeller();
+        User seller = chatRoom.getSeller();
 
         User customer = chatRoom.getCustomer();
 
-        ChatRoomDto chatRoomDto=ChatRoomDto.builder()
+        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
                 .chatRoomId(chatRoom.getId())
                 .productId(product.getId())
                 .productImage(product.getProductImage())
@@ -92,12 +93,57 @@ public class ChatService {
         return chatRoomDto;
     }
 
-    //채팅방 불러오기
-    public List <ChatRoom> findAllRoom(Long userId) {
+    public List<ChatRoomProfileDto> findAllRoom(Long userId) {
 
         List<ChatRoom> chatRoomList = chatRoomRepository
-                .findBySellerIdOrCustomerId(userId,userId);
+                .findBySellerIdOrCustomerId(userId, userId);
 
-        return chatRoomList;
+        List<ChatRoomProfileDto> chatRoomProfileDtoList = new ArrayList<>();
+
+        for (ChatRoom r : chatRoomList) {
+            ChatRoomProfileDto dto;
+
+            //내가 구매자
+            if (r.getCustomer().getId().equals(userId)){
+
+                User seller = r.getSeller();
+                dto=ChatRoomProfileDto.builder()
+                        .userNickName(seller.getNickName())
+                        .userProfileImage(seller.getProfileImage())
+                        .userLevel(seller.getLevel().getLabel())
+                        .build();
+
+                chatRoomProfileDtoList.add(dto);
+            }
+
+            else {
+                User customer = r.getCustomer();
+                dto=ChatRoomProfileDto.builder()
+                        .userNickName(customer.getNickName())
+                        .userProfileImage(customer.getProfileImage())
+                        .userLevel(customer.getLevel().getLabel())
+                        .build();
+
+                chatRoomProfileDtoList.add(dto);
+            }
+        }
+
+        return chatRoomProfileDtoList;
     }
+
+    //채팅방 불러오기
+//    public List<ChatRoomProfileDto> findAllRoom(Long userId) {
+//
+//        List<ChatRoom> chatRoomList = chatRoomRepository
+//                .findBySellerIdOrCustomerId(userId, userId);
+//
+//        List<ChatRoomDto> chatRoomDtoList = new ArrayList<>();
+//
+//        for (ChatRoom r : chatRoomList) {
+//            if (r.getCustomer().)
+//        }
+//
+//        return chatRoomList;
+//    }
+
 }

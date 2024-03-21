@@ -2,6 +2,7 @@ package com.backend.wear.controller;
 
 import com.backend.wear.dto.ChatRoomDto;
 import com.backend.wear.dto.ChatRoomIdDto;
+import com.backend.wear.dto.ChatRoomProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,7 @@ public class ChatRoomController {
     // chat/room?userId={userId}
     public ResponseEntity<?> roomList(@RequestParam Long userId){
 
-        List<ChatRoom> chatRoomList=chatService.findAllRoom(userId);
+        List<ChatRoomProfileDto> chatRoomList=chatService.findAllRoom(userId);
 
         if(!chatRoomList.isEmpty())
             return ResponseEntity.ok().body(chatRoomList);
