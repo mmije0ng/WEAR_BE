@@ -65,7 +65,7 @@ public class User extends BaseEntity {
     //환경 레벨
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name="level", columnDefinition = "varchar(10) default '씨앗'")
+    @Column(name="level", columnDefinition = "varchar(10) default 'SEED'")
     private EnvironmentLevel level;
 
     //스타일
