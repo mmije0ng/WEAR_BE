@@ -109,7 +109,7 @@ public class ChatService {
 
                 User seller = r.getSeller();
                 dto=ChatRoomProfileDto.builder()
-                        .roomId(r.getId())
+                        .chatRoomId(r.getId())
                         .productId(r.getProduct().getId())
                         .userNickName(seller.getNickName())
                         .userProfileImage(seller.getProfileImage())
@@ -122,7 +122,7 @@ public class ChatService {
             else {
                 User customer = r.getCustomer();
                 dto=ChatRoomProfileDto.builder()
-                        .roomId(r.getId())
+                        .chatRoomId(r.getId())
                         .productId(r.getProduct().getId())
                         .userNickName(customer.getNickName())
                         .userProfileImage(customer.getProfileImage())
