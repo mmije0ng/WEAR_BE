@@ -406,7 +406,9 @@ public class UserService {
         else if(currentLevel.equals("새싹"))
             return "목화";
         else if(currentLevel.equals("목화"))
-            return "천";
+            return "꽃";
+        else if(currentLevel.equals("꽃"))
+            return "옷";
         else
             return "레벨 달성 완료";
     }
@@ -419,13 +421,15 @@ public class UserService {
 
     //남은 레벨 포인트
     private Integer getRemainLevelPoint(Integer currentPoint){
-        if(currentPoint>=0 && currentPoint<25)
-            return 25-currentPoint;
-        else if(currentPoint>= 25 && currentPoint<50)
-            return 50-currentPoint;
-        else if(currentPoint>= 50 && currentPoint<75)
-            return 75-currentPoint;
-        else
+        if(currentPoint>=0 && currentPoint<100)
             return 100-currentPoint;
+        else if(currentPoint>= 100 && currentPoint<200)
+            return 200-currentPoint;
+        else if(currentPoint>= 200 && currentPoint<300)
+            return 300-currentPoint;
+        else if(currentPoint>=300 && currentPoint<400)
+            return 400-currentPoint;
+        else
+            return 500-currentPoint;
     }
 }

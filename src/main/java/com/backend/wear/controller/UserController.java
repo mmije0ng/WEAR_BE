@@ -130,6 +130,7 @@ public class UserController {
 
     //판매 중 상품 불러오기
     // api/users/myProducts/onSale/{userId}
+  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
     @GetMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId){
         try{
@@ -143,6 +144,9 @@ public class UserController {
 
     //판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
+
+  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
+
     @PutMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){
