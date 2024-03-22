@@ -22,17 +22,15 @@ public class MessageController {
     private static Logger log = LoggerFactory.getLogger(MessageController.class);
 
     //메시지 보내기
+    // pub/api/chat/message
     @MessageMapping("/api/chat/message")
     public void enter(ChatMessage message) {
 
         log.info(message.getId()+": "+message.getMessage());
-
-//        if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
-//            log.info(message.getSender().getNickName()+"님이 입장하였습니다.");
-//        }
-
         messageService.saveMessage(message);
 
+
+        //sub/api/chat/room/{roomId}
         sendingOperations.convertAndSend("/sub/api/chat/room/"+message.getId(), message);
     }
 }
