@@ -146,7 +146,6 @@ public class UserController {
     // api/users/myProducts/onSale/{userId}
 
   //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
-
     @PutMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){

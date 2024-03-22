@@ -8,16 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 @Builder
+//@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductRequestDto {
-    private Long id;
-    private String postStatus;
-
-    public ProductRequestDto(Long id, String postStatus){
-        this.id=id;
-        this.postStatus=postStatus;
-    }
+public class UnivCertRequestDto {
+    private String universityEmail; //대학 이메일
+    private String universityName; //대학 이름
+    private boolean check;
 }
