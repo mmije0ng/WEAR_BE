@@ -94,11 +94,11 @@ public class ProductController {
     }
 
 
-    //✅상품 상세/ 상품 판매 상태 변경하기
-    @PutMapping("/soldOut/{userId}/{productId}")
-    public ResponseEntity<?> updateProductPostStatus(@PathVariable Long userId ,Long productId ,@RequestBody @Valid ProductRequestDto requestDto ,Errors errors) throws Exception{
+    //상품 상세/ 상품 판매 상태 변경하기
+    @PutMapping("/soldOut/{userId}")
+    public ResponseEntity<?> updateProductPostStatus(@PathVariable Long userId,@RequestBody @Valid ProductRequestDto requestDto ,Errors errors) throws Exception{
         try {
-            productService.updateProductPostStatus(requestDto,userId,productId);
+            productService.updateProductPostStatus(requestDto,userId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
