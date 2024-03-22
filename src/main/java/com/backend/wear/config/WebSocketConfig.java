@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry){
         // 웹소켓이 handshake를 하기 위해 연결하는 endpoint
         registry.addEndpoint("/ws-stomp")
-                .setAllowedOrigins("*")
+                .setAllowedOriginPatterns("http://localhost:5173", "http://localhost:8080", "http://43.201.189.171:8080")
                 .withSockJS();
     }
 
