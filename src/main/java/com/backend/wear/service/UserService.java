@@ -42,6 +42,7 @@ public class UserService {
     public UserResponseDto getMyPageUserService(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        System.out.println("유저"+user.getUserName());
 
         return mapToUserResponseDtoMyPage(user, userId);
     }
@@ -73,7 +74,7 @@ public class UserService {
 //        }
     }
 
-    //정보 조회
+    //유저 정보 조회
     @Transactional
     public UserResponseDto getUserInfo(Long userId){
         User user = userRepository.findById(userId)
@@ -188,16 +189,18 @@ public class UserService {
         Integer point=getPoint(userId);
         Integer remainLevelPoint= getRemainLevelPoint(point);
 
+        System.out.println("이름: "+user.getUserName());
+
         return UserResponseDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
-                .style(style)
                 .profileImage(user.getProfileImage())
                 .level(level)
                 .nextLevel(nextLevel)
                 .point(point)
                 .remainLevelPoint(remainLevelPoint)
+                .style(style)
                 .build();
     }
 
@@ -208,8 +211,8 @@ public class UserService {
         return UserResponseDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
-                .style(styleList)
                 .profileImage(user.getProfileImage())
+                .style(styleList)
                 .build();
     }
 
