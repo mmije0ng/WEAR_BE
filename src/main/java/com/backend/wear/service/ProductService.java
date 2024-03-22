@@ -105,6 +105,7 @@ public class ProductService {
                 .price(product.getPrice())
                 .productName(product.getProductName())
                 .postStatus(product.getPostStatus())
+                .productStatus(product.getProductStatus())
                 .isSelected(isSelected)
                 .productImage(product.getProductImage())
                 .build();
