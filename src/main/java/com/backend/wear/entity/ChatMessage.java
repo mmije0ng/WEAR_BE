@@ -19,11 +19,11 @@ import java.time.LocalDateTime;
 @Table(name = "chat_message")
 public class ChatMessage {
 
-    public enum MessageType {
-        ENTER, TALK
-    }
+//    public enum MessageType {
+//        ENTER, TALK
+//    }
 
-    private MessageType type;
+//    private MessageType type;
 
     //아이디
     @Id
@@ -33,11 +33,11 @@ public class ChatMessage {
 //    //채팅방 ID
 //    private String roomId;
 
-    @OneToOne
-    @JoinColumn(name="sender_id")
-    private User sender;
-
-    //채팅 방
+//    @OneToOne
+//    @JoinColumn(name="sender_id")
+//    private User sender;
+//
+//    //채팅 방
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
@@ -45,8 +45,8 @@ public class ChatMessage {
     //내용
     private String message;
 
-    @Column(nullable = false)
-    private LocalDateTime sendTime;
+//    @Column(nullable = false)
+//    private LocalDateTime sendTime;
 
 //    //메시지 보낸 사람
 //    @ManyToOne(fetch = FetchType.LAZY)
