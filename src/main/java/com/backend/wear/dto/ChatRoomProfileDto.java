@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomProfileDto {
 
-    private Long roomId; //채팅방 pk
+    private Long chatRoomId; //채팅방 pk
 
     private Long productId;
 
