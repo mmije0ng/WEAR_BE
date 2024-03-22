@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-//@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"})
 @RequestMapping("/api/chat")
 public class ChatRoomController {
     private final ChatService chatService;
@@ -32,7 +31,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 생성
-    // chat/room?productId={productId}&customerId={customerId}
+    // api/chat/room?productId={productId}&customerId={customerId}
     @PostMapping("/room/create") //상품 아이디, 클릭한 유저 아이디
     public ResponseEntity<?> createRoom(@RequestParam Long productId, @RequestParam Long customerId) {
 
@@ -60,7 +59,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 입장
-    // chat/room/enter?roomId={roomId}&productId={productId}
+    // api/chat/room/enter?roomId={roomId}&productId={productId}
     @GetMapping("/room/enter")
     public ResponseEntity<?> enterRoom(@RequestParam Long roomId,
                                        @RequestParam Long productId)
