@@ -97,6 +97,7 @@ public class Product extends BaseEntity {
     }
 
     public void setDeletedAt(LocalDateTime deletedAt) {
+
         deletedAt= LocalDateTime.now();
     }
 
