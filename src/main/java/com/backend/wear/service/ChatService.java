@@ -37,6 +37,17 @@ public class ChatService {
     //채팅방 생성
     public ChatRoomIdDto createRoom(Long productId, Long customerId) {
 
+        Optional<ChatRoom> existingRoomOpt = chatRoomRepository.findByProductIdAndCustomerId(productId, customerId);
+
+        if (existingRoomOpt.isPresent()) {
+            ChatRoom existingRoom = existingRoomOpt.get();
+            // 이미 존재하는 채팅방이면 해당 채팅방의 ID를 반환
+            return ChatRoomIdDto.builder()
+                    .chatRoomId(existingRoom.getId())
+                    .created(false)
+                    .build();
+        }
+
         //상품
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
@@ -57,6 +68,7 @@ public class ChatService {
 
         ChatRoomIdDto dto = ChatRoomIdDto.builder()
                 .chatRoomId(chatRoom.getId())
+                .created(true)
                 .build();
 
         return dto;

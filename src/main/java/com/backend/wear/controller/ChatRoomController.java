@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,19 @@ public class ChatRoomController {
         try {
             //채팅방 pk 반환
             ChatRoomIdDto chatRoomId =  chatService.createRoom(productId, customerId);
-            return ResponseEntity.ok().body(chatRoomId);
+
+            if(chatRoomId.isCreated()){
+                return ResponseEntity.ok().body(chatRoomId.getChatRoomId());
+            }
+
+
+            else{
+                Long roomId=chatRoomId.getChatRoomId();
+                // 생성된 채팅방의 ID를 사용하여 enterRoom 엔드포인트로 리다이렉션
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .location(URI.create("/api/chat/room/enter?roomId=" + roomId + "&productId=" + productId))
+                        .build();
+            }
         }
 
         catch (IllegalArgumentException e) {
@@ -50,12 +63,13 @@ public class ChatRoomController {
     public ResponseEntity<?> enterRoom(@RequestParam Long roomId,
                                        @RequestParam Long productId)
     {
-        ChatRoomDto dto;
-
         try{
-            dto=chatService.chatRoom(roomId, productId);
+            ChatRoomDto dto=chatService.chatRoom(roomId, productId);
+
             return ResponseEntity.ok().body(dto);
-        } catch (IllegalArgumentException e){
+        }
+
+        catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
