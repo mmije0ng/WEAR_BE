@@ -1,6 +1,7 @@
 package com.backend.wear.controller;
 
 import com.backend.wear.dto.ProductPostRequestDto;
+import com.backend.wear.dto.ProductRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
@@ -84,5 +85,53 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.CREATED);
 
     }
+
+    //상품상세/ 상품 정보 수정하기
+    @PutMapping("/edit/{userId}/{productId}")
+    public ResponseEntity<?> updateProductPost(@PathVariable Long userId , @PathVariable Long productId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
+            productService.updateProductPost(requestDTO,userId,productId);
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+
+    //✅상품 상세/ 상품 판매 상태 변경하기
+    @PutMapping("/soldOut/{userId}/{productId}")
+    public ResponseEntity<?> updateProductPostStatus(@PathVariable Long userId ,Long productId ,@RequestBody @Valid ProductRequestDto requestDto ,Errors errors) throws Exception{
+        try {
+            productService.updateProductPostStatus(requestDto,userId,productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(HttpStatus.CREATED);
+
+    }
+
+    //상품 상세/ 상품 글 숨기기 || 숨김 해제하기
+    @PutMapping("/private/{userId}/{productId}")
+    public ResponseEntity<?> updateProductPostPrivate(@PathVariable Long userId , Long productId, Errors errors) throws Exception{
+        try {
+            productService.updateProductPostPrivate(userId,productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(HttpStatus.CREATED);
+
+    }
+
+    //상품 상세/ 상품 삭제하기
+    @DeleteMapping("/delete/{userId}/{productId}")
+    public ResponseEntity<?> deleteProductPost(@PathVariable Long userId ,Long productId, Errors errors) throws Exception{
+        try {
+            productService.deleteProductPost(userId,productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(HttpStatus.CREATED);
+
+    }
+
 
 }
