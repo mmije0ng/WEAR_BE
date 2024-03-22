@@ -259,6 +259,7 @@ public class UserService {
 
         for(Product p: productList){
             //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+
             if(!p.getPostStatus().equals(postStatus))
                 continue;
 
