@@ -24,11 +24,12 @@ public class MessageController {
     //메시지 보내기
     @MessageMapping("/api/chat/message")
     public void enter(ChatMessage message) {
-        log.info(message.getMessage());
 
-        if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
-            log.info(message.getSender().getNickName()+"님이 입장하였습니다.");
-        }
+        log.info(message.getId()+": "+message.getMessage());
+
+//        if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
+//            log.info(message.getSender().getNickName()+"님이 입장하였습니다.");
+//        }
 
         messageService.saveMessage(message);
 
