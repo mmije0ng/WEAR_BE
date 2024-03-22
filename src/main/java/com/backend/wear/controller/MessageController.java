@@ -4,6 +4,8 @@ import com.backend.wear.entity.ChatMessage;
 import com.backend.wear.repository.ChatRoomRepository;
 import com.backend.wear.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -17,10 +19,13 @@ public class MessageController {
 
     private final SimpMessageSendingOperations sendingOperations;
     private final MessageService messageService;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     //메시지 보내기
     @MessageMapping("/api/chat/message")
     public void enter(ChatMessage message) {
+        log.info(message.getMessage());
+
         if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
             System.out.println(message.getSender().getNickName()+"님이 입장하였습니다.");
         }
