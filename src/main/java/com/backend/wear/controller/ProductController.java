@@ -109,8 +109,10 @@ public class ProductController {
 
     //상품 상세/ 상품 글 숨기기 || 숨김 해제하기
     @PutMapping("/private/{userId}/{productId}")
-    public ResponseEntity<?> updateProductPostPrivate(@PathVariable Long userId , Long productId, Errors errors) throws Exception{
+    public ResponseEntity<?> updateProductPostPrivate(@PathVariable Long userId , @PathVariable Long productId) throws Exception{
         try {
+            System.out.println(userId);
+            System.out.println(productId);
             productService.updateProductPostPrivate(userId,productId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
