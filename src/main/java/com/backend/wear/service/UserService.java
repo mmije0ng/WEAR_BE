@@ -42,8 +42,9 @@ public class UserService {
     public UserResponseDto getMyPageUserService(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        System.out.println("유저"+user.getUserName());
 
-        return mapToUserResponseDtoProfile(user, userId);
+        return mapToUserResponseDtoMyPage(user, userId);
     }
 
     //마이페이지 프로필
@@ -73,7 +74,7 @@ public class UserService {
 //        }
     }
 
-    //정보 조회
+    //유저 정보 조회
     @Transactional
     public UserResponseDto getUserInfo(Long userId){
         User user = userRepository.findById(userId)
@@ -170,8 +171,10 @@ public class UserService {
     public List<DonationApplyResponseDto> getMyDonationApplyCompleteService(Long userId){
         List<DonationApplyResponseDto> responseDtoList
                 = mapToDonationApplyResponseDtoComplete(userId);
-        if(responseDtoList.isEmpty())
+        if(responseDtoList.isEmpty()){
             throw new IllegalArgumentException("현재 기부 진행이 완료된 내역이 없습니다.");
+        }
+
         else
             return responseDtoList;
     }
@@ -186,16 +189,18 @@ public class UserService {
         Integer point=getPoint(userId);
         Integer remainLevelPoint= getRemainLevelPoint(point);
 
+        System.out.println("이름: "+user.getUserName());
+
         return UserResponseDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
-                .style(style)
                 .profileImage(user.getProfileImage())
                 .level(level)
                 .nextLevel(nextLevel)
                 .point(point)
                 .remainLevelPoint(remainLevelPoint)
+                .style(style)
                 .build();
     }
 
@@ -206,8 +211,8 @@ public class UserService {
         return UserResponseDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
-                .style(styleList)
                 .profileImage(user.getProfileImage())
+                .style(styleList)
                 .build();
     }
 
@@ -254,6 +259,7 @@ public class UserService {
 
         for(Product p: productList){
             //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+
             if(!p.getPostStatus().equals(postStatus))
                 continue;
 
@@ -362,9 +368,11 @@ public class UserService {
     //스타일 태그 이름으로 Style 저장
     private void setProfileStyle (User user, List<String> style){
         List<Style> newStyles = new ArrayList<>();
+
         for (String styleName : style) {
             // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
-            Style s = styleRepository.findByStyleName(styleName)
+            Style s = styleRepository.findByStyleNameAndUserId(styleName,
+                            user.getId())
                     .orElse(new Style(styleName));
 
             // Style 객체와 User 객체의 연관 관계 설정

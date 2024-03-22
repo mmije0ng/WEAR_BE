@@ -90,7 +90,7 @@ public class Product extends BaseEntity {
 
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductChatRoom> chatRoomList=new ArrayList<>();
+    private List<ChatRoom> chatRoomList=new ArrayList<>();
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         updatedAt= LocalDateTime.now();
