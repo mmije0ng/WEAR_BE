@@ -124,7 +124,7 @@ public class ProductController {
 
     //상품 상세/ 상품 삭제하기
     @DeleteMapping("/delete/{userId}/{productId}")
-    public ResponseEntity<?> deleteProductPost(@PathVariable Long userId ,Long productId, Errors errors) throws Exception{
+    public ResponseEntity<?> deleteProductPost(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
         try {
             productService.deleteProductPost(userId,productId);
         } catch (IllegalArgumentException e) {

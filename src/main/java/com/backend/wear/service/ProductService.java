@@ -270,14 +270,7 @@ public class ProductService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
 
-            product.setDeletedAt(product.getDeletedAt());
-
-            // updatedAt 업데이트
-            product.setUpdatedAt(product.getUpdatedAt());
-
-            // 변경된 상품 정보를 저장합니다.
-            productRepository.save(product);
-
+            productRepository.deleteByUserAndProduct(userId,productId);
         }
 
     }
