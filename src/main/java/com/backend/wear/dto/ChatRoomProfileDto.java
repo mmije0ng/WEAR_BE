@@ -16,7 +16,7 @@ public class ChatRoomProfileDto {
 
     private Long chatRoomId; //채팅방 pk
 
-    private Long productId;
+    private Long productId; //상품 pk
 
     private String userNickName;
     private String userProfileImage;
