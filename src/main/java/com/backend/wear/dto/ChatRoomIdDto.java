@@ -12,4 +12,5 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomIdDto {
     private Long chatRoomId; //pk
+    private boolean created;
 }
