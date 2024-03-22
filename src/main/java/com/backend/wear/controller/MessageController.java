@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins="http://43.201.189.171:8080")
+@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173"})
 public class MessageController {
 
     private final SimpMessageSendingOperations sendingOperations;
     private final MessageService messageService;
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static Logger log = LoggerFactory.getLogger(MessageController.class);
 
     //메시지 보내기
     @MessageMapping("/api/chat/message")
@@ -27,7 +27,7 @@ public class MessageController {
         log.info(message.getMessage());
 
         if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
-            System.out.println(message.getSender().getNickName()+"님이 입장하였습니다.");
+            log.info(message.getSender().getNickName()+"님이 입장하였습니다.");
         }
 
         messageService.saveMessage(message);
