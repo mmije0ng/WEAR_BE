@@ -1,6 +1,7 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.ProductPostRequestDto;
+import com.backend.wear.dto.ProductRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
 import com.backend.wear.dto.UserResponseDto;
 import com.backend.wear.entity.Category;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -173,5 +175,111 @@ public class ProductService {
             productRepository.save(newProduct);
 
     }
+
+    //상품 정보 변경(전체를 받아서 전체를 변경)
+    @Transactional
+    public void updateProductPost(ProductPostRequestDto requestDTO, Long userId, Long productId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        // 기존 제품을 찾아 업데이트
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("제품을 찾지 못하였습니다."));
+
+        Category category = categoryRepository.findByCategoryName(requestDTO.getCategoryName());
+
+        if (category == null) {
+            throw new IllegalArgumentException("해당 카테고리를 찾지 못하였습니다.");
+        }
+
+        // 업데이트된 정보로 기존 제품 업데이트
+        product.setProductName(requestDTO.getProductName());
+        product.setPrice(requestDTO.getPrice());
+        product.setProductImage(requestDTO.getProductImage());
+        product.setProductContent(requestDTO.getProductContent());
+        product.setProductStatus(requestDTO.getProductStatus());
+        product.setPlace(requestDTO.getPlace());
+        product.setUser(user);
+        product.setCategory(category);
+
+        // updatedAt 업데이트
+        product.setUpdatedAt(product.getUpdatedAt());
+
+        productRepository.save(product);
+    }
+
+    //상품 판매 상태 변경 (판매 완료 또는 판매 중)
+    @Transactional
+    public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId, Long productId ) throws Exception {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        if(user != null){
+            //해당 사용자의 상품을 제대로 요청했는지 확인
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+            // 요청으로 받은 postStatus를 상품의 상태로 설정합니다.
+            product.setPostStatus(requestDto.getPostStatus());
+
+            // updatedAt 업데이트
+            product.setUpdatedAt(product.getUpdatedAt());
+
+            // 변경된 상품 정보를 저장합니다.
+             productRepository.save(product);
+        }
+
+
+    }
+
+
+    //상품 숨기기 || 숨김 해제하기
+    @Transactional
+    public void updateProductPostPrivate( Long userId, Long productId ) throws Exception {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        if(user != null){
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+            if(product.isPrivate() == true){
+                product.setPrivate(false);
+            }else{
+                product.setPrivate(true);
+            }
+            // updatedAt 업데이트
+            product.setUpdatedAt(product.getUpdatedAt());
+            productRepository.save(product);
+        }
+    }
+
+    //상품 삭제
+    @Transactional
+    public void deleteProductPost( Long userId, Long productId ) throws Exception {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        if(user != null){
+            //해당 사용자의 상품을 제대로 요청했는지 확인
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+            product.setDeletedAt(product.getDeletedAt());
+
+            // updatedAt 업데이트
+            product.setUpdatedAt(product.getUpdatedAt());
+
+            // 변경된 상품 정보를 저장합니다.
+            productRepository.save(product);
+
+        }
+
+    }
+
+
 
 }
