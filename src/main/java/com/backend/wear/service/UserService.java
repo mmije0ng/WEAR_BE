@@ -369,16 +369,16 @@ public class UserService {
     private void setProfileStyle (User user, List<String> style){
         List<Style> newStyles = new ArrayList<>();
 
-        for (String styleName : style) {
-            // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
-            Style s = styleRepository.findByStyleNameAndUserId(styleName,
-                            user.getId())
-                    .orElse(new Style(styleName));
-
-            // Style 객체와 User 객체의 연관 관계 설정
-            s.setUser(user);
-            newStyles.add(s);
-        }
+//        for (String styleName : style) {
+//            // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
+//            Style s = styleRepository.findByStyleNameAndUserId(styleName,
+//                            user.getId())
+//                    .orElse(new Style(styleName));
+//
+//            // Style 객체와 User 객체의 연관 관계 설정
+//            s.setUser(user);
+//            newStyles.add(s);
+//        }
 
         // 기존의 Style을 삭제하고 새로운 Style을 설정
         user.setStyle(newStyles);
