@@ -4,6 +4,7 @@ import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -65,13 +66,8 @@ public class UserService {
         user.setUserName(userRequestDto.getUserName());
         user.setNickName(userRequestDto.getNickName());
         user.setProfileImage(userRequestDto.getProfileImage());
-        setProfileStyle(user,userRequestDto.getStyle());
 
-//        try {
-//            userRepository.save(user); // 변경된 엔티티를 저장
-//        } catch (DataAccessException e) {
-//            throw new IllegalStateException("회원 정보 변경에 실패했습니다.");
-//        }
+        setProfileStyle(user,userRequestDto.getStyle());
     }
 
     //유저 정보 조회
@@ -366,21 +362,20 @@ public class UserService {
     }
 
     //스타일 태그 이름으로 Style 저장
-    private void setProfileStyle (User user, List<String> style){
+    @Transactional
+    public void setProfileStyle (User user, List<String> style){
         List<Style> newStyles = new ArrayList<>();
 
-//        for (String styleName : style) {
-//            // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
-//            Style s = styleRepository.findByStyleNameAndUserId(styleName,
-//                            user.getId())
-//                    .orElse(new Style(styleName));
-//
-//            // Style 객체와 User 객체의 연관 관계 설정
-//            s.setUser(user);
-//            newStyles.add(s);
-//        }
+        styleRepository.deleteAllByUserId(user.getId());
 
-        // 기존의 Style을 삭제하고 새로운 Style을 설정
+        for(String s: style){
+            Style styleTag =new Style();
+            styleTag.setUser(user);
+            styleTag.setStyleName(s);
+
+            newStyles.add(styleTag);
+        }
+
         user.setStyle(newStyles);
     }
 
