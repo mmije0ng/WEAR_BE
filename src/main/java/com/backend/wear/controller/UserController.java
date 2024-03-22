@@ -111,7 +111,7 @@ public class UserController {
         }
     }
 
-    //찜한 상품 리스트
+    //찜한 상품 리스트 보기
     // api/users/wishList/{userId}
     @GetMapping("/wishList/{userId}")
     public ResponseEntity<?> getWishList(@PathVariable Long userId){
