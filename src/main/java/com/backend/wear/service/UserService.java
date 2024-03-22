@@ -367,9 +367,11 @@ public class UserService {
     //스타일 태그 이름으로 Style 저장
     private void setProfileStyle (User user, List<String> style){
         List<Style> newStyles = new ArrayList<>();
+
         for (String styleName : style) {
             // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
-            Style s = styleRepository.findByStyleName(styleName)
+            Style s = styleRepository.findByStyleNameAndUserId(styleName,
+                            user.getId())
                     .orElse(new Style(styleName));
 
             // Style 객체와 User 객체의 연관 관계 설정
