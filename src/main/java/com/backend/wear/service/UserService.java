@@ -138,7 +138,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
         product.setPostStatus(dto.getPostStatus());
 
-        productRepository.save(product);
+  //      productRepository.save(product);
     }
 
     //숨김 처리 상품 보기
