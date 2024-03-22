@@ -18,7 +18,7 @@ public class ChatRoomProfileDto {
 
     private Long productId; //상품 pk
 
-    private String userNickName;
+    private String userNickName; //닉네임
     private String userProfileImage;
     private String userLevel;
 }
