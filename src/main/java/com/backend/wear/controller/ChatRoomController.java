@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"})
+//@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"})
 @RequestMapping("/api/chat")
 public class ChatRoomController {
     private final ChatService chatService;

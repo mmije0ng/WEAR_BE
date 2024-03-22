@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173"})
+//@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173"})
 public class MessageController {
 
     private final SimpMessageSendingOperations sendingOperations;

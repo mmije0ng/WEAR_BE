@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/donations")
 public class DonationApplyController {
-
     private final DonationApplyService donationApplyService;
 
     @Autowired
