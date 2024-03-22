@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
 @RestController
 @CrossOrigin(origins="http://43.201.189.171:8080")
 @RequestMapping("/api/chat")
