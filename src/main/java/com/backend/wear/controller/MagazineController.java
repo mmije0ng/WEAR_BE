@@ -19,7 +19,7 @@ public class MagazineController {
 
     //퀴즈 정답만큼 환경 점수 올리기
     //api/magazine/{userId}?score=score
-    @PutMapping("/{userId}")
+    @PostMapping("/{userId}")
     public ResponseEntity<?> quizPoint(@PathVariable("userId")Long userId,
                                        @RequestParam Integer score)
     {
