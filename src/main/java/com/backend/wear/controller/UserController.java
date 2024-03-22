@@ -87,7 +87,7 @@ public class UserController {
 
     //계정 정보 저장
     // api/users/userInfo/{userId}
-    @PutMapping("/userInfo/{userId}")
+    @PutMapping("/userInfo/update/{userId}")
     public ResponseEntity<?> putUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto userRequestDto){
         try {
             userService.updateUserInfo(userId, userRequestDto);
