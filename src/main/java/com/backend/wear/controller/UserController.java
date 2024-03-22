@@ -139,11 +139,11 @@ public class UserController {
 
     //판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
-    @PutMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
+    @PutMapping("/myProducts/onSale?userId={userId}&productId={productId}")
+    public ResponseEntity<?> postMyProductStatus(@RequestParam Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){
         try{
-            userService.postMyProductStatusService(userId,productRequestDto);
+            userService.postMyProductStatusService(userId, productRequestDto);
             return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
