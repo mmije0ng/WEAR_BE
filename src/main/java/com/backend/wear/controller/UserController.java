@@ -86,7 +86,7 @@ public class UserController {
     }
 
     //계정 정보 저장
-    // api/users/userInfo/{userId}
+    // api/users/userInfo/update/{userId}
     @PutMapping("/userInfo/update/{userId}")
     public ResponseEntity<?> putUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto userRequestDto){
         try {
@@ -139,8 +139,8 @@ public class UserController {
 
     //판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
-    @PutMapping("/myProducts/onSale?userId={userId}&productId={productId}")
-    public ResponseEntity<?> postMyProductStatus(@RequestParam Long userId,
+    @PutMapping("/myProducts/onSale/{userId}")
+    public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){
         try{
             userService.postMyProductStatusService(userId, productRequestDto);
