@@ -21,7 +21,7 @@ public class MessageController {
     @MessageMapping("/api/chat/message")
     public void enter(ChatMessage message) {
         if (ChatMessage.MessageType.ENTER.equals(message.getType())) {
-            System.out.println(message.getSender().getNickName()+"님이 입장하였습니다.");
+            System.out.println(message.getSender()+"님이 입장하였습니다.");
         }
 
         messageService.saveMessage(message);

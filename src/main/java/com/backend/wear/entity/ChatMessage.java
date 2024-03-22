@@ -30,8 +30,8 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //채팅방 ID
-    private String roomId;
+//    //채팅방 ID
+//    private String roomId;
 
     @OneToOne
     @JoinColumn(name="sender_id")
