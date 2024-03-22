@@ -210,14 +210,14 @@ public class ProductService {
 
     //상품 판매 상태 변경 (판매 완료 또는 판매 중)
     @Transactional
-    public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId, Long productId ) throws Exception {
+    public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId ) throws Exception {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
         if(user != null){
             //해당 사용자의 상품을 제대로 요청했는지 확인
-            Product product = productRepository.findById(productId)
+            Product product = productRepository.findById(requestDto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
 
             // 요청으로 받은 postStatus를 상품의 상태로 설정합니다.
