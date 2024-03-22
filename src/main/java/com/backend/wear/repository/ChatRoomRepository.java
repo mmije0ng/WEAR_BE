@@ -10,5 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+  
+    //판매자 또는 구매자
     List<ChatRoom> findBySellerIdOrCustomerId(Long sellerId, Long customerId);
 }
