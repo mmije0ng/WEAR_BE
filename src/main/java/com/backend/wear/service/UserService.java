@@ -170,8 +170,10 @@ public class UserService {
     public List<DonationApplyResponseDto> getMyDonationApplyCompleteService(Long userId){
         List<DonationApplyResponseDto> responseDtoList
                 = mapToDonationApplyResponseDtoComplete(userId);
-        if(responseDtoList.isEmpty())
+        if(responseDtoList.isEmpty()){
             throw new IllegalArgumentException("현재 기부 진행이 완료된 내역이 없습니다.");
+        }
+
         else
             return responseDtoList;
     }
