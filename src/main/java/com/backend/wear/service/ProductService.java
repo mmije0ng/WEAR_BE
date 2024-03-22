@@ -214,6 +214,7 @@ public class ProductService {
     @Transactional
     public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId ) throws Exception {
 
+        System.out.println(requestDto);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
@@ -221,6 +222,9 @@ public class ProductService {
             //해당 사용자의 상품을 제대로 요청했는지 확인
             Product product = productRepository.findById(requestDto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+            System.out.println(requestDto.getPostStatus());
+
 
             // 요청으로 받은 postStatus를 상품의 상태로 설정합니다.
             product.setPostStatus(requestDto.getPostStatus());

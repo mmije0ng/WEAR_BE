@@ -15,10 +15,10 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:application-prod.yml")
 public class S3uploadConfig {
 
-   /* @Value("${cloud.aws.credentials.aws-access-key-id}")
+    @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.aws-secret-access-key}")
+    @Value("${cloud.aws.credentials.secret-key}")
     private String secretKey;
 
     @Value("${cloud.aws.region.static}")
@@ -35,5 +35,5 @@ public class S3uploadConfig {
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .build();
-    }*/
+    }
 }

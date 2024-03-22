@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@RestController
+/*@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ImageUploadController {
 
-/*    private final ImageUploadService imageUploadService;
+    private final ImageUploadService imageUploadService;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -28,6 +31,30 @@ public class ImageUploadController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
         }
-    }*/
+    }
 
+}*/
+
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+public class ImageUploadController {
+
+    private final ImageUploadService imageUploadService;
+
+    @PostMapping("/upload")
+    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+        List<String> fileUrls = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                String fileUrl = imageUploadService.saveFile(file);
+                fileUrls.add(fileUrl);
+            }
+            return ResponseEntity.ok().body(fileUrls);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
+    }
 }

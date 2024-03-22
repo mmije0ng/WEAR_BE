@@ -14,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ImageUploadService {
 
-/*    private final AmazonS3 amazonS3;
+    private final AmazonS3 amazonS3;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -28,5 +28,5 @@ public class ImageUploadService {
 
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         return amazonS3.getUrl(bucket, originalFilename).toString();
-    }*/
+    }
 }
