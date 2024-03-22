@@ -13,9 +13,12 @@ import java.time.LocalDateTime;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomProfileDto {
-//    private Long userId; //보낸 사람 pk
+
+    private Long roomId; //채팅방 pk
+
+    private Long productId;
+
     private String userNickName;
     private String userProfileImage;
     private String userLevel;
- //   private LocalDateTime sendTime; //몇분전에 메시지 보냈는지
 }
