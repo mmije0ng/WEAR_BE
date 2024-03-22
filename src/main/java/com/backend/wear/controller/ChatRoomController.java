@@ -41,7 +41,6 @@ public class ChatRoomController {
                 return ResponseEntity.ok().body(chatRoomId.getChatRoomId());
             }
 
-
             else{
                 Long roomId=chatRoomId.getChatRoomId();
                 // 생성된 채팅방의 ID를 사용하여 enterRoom 엔드포인트로 리다이렉션
