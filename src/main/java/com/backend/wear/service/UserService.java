@@ -317,14 +317,23 @@ public class UserService {
         List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
         List<ProductResponseDto> myHistoryList=new ArrayList<>();
 
+
+
         for(Product p: list){
+            // JSON 배열 파싱
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(p.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
                     .price(p.getPrice())
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(p.getProductImage())
+                    .productImage(array)
                     .build();
 
             myHistoryList.add(dto);
