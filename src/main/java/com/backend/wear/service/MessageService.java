@@ -28,7 +28,8 @@ public class MessageService {
 
     @Transactional
     public void saveMessage(MyMessage message) {
-
+    
+        //채팅방
         ChatRoom chatRoom = chatRoomRepository.findById(message.getChatRoomId())
                 .get();
 
