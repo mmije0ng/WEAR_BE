@@ -39,19 +39,17 @@ public class ChatRoomController {
 
         try {
             //채팅방 pk 반환
-            ChatRoomIdDto chatRoomId =  chatService.createRoom(productId, customerId);
+            ChatRoomDto chatRoom =  chatService.createRoom(productId, customerId);
 
-            if(chatRoomId.isCreated()){
-                return ResponseEntity.ok().body(chatRoomId.getChatRoomId());
+            if(chatRoom.is_created()){
+                return ResponseEntity.ok().body(chatRoom);
             }
 
             else{
-                Long roomId=chatRoomId.getChatRoomId();
+                Long roomId=chatRoom.getChatRoomId();
                 log.info("존재하는 채팅방, roomId: "+roomId);
-                // 생성된 채팅방의 ID를 사용하여 enterRoom 엔드포인트로 리다이렉션
-                return ResponseEntity.status(HttpStatus.FOUND)
-                        .location(URI.create("/api/chat/room/enter?roomId=" + roomId + "&productId=" + productId))
-                        .build();
+
+                return ResponseEntity.ok().body(chatRoom);
             }
         }
 
