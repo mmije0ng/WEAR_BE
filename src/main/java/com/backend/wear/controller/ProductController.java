@@ -24,41 +24,41 @@ public class ProductController {
     }
 
     //카테고리별 최신순 조회
-    //api/products/category?categoryName={}&pageNumber={}
-//    @GetMapping("/category")
-//    public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName,@RequestParam Integer pageNumber)
-//    {
-//        System.out.println(categoryName);
-//        Page page = productService.findProductsByCategory(categoryName, pageNumber);
-//
-//        //페이지에 요소가 있는 경우
-//        if(!page.isEmpty()){
-//            return ResponseEntity.ok(page);
-//        }
-//
-//        else{
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("카테고리와 일치하는 상품이 없습니다.");
-//        }
-//    }
+//    api/products/category?categoryName={}&pageNumber={}
+    @GetMapping("/category")
+    public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName,@RequestParam Integer pageNumber)
+    {
+        System.out.println(categoryName);
+        Page page = productService.findProductsByCategory(categoryName, pageNumber);
 
-    //카테고리별 최신순, 판매 상태
-    //api/products/category/sale?categoryName={}&postStatus={}&pageNumber={}
-//    @GetMapping("/category/sale")
-//    public ResponseEntity<?> findProductsByCategoryName(@RequestParam String categoryName,
-//                                                        @RequestParam String postStatus, @RequestParam Integer pageNumber ){
-//        Page page=productService.findProductsByCategoryOnSale(categoryName,postStatus,pageNumber);
-//
-//        //페이지에 요소가 있는 경우
-//        if(!page.isEmpty()){
-//            return ResponseEntity.ok(page);
-//        }
-//
-//        else{
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("카테고리와 일치하는 판매중인 상품이 없습니다.");
-//        }
-//    }
+        //페이지에 요소가 있는 경우
+        if(!page.isEmpty()){
+            return ResponseEntity.ok(page);
+        }
+
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("카테고리와 일치하는 상품이 없습니다.");
+        }
+    }
+
+//    카테고리별 최신순, 판매 상태
+//    api/products/category/sale?categoryName={}&postStatus={}&pageNumber={}
+    @GetMapping("/category/sale")
+    public ResponseEntity<?> findProductsByCategoryName(@RequestParam String categoryName,
+                                                        @RequestParam String postStatus, @RequestParam Integer pageNumber ){
+        Page page=productService.findProductsByCategoryOnSale(categoryName,postStatus,pageNumber);
+
+        //페이지에 요소가 있는 경우
+        if(!page.isEmpty()){
+            return ResponseEntity.ok(page);
+        }
+
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("카테고리와 일치하는 판매중인 상품이 없습니다.");
+        }
+    }
 
 
     //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
