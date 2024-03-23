@@ -432,4 +432,10 @@ public class UserService {
         else
             return 500-currentPoint;
     }
+
+    public void myHistoryProduct(Long userId){
+
+
+    }
+
 }
