@@ -45,6 +45,7 @@ public class ChatRoomController {
 
             else{
                 Long roomId=chatRoomId.getChatRoomId();
+                log.info("존재하는 채팅방, roomId: "+roomId);
                 // 생성된 채팅방의 ID를 사용하여 enterRoom 엔드포인트로 리다이렉션
                 return ResponseEntity.status(HttpStatus.FOUND)
                         .location(URI.create("/api/chat/room/enter?roomId=" + roomId + "&productId=" + productId))
