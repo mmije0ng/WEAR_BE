@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +18,8 @@ public class LoginDto {
 
     private String userId;
     private String userPassword;
+    private String userCheckPassword;
+    private String universityName;
+    private String universityEmail;
+    private List<String> list;
 }
