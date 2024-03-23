@@ -68,7 +68,7 @@ public class LonginController {
         myUniversityEmail=dto.getUniversityEmail();
 
         Map<String, Object> response =
-                UnivCert.certify(API_KEY, dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
+                UnivCert.certify("8664efc6-ab71-47b9-8cb0-5aa20dccc59c", dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
 
         return ResponseEntity.ok(response);
     }
@@ -79,7 +79,7 @@ public class LonginController {
             @RequestBody UnivCertRequestDto dto) throws IOException {
 
         Map<String, Object> response =
-                UnivCert.certifyCode(API_KEY, dto.getUniversityEmail(),
+                UnivCert.certifyCode("8664efc6-ab71-47b9-8cb0-5aa20dccc59c", dto.getUniversityEmail(),
                         dto.getUniversityName(), dto.getCode());
 
         Boolean success = (Boolean) response.get("success");
