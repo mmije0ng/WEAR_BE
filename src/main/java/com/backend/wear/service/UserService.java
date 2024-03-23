@@ -137,7 +137,7 @@ public class UserService {
         Product product=productRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
 
-        product.setPostStatus("soldOut");
+        product.setPostStatus(dto.getPostStatus());
   //      productRepository.save(product);
     }
 
