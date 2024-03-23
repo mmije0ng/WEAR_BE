@@ -2,6 +2,7 @@ package com.backend.wear.dto;
 
 
 import com.backend.wear.entity.ChatMessage;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatRoomDto {
     //채팅방 dto
@@ -35,4 +37,6 @@ public class ChatRoomDto {
     private String customerNickName;
     private String customerProfileImage;
     private String customerLevel;
+
+    private boolean is_created;
 }

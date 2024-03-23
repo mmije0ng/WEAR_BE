@@ -1,5 +1,7 @@
 package com.backend.wear.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,13 +12,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final Logger log = LoggerFactory.getLogger(WebSocketConfig.class);
+
     // sockJS Fallback을 이용해 노출할 endpoint 설정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         // 웹소켓이 handshake를 하기 위해 연결하는 endpoint
         registry.addEndpoint("/ws-stomp")
-                .setAllowedOriginPatterns("http://localhost:5173", "http://localhost:8080", "http://43.201.189.171:8080")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
+
+        log.info("엔드포인트 연결 완료");
     }
 
     //메세지 브로커에 관한 설정

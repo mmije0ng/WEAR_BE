@@ -4,6 +4,7 @@ import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -65,13 +66,8 @@ public class UserService {
         user.setUserName(userRequestDto.getUserName());
         user.setNickName(userRequestDto.getNickName());
         user.setProfileImage(userRequestDto.getProfileImage());
-        setProfileStyle(user,userRequestDto.getStyle());
 
-//        try {
-//            userRepository.save(user); // 변경된 엔티티를 저장
-//        } catch (DataAccessException e) {
-//            throw new IllegalStateException("회원 정보 변경에 실패했습니다.");
-//        }
+        setProfileStyle(user,userRequestDto.getStyle());
     }
 
     //유저 정보 조회
@@ -140,9 +136,9 @@ public class UserService {
     public void postMyProductStatusService(Long userId, ProductRequestDto dto){
         Product product=productRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
-        product.setPostStatus(dto.getPostStatus());
 
-        productRepository.save(product);
+        product.setPostStatus("soldOut");
+  //      productRepository.save(product);
     }
 
     //숨김 처리 상품 보기
@@ -192,7 +188,7 @@ public class UserService {
         System.out.println("이름: "+user.getUserName());
 
         return UserResponseDto.builder()
-                .userName(user.getUserName())
+                .userName(user.getNickName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .profileImage(user.getProfileImage())
@@ -366,21 +362,20 @@ public class UserService {
     }
 
     //스타일 태그 이름으로 Style 저장
-    private void setProfileStyle (User user, List<String> style){
+    @Transactional
+    public void setProfileStyle (User user, List<String> style){
         List<Style> newStyles = new ArrayList<>();
 
-        for (String styleName : style) {
-            // 기존에 동일한 이름의 Style이 있는지 확인하거나 새로 생성합니다.
-            Style s = styleRepository.findByStyleNameAndUserId(styleName,
-                            user.getId())
-                    .orElse(new Style(styleName));
+        styleRepository.deleteAllByUserId(user.getId());
 
-            // Style 객체와 User 객체의 연관 관계 설정
-            s.setUser(user);
-            newStyles.add(s);
+        for(String s: style){
+            Style styleTag =new Style();
+            styleTag.setUser(user);
+            styleTag.setStyleName(s);
+
+            newStyles.add(styleTag);
         }
 
-        // 기존의 Style을 삭제하고 새로운 Style을 설정
         user.setStyle(newStyles);
     }
 
@@ -411,7 +406,9 @@ public class UserService {
         else if(currentLevel.equals("새싹"))
             return "목화";
         else if(currentLevel.equals("목화"))
-            return "천";
+            return "꽃";
+        else if(currentLevel.equals("꽃"))
+            return "옷";
         else
             return "레벨 달성 완료";
     }
@@ -424,13 +421,15 @@ public class UserService {
 
     //남은 레벨 포인트
     private Integer getRemainLevelPoint(Integer currentPoint){
-        if(currentPoint>=0 && currentPoint<25)
-            return 25-currentPoint;
-        else if(currentPoint>= 25 && currentPoint<50)
-            return 50-currentPoint;
-        else if(currentPoint>= 50 && currentPoint<75)
-            return 75-currentPoint;
-        else
+        if(currentPoint>=0 && currentPoint<100)
             return 100-currentPoint;
+        else if(currentPoint>= 100 && currentPoint<200)
+            return 200-currentPoint;
+        else if(currentPoint>= 200 && currentPoint<300)
+            return 300-currentPoint;
+        else if(currentPoint>=300 && currentPoint<400)
+            return 400-currentPoint;
+        else
+            return 500-currentPoint;
     }
 }

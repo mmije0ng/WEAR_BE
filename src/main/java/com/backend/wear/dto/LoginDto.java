@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductRequestDto {
-    private Long id;
-    private String postStatus;
+public class LoginDto {
+
+    private String userId;
+    private String userPassword;
 }

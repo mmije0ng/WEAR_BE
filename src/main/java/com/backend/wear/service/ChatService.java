@@ -35,7 +35,30 @@ public class ChatService {
     }
 
     //채팅방 생성
-    public ChatRoomIdDto createRoom(Long productId, Long customerId) {
+    public ChatRoomDto createRoom(Long productId, Long customerId) {
+
+        //이미 상품에 대해 채팅방이 존재하는지
+        Optional<ChatRoom> existingRoomOpt = chatRoomRepository.findByProductIdAndCustomerId(productId, customerId);
+
+        if (existingRoomOpt.isPresent()) {
+            ChatRoom existingRoom = existingRoomOpt.get();
+            // 이미 존재하는 채팅방이면 해당 채팅방의 ID를 반환
+            return ChatRoomDto.builder()
+                    .chatRoomId(existingRoom.getId())
+                    .productId(existingRoom.getProduct().getId())
+                    .productImage(existingRoom.getProduct().getProductImage())
+                    .productName(existingRoom.getProduct().getProductName())
+                    .sellerId(existingRoom.getSeller().getId())
+                    .sellerNickName(existingRoom.getSeller().getNickName())
+                    .sellerProfileImage(existingRoom.getSeller().getProfileImage())
+                    .sellerLevel(existingRoom.getSeller().getLevel().getLabel())
+                    .customerId(existingRoom.getCustomer().getId())
+                    .customerNickName(existingRoom.getCustomer().getNickName())
+                    .customerProfileImage(existingRoom.getCustomer().getProfileImage())
+                    .customerLevel(existingRoom.getCustomer().getLevel().getLabel())
+                    .is_created(false)
+                    .build();
+        }
 
         //상품
         Product product = productRepository.findById(productId)
@@ -48,6 +71,9 @@ public class ChatService {
         //판매자
         User seller = productRepository.findById(productId).get().getUser();
 
+        if(customer.getId()==seller.getId())
+            throw new IllegalArgumentException("판매자와 구매자는 똑같은 아이디 불가능");
+
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setCustomer(customer);
         chatRoom.setSeller(seller);
@@ -55,14 +81,25 @@ public class ChatService {
 
         chatRoomRepository.save(chatRoom);
 
-        ChatRoomIdDto dto = ChatRoomIdDto.builder()
-                .chatRoomId(chatRoom.getId())
+        return ChatRoomDto.builder()
+                .chatRoomId(chatRoom .getId())
+                .productId(chatRoom .getProduct().getId())
+                .productImage(chatRoom .getProduct().getProductImage())
+                .productName(chatRoom .getProduct().getProductName())
+                .sellerId(chatRoom .getSeller().getId())
+                .sellerNickName(chatRoom .getSeller().getNickName())
+                .sellerProfileImage(chatRoom .getSeller().getProfileImage())
+                .sellerLevel(chatRoom .getSeller().getLevel().getLabel())
+                .customerId(chatRoom .getCustomer().getId())
+                .customerNickName(chatRoom .getCustomer().getNickName())
+                .customerProfileImage(chatRoom .getCustomer().getProfileImage())
+                .customerLevel(chatRoom .getCustomer().getLevel().getLabel())
+                .is_created(true)
                 .build();
-
-        return dto;
     }
 
     //채팅방 입장
+
 //    public ChatRoomDto chatRoom(Long roomId, Long productId) {
 //        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
 //                .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
@@ -93,6 +130,7 @@ public class ChatService {
 //        return chatRoomDto;
 //    }
 
+
     //채팅 리스트 불러오기
     public List<ChatRoomProfileDto> findAllRoom(Long userId) {
 
@@ -109,6 +147,8 @@ public class ChatService {
 
                 User seller = r.getSeller();
                 dto=ChatRoomProfileDto.builder()
+                        .chatRoomId(r.getId())
+                        .productId(r.getProduct().getId())
                         .userNickName(seller.getNickName())
                         .userProfileImage(seller.getProfileImage())
                         .userLevel(seller.getLevel().getLabel())
@@ -120,6 +160,8 @@ public class ChatService {
             else {
                 User customer = r.getCustomer();
                 dto=ChatRoomProfileDto.builder()
+                        .chatRoomId(r.getId())
+                        .productId(r.getProduct().getId())
                         .userNickName(customer.getNickName())
                         .userProfileImage(customer.getProfileImage())
                         .userLevel(customer.getLevel().getLabel())
@@ -146,5 +188,4 @@ public class ChatService {
 //
 //        return chatRoomList;
 //    }
-
 }
