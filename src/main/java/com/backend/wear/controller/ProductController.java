@@ -3,6 +3,7 @@ package com.backend.wear.controller;
 import com.backend.wear.dto.ProductPostRequestDto;
 import com.backend.wear.dto.ProductRequestDto;
 import com.backend.wear.dto.ProductResponseDto;
+import com.backend.wear.entity.Product;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -64,15 +67,35 @@ public class ProductController {
     //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
     //  /products/search?searchName={searchName}
 
-    /*@GetMapping("/products/search")
-    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {}*/
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {
+
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductName(searchName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+    }
 
 
 
     //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
     //   /products/search/category?searchName={searchName}?categoryName={categoryName}
+    @GetMapping("/search/category")
+    public ResponseEntity<?> searchProductsby(@RequestParam String searchName, String categoryName) {
 
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductNameAndCategory(searchName, categoryName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
 
+    }
 
     //상품 상세 페이지 불러오기
     // api/products/{productId}

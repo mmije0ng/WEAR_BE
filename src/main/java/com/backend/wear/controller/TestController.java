@@ -3,6 +3,7 @@ package com.backend.wear.controller;
 import org.springframework.web.bind.annotation.*;
 
 
+/*
 @RestController
 @RequestMapping("/")
 public class TestController {
@@ -12,4 +13,4 @@ public class TestController {
     public String main(){
         return "Hello World";
     }
-}
+}*/
