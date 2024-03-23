@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -39,4 +40,6 @@ public class ChatRoomDto {
     private String customerLevel;
 
     private boolean is_created;
+
+    private List<String> messageList=new ArrayList<>();
 }
