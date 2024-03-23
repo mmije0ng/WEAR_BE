@@ -32,16 +32,19 @@ public class UserService {
 
     private final ProductRepository productRepository;
 
+    private final ObjectMapper objectMapper;
+
     @Autowired
-    public UserService(UserRepository userRepository,StyleRepository styleRepository,
+    public UserService(UserRepository userRepository, StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
-                       WishRepository wishRepository, ProductRepository productRepository){
+                       WishRepository wishRepository, ProductRepository productRepository, ObjectMapper objectMapper){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
         this.wishRepository=wishRepository;
         this.productRepository=productRepository;
+        this.objectMapper = objectMapper;
     }
 
     //마이페이지 사용자 정보
@@ -300,9 +303,9 @@ public class UserService {
 
         for(Product p: list){
             // JSON 배열 파싱
-            String[] array = new String[0];
+            String array;
             try {
-                array = objectMapper.readValue(p.getProductImage(), String[].class);
+                array = objectMapper.readValue(p.getProductImage(), String.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
