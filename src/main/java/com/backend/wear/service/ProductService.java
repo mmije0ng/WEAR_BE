@@ -84,6 +84,7 @@ public class ProductService {
         }
     }
 
+    //카테고리별, 판매중, 최신순
     @Transactional
     public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
         Page<Product> productsPage;
@@ -107,26 +108,6 @@ public class ProductService {
         return PageRequest.of(pageNumber,12,
                 Sort.by("updatedAt").descending());
     }
-
-    //카테고리별, 판매중, 최신순
-//    @Transactional
-//    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
-//        Page<Product> productsPage;
-//
-//        //전체, 판매중, 최신순
-//        if(categoryName.equals("전체")){
-//            productsPage=productRepository
-//                    .findByPostStatusAndIsPrivateFalse(postStatus);
-//        }
-//
-//        //카테고리별 판매중 최신순
-//        else{
-//            productsPage =productRepository
-//                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName);
-//        }
-//
-//        return productsPage.map(this::mapToProductResponseDto);
-//    }
 
     //상품 상세 조회
     @Transactional
