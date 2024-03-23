@@ -46,20 +46,20 @@ public class ChatRoomController {
 
     // 채팅방 입장
     // chat/room/enter?roomId={roomId}&productId={productId}
-    @GetMapping("/room/enter")
-    public ResponseEntity<?> enterRoom(@RequestParam Long roomId,
-                                       @RequestParam Long productId)
-    {
-        ChatRoomDto dto;
-
-        try{
-            dto=chatService.chatRoom(roomId, productId);
-            return ResponseEntity.ok().body(dto);
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
+//    @GetMapping("/room/enter")
+//    public ResponseEntity<?> enterRoom(@RequestParam Long roomId,
+//                                       @RequestParam Long productId)
+//    {
+//        ChatRoomDto dto;
+//
+//        try{
+//            dto=chatService.chatRoom(roomId, productId);
+//            return ResponseEntity.ok().body(dto);
+//        } catch (IllegalArgumentException e){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(e.getMessage());
+//        }
+//    }
 
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")
