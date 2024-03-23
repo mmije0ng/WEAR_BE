@@ -230,15 +230,15 @@ public class UserController {
                 .body("서비스 페이지");
     }
 
-//    @GetMapping("/myHistory/{userId}")
-//    public ResponseEntity<?> getMyHistory(Long userId){
-//        try {;
-//
-//            return ResponseEntity.ok().body();
-//
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(e.getMessage());
-//        }
-//    }
+    @GetMapping("/myHistory/{userId}")
+    public ResponseEntity<?> getMyHistory(Long userId){
+        try {;
+            List<ProductResponseDto> list=userService.myHistoryService(userId);
+            return ResponseEntity.ok().body(list);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
 }

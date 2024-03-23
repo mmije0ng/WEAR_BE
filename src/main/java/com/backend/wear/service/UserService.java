@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -129,6 +130,17 @@ public class UserService {
 
         else
             return productResponseDtoList;
+    }
+
+    @Transactional
+    public List<ProductResponseDto> myHistoryService(Long userId){
+        List<ProductResponseDto> list = mapToMyHistory(userId);
+
+        if(list.isEmpty())
+            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
+
+        else
+            return list;
     }
 
     //판매 중 상품 완료로 변경
@@ -272,6 +284,31 @@ public class UserService {
         }
 
         return myProductList;
+    }
+
+    //구매 내역
+    private List<ProductResponseDto> mapToMyHistory(Long userId){
+        List<Product> list =  productRepository.findAll();
+        List<ProductResponseDto> myHistoryList=new ArrayList<>();
+
+        for(Product p: list){
+
+            if(p.getUser().getId()==userId)
+                continue;
+
+            ProductResponseDto dto=ProductResponseDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(p.getProductImage())
+                    .build();
+
+            myHistoryList.add(dto);
+        }
+
+        return myHistoryList;
     }
 
     //숨김내역
@@ -431,11 +468,6 @@ public class UserService {
             return 400-currentPoint;
         else
             return 500-currentPoint;
-    }
-
-    public void myHistoryProduct(Long userId){
-
-
     }
 
 }
