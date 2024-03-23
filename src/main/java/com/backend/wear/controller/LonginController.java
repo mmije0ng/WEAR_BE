@@ -29,18 +29,18 @@ public class LonginController {
     }
 
     // api/login
-    @PostMapping("/login")
-    public ResponseEntity<?> myLogin(@RequestBody LoginDto loginDto){
-        try{
-            LoginResponseDto dto=loginService.loginByUser(loginDto);
-             return ResponseEntity.ok(dto);
-        }
-
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(e.getMessage());
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<?> myLogin(@RequestBody LoginDto loginDto){
+//        try{
+//            LoginResponseDto dto=loginService.loginByUser(loginDto);
+//             return ResponseEntity.ok(dto);
+//        }
+//
+//        catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                .body(e.getMessage());
+//        }
+//    }
 
     // api/signup
 //    @PostMapping("/signup")
