@@ -1,11 +1,21 @@
 package com.backend.wear.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @Configuration
+@EnableWebSocket
 public class WebConfig implements WebMvcConfigurer {
+    private final StompHandshakeInterceptor interceptor;
+
+    @Autowired
+    public WebConfig(StompHandshakeInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -20,4 +30,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600); // Preflight 요청 결과를 캐시하는 시간 (초)
     }
+
+//    @Bean
+//    public StompHandshakeInterceptor stompHandler() {
+//        return new StompHandshakeInterceptor();
+//    }
 }
