@@ -45,7 +45,7 @@ public class ChatService {
             // 이미 존재하는 채팅방이면 해당 채팅방의 ID를 반환
             return ChatRoomIdDto.builder()
                     .chatRoomId(existingRoom.getId())
-                    .created(false)
+                    .is_created(false)
                     .build();
         }
 
@@ -72,7 +72,7 @@ public class ChatService {
 
         ChatRoomIdDto dto = ChatRoomIdDto.builder()
                 .chatRoomId(chatRoom.getId())
-                .created(true)
+                .is_created(true)
                 .build();
 
         return dto;
