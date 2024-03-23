@@ -24,6 +24,7 @@ public class MessageController {
     // pub/api/chat/message
     @MessageMapping("/api/chat/message")
     public void enter(ChatMessage message) {
+        log.info("채팅방 아이디: "+message.getId());
 
         log.info(message.getId()+": "+message.getMessage());
         messageService.saveMessage(message);
