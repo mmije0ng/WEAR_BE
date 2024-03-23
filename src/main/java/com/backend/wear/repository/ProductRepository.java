@@ -20,16 +20,16 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // isPrivate가 false인 상품들만 반환
-    Page<Product> findByIsPrivateFalse(Pageable pageable);
+    List<Product> findByIsPrivateFalse();
 
     // 카테고리별로 isPrivate가 false인 상품 조회
-    Page<Product> findByCategory_CategoryNameAndIsPrivateFalse(String categoryName, Pageable pageable);
+    List<Product> findByCategory_CategoryNameAndIsPrivateFalse(String categoryName);
 
     // 판매 상태와 카테고리별로 isPrivate가 false인 상품 조회
-    Page<Product> findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(String postStatus, String categoryName, Pageable pageable);
+    List<Product> findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(String postStatus, String categoryName);
 
     //판매중인 상품만 조회
-    Page<Product> findByPostStatusAndIsPrivateFalse(String postStatus, Pageable pageable);
+    List<Product> findByPostStatusAndIsPrivateFalse(String postStatus);
 
 
     //검색어별 상품 조회
