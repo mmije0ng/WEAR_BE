@@ -143,8 +143,6 @@ public class ProductService {
         //판매자
         UserResponseDto seller =mapToUserPostResponseDto(user);
 
-
-
         //상품
         return ProductResponseDto.builder()
                 .id(product.getId())
