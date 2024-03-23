@@ -104,7 +104,7 @@ public class ProductService {
         return productsPage.map(this::mapToProductResponseDto);
     }
 
-    private Pageable pageRequest(int pageNumber){
+    private Pageable pageRequest(Integer pageNumber){
         return PageRequest.of(pageNumber,50,
                 Sort.by("updatedAt").descending());
     }

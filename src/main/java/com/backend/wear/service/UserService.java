@@ -14,6 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class UserService {
 
@@ -27,16 +32,19 @@ public class UserService {
 
     private final ProductRepository productRepository;
 
+    private final ObjectMapper objectMapper;
+
     @Autowired
-    public UserService(UserRepository userRepository,StyleRepository styleRepository,
+    public UserService(UserRepository userRepository, StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
-                       WishRepository wishRepository, ProductRepository productRepository){
+                       WishRepository wishRepository, ProductRepository productRepository, ObjectMapper objectMapper){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
         this.wishRepository=wishRepository;
         this.productRepository=productRepository;
+        this.objectMapper = objectMapper;
     }
 
     //마이페이지 사용자 정보
@@ -291,14 +299,23 @@ public class UserService {
         List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
         List<ProductResponseDto> myHistoryList=new ArrayList<>();
 
+
+
         for(Product p: list){
+            // JSON 배열 파싱
+            String array;
+            try {
+                array = objectMapper.readValue(p.getProductImage(), String.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
                     .price(p.getPrice())
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(p.getProductImage())
+                    .productImage(array)
                     .build();
 
             myHistoryList.add(dto);
