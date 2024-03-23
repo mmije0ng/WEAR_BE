@@ -37,6 +37,7 @@ public class ChatService {
     //채팅방 생성
     public ChatRoomIdDto createRoom(Long productId, Long customerId) {
 
+        //이미 상품에 대해 채팅방이 존재하는지
         Optional<ChatRoom> existingRoomOpt = chatRoomRepository.findByProductIdAndCustomerId(productId, customerId);
 
         if (existingRoomOpt.isPresent()) {

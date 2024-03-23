@@ -7,11 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductRequestDto {
-    private Long id;
-    private String postStatus;
-}
+//@Getter
+//@AllArgsConstructor
+//@NoArgsConstructor
+//@Builder
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//public class LoginDto {
+//
+//
+//}
