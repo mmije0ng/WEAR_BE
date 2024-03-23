@@ -105,7 +105,7 @@ public class ProductService {
     }
 
     private Pageable pageRequest(int pageNumber){
-        return PageRequest.of(pageNumber,12,
+        return PageRequest.of(pageNumber,50,
                 Sort.by("updatedAt").descending());
     }
 
@@ -238,6 +238,7 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
     //상품 판매 상태 변경 (판매 완료 또는 판매 중)
     @Transactional
     public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId ) throws Exception {
@@ -263,8 +264,6 @@ public class ProductService {
             // 변경된 상품 정보를 저장합니다.
             productRepository.save(product);
         }
-
-
     }
 
 
@@ -304,7 +303,6 @@ public class ProductService {
 
             productRepository.deleteByUserAndProduct(userId,productId);
         }
-
     }
 
 }
