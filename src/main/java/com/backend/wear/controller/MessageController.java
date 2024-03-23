@@ -32,6 +32,6 @@ public class MessageController {
         messageService.saveMessage(message);
 
         //sub/api/chat/room/{roomId}
-        sendingOperations.convertAndSend("/sub/api/chat/room/"+message.getId(), message);
+        sendingOperations.convertAndSend("/sub/api/chat/room/"+message.getChatRoom().getId(), message);
     }
 }

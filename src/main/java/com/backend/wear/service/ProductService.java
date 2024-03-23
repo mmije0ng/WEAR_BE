@@ -208,9 +208,6 @@ public class ProductService {
 
     }
 
-
-
-
     //상품 정보 변경(전체를 받아서 전체를 변경)
     @Transactional
     public void updateProductPost(ProductPostRequestDto requestDTO, Long userId, Long productId) throws Exception {
