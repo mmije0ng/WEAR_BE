@@ -33,6 +33,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     //검색어별 상품 조회
+    /*List<Product> findByProductNameContainingIgnoreCase(String searchName);*/
+    @Query("select p from Product p where p.productName LIKE %:searchName%")
+    List<Product> findByProductName(String searchName);
+
+    //검색어별 , 카테고리별 상품 조회
+    @Query("select p from Product p where p.productName LIKE %:searchName% AND p.category.categoryName = :categoryName")
+    List<Product> findByProductNameAndCategoryName(@Param("searchName") String seacrchName, @Param("categoryName") String categoryName);
+
+
 
     //사용자 아이디로 판매자 조회
     User findUserById(Long productId);

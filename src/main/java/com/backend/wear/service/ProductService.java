@@ -15,27 +15,17 @@ import com.backend.wear.repository.WishRepository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.util.Json;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -46,6 +36,13 @@ public class ProductService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
+
+    // ObjectMapper 생성
+    ObjectMapper objectMapper = new ObjectMapper();
+
+   /* // JSON 배열 파싱
+    String[] array = objectMapper.readValue(jsonString, String[].class);
+*/
     // List<String>를 JSON 문자열로 변환하는 메서드
     private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -122,9 +119,13 @@ public class ProductService {
                 .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
                 .orElse(false); // 기본값으로 false를 반 환
 
-       /* // JSON문자열을 List<String>으로 변환
-        String productImageJson = product.getProductImage();
-        List<String> productImageList = convertJsonToImageList(productImageJson);*/
+        // JSON 배열 파싱
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(product.getProductImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return ProductResponseDto.builder()
                 .id(product.getId())
@@ -133,7 +134,7 @@ public class ProductService {
                 .postStatus(product.getPostStatus())
                 .productStatus(product.getProductStatus())
                 .isSelected(isSelected)
-                .productImage(product.getProductImage())
+                .productImage(array)
                 .build();
     }
 
@@ -143,6 +144,13 @@ public class ProductService {
         //판매자
         UserResponseDto seller =mapToUserPostResponseDto(user);
 
+        // JSON 배열 파싱
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(product.getProductImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
 
         //상품
@@ -154,7 +162,7 @@ public class ProductService {
                 .productStatus(product.getProductStatus())
                 .postStatus(product.getPostStatus())
                 .productContent(product.getProductContent())
-                .productImage(product.getProductImage())
+                .productImage(array)
                 .place(product.getPlace())
                 .build();
     }
@@ -174,6 +182,42 @@ public class ProductService {
         return PageRequest.of(pageNumber,12,
                 Sort.by("updatedAt").descending());
     }
+
+
+
+
+    @Transactional
+    public List<ProductResponseDto> searchProductByproductName(String searchName){
+        List<Product> products  = productRepository.findByProductName(searchName);
+
+        List<ProductResponseDto> responseDto = products.stream()
+                .map(ProductResponseDto::new)
+                .toList();
+
+        return responseDto;
+    }
+
+
+
+
+    //상품 검색하기(productName 검색, 카테고리 검색)
+    @Transactional
+    public List<ProductResponseDto> searchProductByproductNameAndCategory(String searchName, String categoryName){
+
+        List<Product> filteredProducts  = productRepository.findByProductNameAndCategoryName(searchName, categoryName);
+
+        List<ProductResponseDto> responseDto = filteredProducts.stream()
+                .map(ProductResponseDto::new)
+                .toList();
+
+        return responseDto;
+
+
+    }
+
+
+
+
 
     //상품 등록하기
     @Transactional
