@@ -2,6 +2,8 @@ package com.backend.wear.controller;
 
 import com.backend.wear.dto.*;
 import com.backend.wear.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    private static Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -86,8 +90,8 @@ public class UserController {
     }
 
     //계정 정보 저장
-    // api/users/userInfo/{userId}
-    @PutMapping("/userInfo/{userId}")
+    // api/users/userInfo/update/{userId}
+    @PutMapping("/userInfo/update/{userId}")
     public ResponseEntity<?> putUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto userRequestDto){
         try {
             userService.updateUserInfo(userId, userRequestDto);
@@ -126,6 +130,7 @@ public class UserController {
 
     //판매 중 상품 불러오기
     // api/users/myProducts/onSale/{userId}
+  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
     @GetMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId){
         try{
@@ -139,11 +144,13 @@ public class UserController {
 
     //판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
+
+  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
     @PutMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){
         try{
-            userService.postMyProductStatusService(userId,productRequestDto);
+            userService.postMyProductStatusService(userId, productRequestDto);
             return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
