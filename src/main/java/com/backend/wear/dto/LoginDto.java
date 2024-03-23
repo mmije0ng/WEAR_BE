@@ -19,7 +19,7 @@ public class LoginDto {
     private String userId;
     private String userPassword;
     private String userCheckPassword;
-    private String universityName;
-    private String universityEmail;
-    private List<String> list;
+//    private String universityName;
+//    private String universityEmail;
+//    private List<String> list;
 }

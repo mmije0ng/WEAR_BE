@@ -31,7 +31,7 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {url 'https://jitpack.io'}
+    maven{url 'https://jitpack.io'}
 }
 
 dependencies {
@@ -76,6 +76,8 @@ dependencies {
     implementation 'org.json:json:20231013'
 
 
+    //univcert
+    implementation 'com.github.in-seo:univcert:master-SNAPSHOT'
 }
 
 tasks.named('test') {

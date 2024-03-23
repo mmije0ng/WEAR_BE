@@ -1,5 +1,6 @@
 package com.backend.wear.service;
 
+import com.backend.wear.dto.ChatMessageDto;
 import com.backend.wear.dto.ChatRoomDto;
 import com.backend.wear.dto.ChatRoomIdDto;
 import com.backend.wear.dto.ChatRoomProfileDto;
@@ -101,7 +102,7 @@ public class ChatService {
     }
 
     //채팅방 입장
-    public ChatRoomDto chatRoom(Long roomId, Long productId) {
+    public List <ChatMessageDto> enterChatRoom(Long roomId, Long productId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
 
@@ -113,28 +114,49 @@ public class ChatService {
         User customer = chatRoom.getCustomer();
 
         boolean isCreated=false; //새로 생긴 방인지
-        if(chatRoom.getMessageList().isEmpty())
+        if (chatRoom.getMessageList().isEmpty())
             isCreated=true;
 
-        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
-                .chatRoomId(chatRoom.getId())
-                .productId(product.getId())
-                .productImage(product.getProductImage())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .sellerId(seller.getId())
-                .sellerNickName(seller.getNickName())
-                .sellerProfileImage(seller.getProfileImage())
-                .sellerLevel(seller.getLevel().getLabel())
-                .customerId(customer.getId())
-                .customerNickName(customer.getNickName())
-                .customerProfileImage(customer.getProfileImage())
-                .customerLevel(customer.getLevel().getLabel())
-                .is_created(isCreated)
-                .messageList(getAllMessages(chatRoom.getId()))
-                .build();
+//        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
+//                .chatRoomId(chatRoom.getId())
+//                .productId(product.getId())
+//                .productImage(product.getProductImage())
+//                .productName(product.getProductName())
+//                .price(product.getPrice())
+//                .sellerId(seller.getId())
+//                .sellerNickName(seller.getNickName())
+//                .sellerProfileImage(seller.getProfileImage())
+//                .sellerLevel(seller.getLevel().getLabel())
+//                .customerId(customer.getId())
+//                .customerNickName(customer.getNickName())
+//                .customerProfileImage(customer.getProfileImage())
+//                .customerLevel(customer.getLevel().getLabel())
+//                .is_created(isCreated)
+//                .messageList(getAllMessages(chatRoom.getId()))
+//                .build();
 
-        return chatRoomDto;
+        List<ChatMessage> chatMessageList = chatRoom.getMessageList();
+        int size=chatRoom.getMessageList().size();
+        List <ChatMessageDto> list=new ArrayList<>();
+
+        for(ChatMessage chatMessage: chatMessageList){
+            User user = userRepository.findById(chatMessage.getUserId())
+                    .get();
+
+            ChatMessageDto dto = ChatMessageDto.builder()
+                    .userId(chatMessage.getUserId())
+                    .chatRoomId(chatMessage.getChatRoom().getId())
+                    .message(chatMessage.getMessage())
+                    .userType(chatMessage.getUserType())
+                    .profilePic(user.getProfileImage())
+                    .sendTime(chatMessage.getSendTime())
+                    .isCreated(isCreated)
+                    .build();
+
+            list.add(dto);
+        }
+
+        return list;
     }
 
     // 모든 메시지 리스트 반환
