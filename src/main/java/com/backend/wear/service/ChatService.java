@@ -73,7 +73,7 @@ public class ChatService {
         //판매자
         User seller = productRepository.findById(productId).get().getUser();
 
-        if(customer.getId()==seller.getId())
+        if(customer.getId().equals(seller.getId()))
             throw new IllegalArgumentException("판매자와 구매자는 똑같은 아이디 불가능");
 
         ChatRoom chatRoom = new ChatRoom();
