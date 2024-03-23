@@ -67,43 +67,43 @@ public class ProductService {
     }
 
     //카테고리별, 최신순
-//    @Transactional
-//    public List<ProductResponseDto> findProductsByCategory(String categoryName, Integer pageNumber ){
-//        List<ProductResponseDto> list;
-//
-//        //카테고리가 전체 일 때
-//        if (categoryName.equals("전체")){
-//            list = productRepository.findByIsPrivateFalse();
-//
-//            return list.map(this::mapToProductResponseDto);
-//        }
-//
-//        else{ //카테고리별
-//            list = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName);
-//
-//            return list.map(this::mapToProductResponseDto);
-//        }
-//    }
+    @Transactional
+    public Page<ProductResponseDto> findProductsByCategory(String categoryName, Integer pageNumber ){
+        Page<Product> productsPage;
+
+        //카테고리가 전체 일 때
+        if (categoryName.equals("전체")){
+            productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
+
+            return productsPage.map(this::mapToProductResponseDto);
+        }
+
+        else{ //카테고리별
+            productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
+
+            return productsPage.map(this::mapToProductResponseDto);
+        }
+    }
 
     //카테고리별, 판매중, 최신순
-//    @Transactional
-//    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
-//        Page<Product> productsPage;
-//
-//        //전체, 판매중, 최신순
-//        if(categoryName.equals("전체")){
-//            productsPage=productRepository
-//                    .findByPostStatusAndIsPrivateFalse(postStatus);
-//        }
-//
-//        //카테고리별 판매중 최신순
-//        else{
-//            productsPage =productRepository
-//                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName);
-//        }
-//
-//        return productsPage.map(this::mapToProductResponseDto);
-//    }
+    @Transactional
+    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
+        Page<Product> productsPage;
+
+        //전체, 판매중, 최신순
+        if(categoryName.equals("전체")){
+            productsPage=productRepository
+                    .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
+        }
+
+        //카테고리별 판매중 최신순
+        else{
+            productsPage =productRepository
+                    .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
+        }
+
+        return productsPage.map(this::mapToProductResponseDto);
+    }
 
     //상품 상세 조회
     @Transactional
@@ -304,4 +304,9 @@ public class ProductService {
     }
 
 
+    //상품 번호로 최신순 페이징
+    private Pageable pageRequest(int pageNumber){
+        return PageRequest.of(pageNumber,12,
+                Sort.by("updatedAt").descending());
+    }
 }
