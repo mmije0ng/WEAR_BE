@@ -36,7 +36,7 @@ public class LonginController {
         return ResponseEntity.ok(response);
     }
 
-    //인증 코드 입력
+    //메일로 발송된 인증 코드 입력
     @PostMapping("/university/certifycode")
     public ResponseEntity<?> certifyUserCode(
         @RequestBody UnivCertRequestDto dto) throws IOException {
