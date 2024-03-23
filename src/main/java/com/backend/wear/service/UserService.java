@@ -188,7 +188,7 @@ public class UserService {
         System.out.println("이름: "+user.getUserName());
 
         return UserResponseDto.builder()
-                .userName(user.getUserName())
+                .userName(user.getNickName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .profileImage(user.getProfileImage())
