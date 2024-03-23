@@ -30,7 +30,6 @@ import java.util.List;
 
 @Service
 public class ProductService {
-
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
@@ -54,7 +53,6 @@ public class ProductService {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
-
 
     @Autowired
     public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,CategoryRepository categoryRepository){
@@ -97,10 +95,15 @@ public class ProductService {
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
+                    .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
         }
 
         return productsPage.map(this::mapToProductResponseDto);
+    }
+
+    private Pageable pageRequest(int pageNumber){
+        return PageRequest.of(pageNumber,50,
+                Sort.by("updatedAt").descending());
     }
 
     //상품 상세 조회
@@ -153,6 +156,7 @@ public class ProductService {
         }
 
 
+
         //상품
         return ProductResponseDto.builder()
                 .id(product.getId())
@@ -176,6 +180,7 @@ public class ProductService {
                 .level(user.getLevel().getLabel())
                 .build();
     }
+
 
     //상품 번호로 최신순 페이징
     private Pageable pageRequest(int pageNumber){
@@ -219,6 +224,7 @@ public class ProductService {
 
 
 
+
     //상품 등록하기
     @Transactional
     public void createProductPost(ProductPostRequestDto requestDTO, Long userId) throws Exception {
@@ -251,9 +257,6 @@ public class ProductService {
         productRepository.save(newProduct);
 
     }
-
-
-
 
     //상품 정보 변경(전체를 받아서 전체를 변경)
     @Transactional
@@ -290,6 +293,7 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
     //상품 판매 상태 변경 (판매 완료 또는 판매 중)
     @Transactional
     public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId ) throws Exception {
@@ -313,10 +317,8 @@ public class ProductService {
             product.setUpdatedAt(product.getUpdatedAt());
 
             // 변경된 상품 정보를 저장합니다.
-             productRepository.save(product);
+            productRepository.save(product);
         }
-
-
     }
 
 
@@ -356,8 +358,6 @@ public class ProductService {
 
             productRepository.deleteByUserAndProduct(userId,productId);
         }
-
     }
-
 
 }

@@ -27,7 +27,7 @@ public class ProductController {
     }
 
     //카테고리별 최신순 조회
-    //api/products/category?categoryName={}&pageNumber={}
+//    api/products/category?categoryName={}&pageNumber={}
     @GetMapping("/category")
     public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName,@RequestParam Integer pageNumber)
     {
@@ -45,8 +45,8 @@ public class ProductController {
         }
     }
 
-    //카테고리별 최신순, 판매 상태
-    //api/products/category/sale?categoryName={}&postStatus={}&pageNumber={}
+//    카테고리별 최신순, 판매 상태
+//    api/products/category/sale?categoryName={}&postStatus={}&pageNumber={}
     @GetMapping("/category/sale")
     public ResponseEntity<?> findProductsByCategoryName(@RequestParam String categoryName,
                                                         @RequestParam String postStatus, @RequestParam Integer pageNumber ){

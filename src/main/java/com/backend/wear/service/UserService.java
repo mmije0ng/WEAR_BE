@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -139,13 +140,24 @@ public class UserService {
             return productResponseDtoList;
     }
 
+    @Transactional
+    public List<ProductResponseDto> myHistoryService(Long userId){
+        List<ProductResponseDto> list = mapToMyHistory(userId);
+
+        if(list.isEmpty())
+            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
+
+        else
+            return list;
+    }
+
     //판매 중 상품 완료로 변경
     @Transactional
     public void postMyProductStatusService(Long userId, ProductRequestDto dto){
         Product product=productRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
 
-        product.setPostStatus("soldOut");
+        product.setPostStatus(dto.getPostStatus());
   //      productRepository.save(product);
     }
 
@@ -300,6 +312,27 @@ public class UserService {
         return myProductList;
     }
 
+    //구매 내역
+    private List<ProductResponseDto> mapToMyHistory(Long userId){
+        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
+        List<ProductResponseDto> myHistoryList=new ArrayList<>();
+
+        for(Product p: list){
+            ProductResponseDto dto=ProductResponseDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(p.getProductImage())
+                    .build();
+
+            myHistoryList.add(dto);
+        }
+
+        return myHistoryList;
+    }
+
     //숨김내역
     private List<ProductResponseDto> mapToProductPostResponseDtoPrivate(Long userId){
         List<Product> productList = productRepository.findByUser_IdAndIsPrivateTrue(userId);
@@ -364,7 +397,7 @@ public class UserService {
         for(int i=0;i<donationApplyList.size();i++){
             DonationApply donationApply = donationApplyList.get(i);
             if(!donationApply.isDonationComplete())
-                continue;;
+                continue;
             String date= donationApply.getCreatedAt()
                     .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
@@ -465,4 +498,5 @@ public class UserService {
         else
             return 500-currentPoint;
     }
+
 }

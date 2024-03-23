@@ -15,7 +15,6 @@ public class LoginService {
     @Autowired
     public LoginService(UserRepository userRepository){
         this.userRepository=userRepository;
-
     }
 
     public LoginResponseDto loginByUser(LoginDto loginDto){
@@ -43,5 +42,42 @@ public class LoginService {
             return dto;
         }
     }
+
+    //대학 인증 메일 발송
+//    @PostMapping("/university/certify")
+//    public ResponseEntity<?> certifyUniversity
+//    (@RequestBody UnivCertRequestDto dto) throws IOException {
+//
+//        Map<String, Object> response =
+//                UnivCert.certify(API_KEY, dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
+//
+//        return ResponseEntity.ok(response);
+//    }
+//
+//    //메일로 발송된 인증 코드 입력
+//    @PostMapping("/university/certifycode")
+//    public ResponseEntity<?> certifyUserCode(
+//            @RequestBody UnivCertRequestDto dto) throws IOException {
+//
+//        Map<String, Object> response =
+//                UnivCert.certifyCode(API_KEY, dto.getUniversityEmail(),
+//                        dto.getUniversityName(), dto.getCode());
+//
+//        Boolean success = (Boolean) response.get("success");
+//        if (success) { //인증 성공
+//            String universityName = (String) response.get("univName");
+//            String universityEmail = (String) response.get("certified_email");
+//
+//            UnivCertResponseDto responseDto = new UnivCertResponseDto(universityEmail, universityName, success);
+//
+//            return ResponseEntity.ok(responseDto);
+//        } else { //인증 실패
+//            Integer code = (Integer) response.get("code");
+//            String message = (String) response.get("message");
+//
+//            UnivCertFail responseDto = new UnivCertFail(code, success, message);
+//            return ResponseEntity.ok(responseDto);
+//        }
+//    }
 
 }

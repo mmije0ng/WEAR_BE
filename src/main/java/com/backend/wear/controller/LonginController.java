@@ -28,7 +28,7 @@ public class LonginController {
 //    private String API_KEY;
 
     // api/signup
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> myLogin(@RequestBody LoginDto loginDto){
         try{
             LoginResponseDto dto=loginService.loginByUser(loginDto);
