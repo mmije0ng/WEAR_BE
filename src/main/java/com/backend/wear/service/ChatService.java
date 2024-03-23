@@ -63,35 +63,35 @@ public class ChatService {
     }
 
     //채팅방 입장
-//    public ChatRoomDto chatRoom(Long roomId, Long productId) {
-//        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-//                .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
-//
-//        Product product = productRepository.findById(productId)
-//                .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
-//
-//        User seller = chatRoom.getSeller();
-//
-//        User customer = chatRoom.getCustomer();
-//
-//        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
-//                .chatRoomId(chatRoom.getId())
-//                .productId(product.getId())
-//                .productImage(product.getProductImage())
-//                .productName(product.getProductName())
-//                .price(product.getPrice())
-//                .sellerId(seller.getId())
-//                .sellerNickName(seller.getNickName())
-//                .sellerProfileImage(seller.getProfileImage())
-//                .sellerLevel(seller.getLevel().getLabel())
-//                .customerId(customer.getId())
-//                .customerNickName(customer.getNickName())
-//                .customerProfileImage(customer.getProfileImage())
-//                .customerLevel(customer.getLevel().getLabel())
-//                .build();
-//
-//        return chatRoomDto;
-//    }
+    public ChatRoomDto chatRoom(Long roomId, Long productId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
+
+        User seller = chatRoom.getSeller();
+
+        User customer = chatRoom.getCustomer();
+
+        ChatRoomDto chatRoomDto = ChatRoomDto.builder()
+                .chatRoomId(chatRoom.getId())
+                .productId(product.getId())
+                .productImage(product.getProductImage())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .sellerId(seller.getId())
+                .sellerNickName(seller.getNickName())
+                .sellerProfileImage(seller.getProfileImage())
+                .sellerLevel(seller.getLevel().getLabel())
+                .customerId(customer.getId())
+                .customerNickName(customer.getNickName())
+                .customerProfileImage(customer.getProfileImage())
+                .customerLevel(customer.getLevel().getLabel())
+                .build();
+
+        return chatRoomDto;
+    }
 
     //채팅 리스트 불러오기
     public List<ChatRoomProfileDto> findAllRoom(Long userId) {
