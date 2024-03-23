@@ -31,6 +31,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     //판매중인 상품만 조회
     Page<Product> findByPostStatusAndIsPrivateFalse(String postStatus, Pageable pageable);
 
+
+    //검색어별 상품 조회
+
     //사용자 아이디로 판매자 조회
     User findUserById(Long productId);
 

@@ -60,6 +60,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 입장
+
     // api/chat/room/enter?roomId={roomId}&productId={productId}
     @GetMapping("/room/enter")
     public ResponseEntity<?> enterRoom(@RequestParam Long roomId,
@@ -78,6 +79,7 @@ public class ChatRoomController {
                     .body(e.getMessage());
         }
     }
+
 
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")

@@ -72,11 +72,10 @@ dependencies {
     // AWS S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-    // UnivCert 대학 인증 api
-    implementation 'com.github.in-seo:univcert:master-SNAPSHOT'
- //   implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
- //   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
- //   implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    //json
+    implementation 'org.json:json:20231013'
+
+
 }
 
 tasks.named('test') {

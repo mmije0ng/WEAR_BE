@@ -1,5 +1,9 @@
 package com.backend.wear.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -36,16 +40,9 @@ public class Product extends BaseEntity {
     private Integer price;
 
     //상품 이미지
- /*   @NotNull
-    @ElementCollection
-    @Column(name="product_image")
-    private List<String> productImage = new ArrayList<>();
-
-*/
-
-    @NotNull
-    @Column(name="product_image")
+    @Column(name="product_image", columnDefinition = "json")
     private String productImage;
+
 
     //상품 내용, 설명
     @NotNull
@@ -99,6 +96,19 @@ public class Product extends BaseEntity {
     public void setDeletedAt(LocalDateTime deletedAt) {
 
         deletedAt= LocalDateTime.now();
+    }
+
+
+    // List<String>를 JSON 문자열로 변환하는 메서드
+    private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(imageList);
+    }
+
+    // JSON 문자열을 List<String>으로 변환하는 메서드
+    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
 
     @Builder

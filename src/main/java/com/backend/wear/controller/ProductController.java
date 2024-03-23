@@ -60,6 +60,20 @@ public class ProductController {
         }
     }
 
+
+    //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
+    //  /products/search?searchName={searchName}
+
+    /*@GetMapping("/products/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {}*/
+
+
+
+    //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
+    //   /products/search/category?searchName={searchName}?categoryName={categoryName}
+
+
+
     //상품 상세 페이지 불러오기
     // api/products/{productId}
     @GetMapping("/{productId}")
