@@ -3,7 +3,6 @@ package com.backend.wear.controller;
 //import com.backend.wear.dto.LoginDto;
 import com.backend.wear.dto.*;
 import com.backend.wear.service.LoginService;
-import com.univcert.api.UnivCert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
