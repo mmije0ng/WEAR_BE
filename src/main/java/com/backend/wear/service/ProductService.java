@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
-
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
@@ -85,7 +84,6 @@ public class ProductService {
         }
     }
 
-    //카테고리별, 판매중, 최신순
     @Transactional
     public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
         Page<Product> productsPage;
@@ -104,6 +102,31 @@ public class ProductService {
 
         return productsPage.map(this::mapToProductResponseDto);
     }
+
+    private Pageable pageRequest(int pageNumber){
+        return PageRequest.of(pageNumber,12,
+                Sort.by("updatedAt").descending());
+    }
+
+    //카테고리별, 판매중, 최신순
+//    @Transactional
+//    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
+//        Page<Product> productsPage;
+//
+//        //전체, 판매중, 최신순
+//        if(categoryName.equals("전체")){
+//            productsPage=productRepository
+//                    .findByPostStatusAndIsPrivateFalse(postStatus);
+//        }
+//
+//        //카테고리별 판매중 최신순
+//        else{
+//            productsPage =productRepository
+//                .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName);
+//        }
+//
+//        return productsPage.map(this::mapToProductResponseDto);
+//    }
 
     //상품 상세 조회
     @Transactional
@@ -257,7 +280,7 @@ public class ProductService {
             product.setUpdatedAt(product.getUpdatedAt());
 
             // 변경된 상품 정보를 저장합니다.
-             productRepository.save(product);
+            productRepository.save(product);
         }
 
 
@@ -303,10 +326,4 @@ public class ProductService {
 
     }
 
-
-    //상품 번호로 최신순 페이징
-    private Pageable pageRequest(int pageNumber){
-        return PageRequest.of(pageNumber,12,
-                Sort.by("updatedAt").descending());
-    }
 }
