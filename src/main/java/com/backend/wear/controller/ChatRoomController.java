@@ -21,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat")
+@CrossOrigin(origins="http://43.201.189.171:8080")
 public class ChatRoomController {
     private final ChatService chatService;
     private static Logger log = LoggerFactory.getLogger(ChatRoomController.class);
