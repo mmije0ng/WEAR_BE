@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductRequestDto {
-    private Long id;
-    private String postStatus;
+    private Long id; //상품 아이디
+    private String postStatus; //상품 상태
 }

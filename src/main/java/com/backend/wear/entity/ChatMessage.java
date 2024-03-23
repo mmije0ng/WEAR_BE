@@ -45,6 +45,8 @@ public class ChatMessage {
     //내용
     private String message;
 
+    //생성시간
+
 //    @Column(nullable = false)
 //    private LocalDateTime sendTime;
 

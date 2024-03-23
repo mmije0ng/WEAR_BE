@@ -3,6 +3,7 @@ package com.backend.wear.service;
 import com.backend.wear.dto.ChatRoomDto;
 import com.backend.wear.dto.ChatRoomIdDto;
 import com.backend.wear.dto.ChatRoomProfileDto;
+import com.backend.wear.entity.ChatMessage;
 import com.backend.wear.entity.ChatRoom;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
@@ -57,6 +58,7 @@ public class ChatService {
                     .customerProfileImage(existingRoom.getCustomer().getProfileImage())
                     .customerLevel(existingRoom.getCustomer().getLevel().getLabel())
                     .is_created(false)
+                    .messageList(getAllMessages(existingRoom.getId()))
                     .build();
         }
 
@@ -71,7 +73,7 @@ public class ChatService {
         //판매자
         User seller = productRepository.findById(productId).get().getUser();
 
-        if(customer.getId()==seller.getId())
+        if(customer.getId().equals(seller.getId()))
             throw new IllegalArgumentException("판매자와 구매자는 똑같은 아이디 불가능");
 
         ChatRoom chatRoom = new ChatRoom();
@@ -99,9 +101,6 @@ public class ChatService {
     }
 
     //채팅방 입장
-
-
-
     public ChatRoomDto chatRoom(Long roomId, Long productId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅 내역이 없습니다."));
@@ -112,6 +111,10 @@ public class ChatService {
         User seller = chatRoom.getSeller();
 
         User customer = chatRoom.getCustomer();
+
+        boolean isCreated=false; //새로 생긴 방인지
+        if(chatRoom.getMessageList().isEmpty())
+            isCreated=true;
 
         ChatRoomDto chatRoomDto = ChatRoomDto.builder()
                 .chatRoomId(chatRoom.getId())
@@ -127,12 +130,26 @@ public class ChatService {
                 .customerNickName(customer.getNickName())
                 .customerProfileImage(customer.getProfileImage())
                 .customerLevel(customer.getLevel().getLabel())
+                .is_created(isCreated)
+                .messageList(getAllMessages(chatRoom.getId()))
                 .build();
 
         return chatRoomDto;
     }
 
+    // 모든 메시지 리스트 반환
+    public List<String> getAllMessages(Long chatRoomId){
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).get();
 
+        List<String> messageList = new ArrayList<>();
+        List<ChatMessage> chatMessageList = chatRoom.getMessageList();
+
+        for(ChatMessage c: chatMessageList){
+            messageList.add(c.getMessage());
+        }
+
+        return messageList;
+    }
 
     //채팅 리스트 불러오기
     public List<ChatRoomProfileDto> findAllRoom(Long userId) {
