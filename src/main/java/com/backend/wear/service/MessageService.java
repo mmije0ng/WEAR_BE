@@ -21,7 +21,7 @@ public class MessageService {
     }
 
     public void saveMessage(ChatMessage message) {
-        // 메시지 저장 로직
+        // 메시지 저장  로직
         chatMessageRepository.save(message);
         log.info("메시지: "+message+" 저장 완료");
     }
