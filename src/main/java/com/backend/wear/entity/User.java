@@ -33,12 +33,12 @@ public class User extends BaseEntity {
 
     //사용자 아이디
     @NotNull
-    @Column(name="user_id",unique = true)
+    @Column(name="user_id")
     private String userId;
 
     //사용자 패스워드
     @NotNull
-    @Column(name="user_password",unique = true)
+    @Column(name="user_password")
     private String userPassword;
 
     //이름 (실명)
@@ -48,12 +48,12 @@ public class User extends BaseEntity {
 
     //닉네임
     @NotNull
-    @Column(name="nick_name",unique = true)
+    @Column(name="nick_name")
     private String nickName;
 
     //대학교 이메일
 
-    @Column(name="university_email",unique = true)
+    @Column(name="university_email")
     private String universityEmail;
 
     //환경 점수

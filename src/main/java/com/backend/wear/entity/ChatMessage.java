@@ -1,13 +1,15 @@
 package com.backend.wear.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,12 +20,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "chat_message")
 public class ChatMessage {
-
-//    public enum MessageType {
-//        ENTER, TALK
-//    }
-
-//    private MessageType type;
 
     //아이디
     @Id
@@ -45,20 +41,12 @@ public class ChatMessage {
     //내용
     private String message;
 
+    //유저 ID
+    private Long userId; //유저 pk
+
+    private String userType; // SELLER, CUSTOMER
+
     //생성시간
-
-//    @Column(nullable = false)
-//    private LocalDateTime sendTime;
-
-//    //메시지 보낸 사람
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="sender_id")
-//    private User sender;
-//
-//    //읽음 여부
-//    @Column(name="is_checked", columnDefinition = "boolean default false")
-//    private boolean isChecked;
-//
-//    @Column(name="is_alert", columnDefinition = "boolean default true" )
-//    private boolean isAlert;
+    @CreatedDate
+    private LocalDateTime sendTime;
 }
