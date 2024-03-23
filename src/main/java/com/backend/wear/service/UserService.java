@@ -288,14 +288,10 @@ public class UserService {
 
     //구매 내역
     private List<ProductResponseDto> mapToMyHistory(Long userId){
-        List<Product> list =  productRepository.findAll();
+        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
         List<ProductResponseDto> myHistoryList=new ArrayList<>();
 
         for(Product p: list){
-
-            if(p.getUser().getId()==userId)
-                continue;
-
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
                     .price(p.getPrice())
@@ -368,7 +364,7 @@ public class UserService {
         for(int i=0;i<donationApplyList.size();i++){
             DonationApply donationApply = donationApplyList.get(i);
             if(!donationApply.isDonationComplete())
-                continue;;
+                continue;
             String date= donationApply.getCreatedAt()
                     .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 

@@ -47,4 +47,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Transactional
     @Query("delete from Product p where p.user.id = :userId and p.id = :productId")
     void deleteByUserAndProduct(@Param("userId") Long userId, @Param("productId") Long productId);
+
+    //구매내역
+    @Query("SELECT p FROM Product p WHERE p.user.id != :userId AND p.productStatus = 'soldOut'")
+    List<Product> findSoldOutProductsByUserId(Long userId);
 }
