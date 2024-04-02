@@ -45,7 +45,7 @@ public class ProductResponseDto{
         private LocalDateTime createdAt; // 상품 등록 시간
     }
 
-    // 썸네일
+    // 상품 썸네일
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
