@@ -80,10 +80,6 @@ public class Product extends BaseEntity {
 //    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
 //    private List<Wish> wishList = new ArrayList<>();
 
-    //찜 횟수, 조회수
-    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
-    private Count count;
-
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRoomList=new ArrayList<>();
@@ -111,7 +107,7 @@ public class Product extends BaseEntity {
     }
 
     @Builder
-    public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category, Wish wish, Count count) {
+    public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category, Wish wish) {
         this.productName = productName;
         this.price = price;
         this.productImage = productImage;
@@ -122,6 +118,5 @@ public class Product extends BaseEntity {
         this.isPrivate = isPrivate;
         this.user = user;
         this.category = category;
-        this.count = count;
     }
 }

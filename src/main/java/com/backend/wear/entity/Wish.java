@@ -35,4 +35,10 @@ public class Wish extends Serializers.Base {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
+
+    @Builder
+    public Wish(User user, Product product){
+        this.user=user;
+        this.product=product;
+    }
 }
