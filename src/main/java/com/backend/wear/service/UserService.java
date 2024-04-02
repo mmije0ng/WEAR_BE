@@ -216,32 +216,32 @@ public class UserService {
        return productList;
     }
 
-    //판매 중, 완료 상품 불러오기
-    @Transactional
-    public List<ProductResponseDto> myProductsService(Long userId, String postStatus){
-        List<ProductResponseDto> productResponseDtoList = mapToProductResponseDtoPostStatus(userId,postStatus);
-
-        if(productResponseDtoList.isEmpty()){
-            if(postStatus.equals("onSale"))
-                throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
-            else
-                throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
-        }
-
-        else
-            return productResponseDtoList;
-    }
-
-    @Transactional
-    public List<ProductResponseDto> myHistoryService(Long userId){
-        List<ProductResponseDto> list = mapToMyHistory(userId);
-
-        if(list.isEmpty())
-            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
-
-        else
-            return list;
-    }
+//    //판매 중, 완료 상품 불러오기
+//    @Transactional
+//    public List<ProductResponseDto> myProductsService(Long userId, String postStatus){
+//        List<ProductResponseDto> productResponseDtoList = mapToProductResponseDtoPostStatus(userId,postStatus);
+//
+//        if(productResponseDtoList.isEmpty()){
+//            if(postStatus.equals("onSale"))
+//                throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
+//            else
+//                throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
+//        }
+//
+//        else
+//            return productResponseDtoList;
+//    }
+//
+//    @Transactional
+//    public List<ProductResponseDto> myHistoryService(Long userId){
+//        List<ProductResponseDto> list = mapToMyHistory(userId);
+//
+//        if(list.isEmpty())
+//            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
+//
+//        else
+//            return list;
+//    }
 
     //판매 중 상품 완료로 변경
     @Transactional
@@ -254,15 +254,15 @@ public class UserService {
     }
 
     //숨김 처리 상품 보기
-    @Transactional
-    public List<ProductResponseDto> getMyProductsPrivateService(Long userId){
-        List<ProductResponseDto> privateList = mapToProductPostResponseDtoPrivate(userId);
-
-        if(privateList.isEmpty())
-            throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
-        else
-            return privateList;
-    }
+//    @Transactional
+//    public List<ProductResponseDto> getMyProductsPrivateService(Long userId){
+//        List<ProductResponseDto> privateList = mapToProductPostResponseDtoPrivate(userId);
+//
+//        if(privateList.isEmpty())
+//            throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
+//        else
+//            return privateList;
+//    }
 
     //내 기부 내역
     @Transactional
@@ -287,90 +287,90 @@ public class UserService {
             return responseDtoList;
     }
 
-    //판매 내역
-    private List<ProductResponseDto> mapToProductResponseDtoPostStatus(Long userId, String postStatus){
-        List<Product> productList= productRepository.findByUserId(userId);
-        List<ProductResponseDto> myProductList = new ArrayList<>();
-
-        for(Product p: productList){
-            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
-
-            if(!p.getPostStatus().equals(postStatus))
-                continue;
-
-            String array;
-            try {
-                array = objectMapper.readValue(p.getProductImage(), String.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            ProductResponseDto dto=ProductResponseDto.builder()
-                    .id(p.getId())
-                    .price(p.getPrice())
-                    .productName(p.getProductName())
-                    .productStatus(p.getProductStatus())
-                    .postStatus(p.getPostStatus())
-                    .productImage(array)
-                    .build();
-
-            myProductList.add(dto);
-        }
-
-        return myProductList;
-    }
-
-    //구매 내역
-    private List<ProductResponseDto> mapToMyHistory(Long userId){
-        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
-        List<ProductResponseDto> myHistoryList=new ArrayList<>();
-
-        for(Product p: list){
-            // JSON 배열 파싱
-            String array;
-            try {
-                array = objectMapper.readValue(p.getProductImage(), String.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            ProductResponseDto dto=ProductResponseDto.builder()
-                    .id(p.getId())
-                    .price(p.getPrice())
-                    .productName(p.getProductName())
-                    .productStatus(p.getProductStatus())
-                    .postStatus(p.getPostStatus())
-                    .productImage(array)
-                    .build();
-
-            myHistoryList.add(dto);
-        }
-
-        return myHistoryList;
-    }
-
-    // 숨김내역
-    private List<ProductResponseDto> mapToProductPostResponseDtoPrivate(Long userId){
-        List<Product> productList = productRepository.findByUser_IdAndIsPrivateTrue(userId);
-        List<ProductResponseDto> privateProductList= new ArrayList<>();
-
-        for(Product p: productList){
-            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
-
-            ProductResponseDto dto=ProductResponseDto.builder()
-                    .id(p.getId())
-                    .price(p.getPrice())
-                    .productName(p.getProductName())
-                    .productStatus(p.getProductStatus())
-                    .postStatus(p.getPostStatus())
-                    .productImage(p.getProductImage())
-                    .isPrivate(p.isPrivate())
-                    .build();
-
-            privateProductList.add(dto);
-        }
-
-        return privateProductList;
-    }
+//    //판매 내역
+//    private List<ProductResponseDto> mapToProductResponseDtoPostStatus(Long userId, String postStatus){
+//        List<Product> productList= productRepository.findByUserId(userId);
+//        List<ProductResponseDto> myProductList = new ArrayList<>();
+//
+//        for(Product p: productList){
+//            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+//
+//            if(!p.getPostStatus().equals(postStatus))
+//                continue;
+//
+//            String array;
+//            try {
+//                array = objectMapper.readValue(p.getProductImage(), String.class);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//            ProductResponseDto dto=ProductResponseDto.builder()
+//                    .id(p.getId())
+//                    .price(p.getPrice())
+//                    .productName(p.getProductName())
+//                    .productStatus(p.getProductStatus())
+//                    .postStatus(p.getPostStatus())
+//                    .productImage(array)
+//                    .build();
+//
+//            myProductList.add(dto);
+//        }
+//
+//        return myProductList;
+//    }
+//
+//    //구매 내역
+//    private List<ProductResponseDto> mapToMyHistory(Long userId){
+//        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
+//        List<ProductResponseDto> myHistoryList=new ArrayList<>();
+//
+//        for(Product p: list){
+//            // JSON 배열 파싱
+//            String array;
+//            try {
+//                array = objectMapper.readValue(p.getProductImage(), String.class);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
+//            ProductResponseDto dto=ProductResponseDto.builder()
+//                    .id(p.getId())
+//                    .price(p.getPrice())
+//                    .productName(p.getProductName())
+//                    .productStatus(p.getProductStatus())
+//                    .postStatus(p.getPostStatus())
+//                    .productImage(array)
+//                    .build();
+//
+//            myHistoryList.add(dto);
+//        }
+//
+//        return myHistoryList;
+//    }
+//
+//    // 숨김내역
+//    private List<ProductResponseDto> mapToProductPostResponseDtoPrivate(Long userId){
+//        List<Product> productList = productRepository.findByUser_IdAndIsPrivateTrue(userId);
+//        List<ProductResponseDto> privateProductList= new ArrayList<>();
+//
+//        for(Product p: productList){
+//            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+//
+//            ProductResponseDto dto=ProductResponseDto.builder()
+//                    .id(p.getId())
+//                    .price(p.getPrice())
+//                    .productName(p.getProductName())
+//                    .productStatus(p.getProductStatus())
+//                    .postStatus(p.getPostStatus())
+//                    .productImage(p.getProductImage())
+//                    .isPrivate(p.isPrivate())
+//                    .build();
+//
+//            privateProductList.add(dto);
+//        }
+//
+//        return privateProductList;
+//    }
 
     //내 기부 내역 응답 dto
     private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId){
