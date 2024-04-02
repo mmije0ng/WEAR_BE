@@ -1,6 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.*;
+import com.backend.wear.dto.donation.DonationApplyResponseDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.dto.user.UserRequestDto;
@@ -106,7 +106,7 @@ public class UserController {
         }
     }
 
-    //비밀번호 변경하기
+    // 비밀번호 변경하기
     // api/users/password/{userId}
     @PutMapping ("/password/{userId}")
     public ResponseEntity<?> putPassword(@PathVariable Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto){
@@ -132,13 +132,13 @@ public class UserController {
         }
     }
 
-    //판매 중 상품 불러오기
+    // 판매 중 상품 불러오기
     // api/users/myProducts/onSale/{userId}
-  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
     @GetMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId){
+    public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId) throws Exception{
         try{
-            List<ProductResponseDto> myProductList = userService.myProductsService(userId,"onSale");
+            List<ProductResponseDto.MyPageScreenDto> myProductList =
+                    userService.getMyProductsList(userId,"onSale");
             return ResponseEntity.ok(myProductList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -146,14 +146,13 @@ public class UserController {
         }
     }
 
-    //판매 중인 상품 판매 완료하기
+    // 판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
-
     @PutMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
-                                                 @RequestBody ProductRequestDto productRequestDto){
+    public ResponseEntity<?> putPostStatus(@PathVariable Long userId,
+                                                 @RequestBody ProductRequestDto requestDto){
         try{
-            userService.postMyProductStatusService(userId, productRequestDto);
+            userService.changePostStatus(userId, requestDto);
             return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -161,12 +160,13 @@ public class UserController {
         }
     }
 
-    //판매 완료 상품 불러오기
+    // 판매 완료 상품 불러오기
     // api/users/myProducts/soldOut/{userId}
     @GetMapping("/myProducts/soldOut/{userId}")
-    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable Long userId){
+    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable Long userId) throws Exception{
         try{
-            List<ProductResponseDto> myProductList = userService.myProductsService(userId,"soldOut");
+            List<ProductResponseDto.MyPageScreenDto> myProductList =
+                    userService.getMyProductsList(userId,"soldOut");
             return ResponseEntity.ok(myProductList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -174,13 +174,13 @@ public class UserController {
         }
     }
 
-    //숨김 처리 상품 불러오기
+    // 숨김 처리 상품 불러오기
     // api/users/myProducts/private/{userId}
     @GetMapping("/myProducts/private/{userId}")
-    public ResponseEntity<?> getMyProductsPrivate(@PathVariable Long userId){
+    public ResponseEntity<?> getMyProductsPrivate(@PathVariable Long userId) throws Exception{
 
         try{
-            List<ProductResponseDto> privateList = userService.getMyProductsPrivateService(userId);
+            List<ProductResponseDto.PrivateDto> privateList = userService.myyProductsPrivateList(userId);
             return ResponseEntity.ok(privateList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -188,14 +188,13 @@ public class UserController {
         }
     }
 
-
     // 내 기부 내역 불러오기
     // api/users/myDonations/{userId}
     @GetMapping ("/myDonations/{userId}")
     public ResponseEntity<?> getMyDonationApply(@PathVariable Long userId){
         try {;
             List <DonationApplyResponseDto> responseDtoList
-                    =userService.getMyDonationApplyService(userId);
+                    =userService.myDonationApplyList(userId);
             return ResponseEntity.ok().body(responseDtoList);
 
         } catch (IllegalArgumentException e) {
@@ -204,13 +203,13 @@ public class UserController {
         }
     }
 
-    //내 기부 내역 중 기부 완료 된 상품만 불러오기
+    // 내 기부 내역 중 기부 완료 된 상품만 불러오기
     // api/users/complete/{userId}
     @GetMapping ("/myDonations/complete/{userId}")
     public ResponseEntity<?> getMyDonationCompleteApplyComplete(@PathVariable Long userId){
         try {;
             List <DonationApplyResponseDto> responseDtoList
-                    =userService.getMyDonationApplyCompleteService(userId);
+                    =userService.myDonationApplyCompleteList(userId);
             return ResponseEntity.ok().body(responseDtoList);
 
         } catch (IllegalArgumentException e) {
@@ -219,15 +218,16 @@ public class UserController {
         }
     }
 
-    @GetMapping("/myHistory/{userId}")
-    public ResponseEntity<?> getMyHistory(Long userId){
-        try {;
-            List<ProductResponseDto> list=userService.myHistoryService(userId);
-            return ResponseEntity.ok().body(list);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
+    // 구매내역
+//    @GetMapping("/myHistory/{userId}")
+//    public ResponseEntity<?> getMyHistory(Long userId){
+//        try {;
+//            List<ProductResponseDto> list=userService.myHistoryService(userId);
+//            return ResponseEntity.ok().body(list);
+//
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(e.getMessage());
+//        }
+//    }
 }

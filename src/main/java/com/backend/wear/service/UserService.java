@@ -1,6 +1,6 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.*;
+import com.backend.wear.dto.donation.DonationApplyResponseDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.dto.user.UserRequestDto;
@@ -217,173 +217,154 @@ public class UserService {
        return productList;
     }
 
-    //판매 중, 완료 상품 불러오기
-//    @Transactional
-//    public List<ProductResponseDto> myProductsService(Long userId, String postStatus){
-//        List<ProductResponseDto> productResponseDtoList = mapToProductResponseDtoPostStatus(userId,postStatus);
-//
-//        if(productResponseDtoList.isEmpty()){
-//            if(postStatus.equals("onSale"))
-//                throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
-//            else
-//                throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
-//        }
-//
-//        else
-//            return productResponseDtoList;
-//    }
-
-//    @Transactional
-//    public List<ProductResponseDto> myHistoryService(Long userId){
-//        List<ProductResponseDto> list = mapToMyHistory(userId);
-//
-//        if(list.isEmpty())
-//            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
-//
-//        else
-//            return list;
-//    }
-
-    //판매 중 상품 완료로 변경
+    // 판매 중, 완료 상품 불러오기
     @Transactional
-    public void postMyProductStatusService(Long userId, ProductRequestDto dto){
-        Product product=productRepository.findById(dto.getId())
+    public List<ProductResponseDto.MyPageScreenDto> getMyProductsList(Long userId, String postStatus) throws Exception{
+        List<ProductResponseDto.MyPageScreenDto> productResponseDtoList =
+                mapToMyPageScreenDto(userId,postStatus);
+
+        if(productResponseDtoList.isEmpty()){
+            if(postStatus.equals("onSale"))
+                throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
+            else
+                throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
+        }
+
+        else
+            return productResponseDtoList;
+    }
+
+    // 판매 내역 상품 dto 매핑
+    private List<ProductResponseDto.MyPageScreenDto> mapToMyPageScreenDto(Long userId, String postStatus)
+            throws Exception {
+        // 사용자 판매 상품 조회
+        List<Product> productList = productRepository.findByUserId(userId);
+        // dto 리스트
+        List<ProductResponseDto.MyPageScreenDto> myProductList = new ArrayList<>();
+
+        for (Product product : productList) {
+            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+            if (!product.getPostStatus().equals(postStatus))
+                continue;
+
+            String json = objectMapper.readValue(product.getProductImage(), String.class);
+            List <String> imageList = convertJsonToImageList(json);
+
+            ProductResponseDto.MyPageScreenDto dto = ProductResponseDto.MyPageScreenDto.builder()
+                    .id(product.getId())
+                    .price(product.getPrice())
+                    .productName(product.getProductName())
+                    .productStatus(product.getProductStatus())
+                    .postStatus(product.getPostStatus())
+                    .productImage(imageList)
+                    .createdAt(product.getCreatedAt())
+                    .build();
+
+            myProductList.add(dto);
+        }
+
+        return myProductList;
+    }
+
+    // 판매 중 상품 완료로 변경
+    @Transactional
+    public void changePostStatus(Long userId, ProductRequestDto requestDto){
+        // 아이디로 상품 조회
+        Product product=productRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
 
-        product.setPostStatus(dto.getPostStatus());
-  //      productRepository.save(product);
+        // 상품 상태 변경
+        product.setPostStatus(requestDto.getPostStatus());
+        // product.setPostStatus("soldOut");
     }
 
-    //숨김 처리 상품 보기
-//    @Transactional
-//    public List<ProductResponseDto> getMyProductsPrivateService(Long userId){
-//        List<ProductResponseDto> privateList = mapToProductPostResponseDtoPrivate(userId);
-//
-//        if(privateList.isEmpty())
-//            throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
-//        else
-//            return privateList;
-//    }
-
-    //내 기부 내역
+    // 숨김 처리 상품 보기
     @Transactional
-    public List<DonationApplyResponseDto> getMyDonationApplyService(Long userId){
-        List<DonationApplyResponseDto> responseDtoList =mapToDonationApplyResponseDto(userId);
+    public List<ProductResponseDto.PrivateDto> myyProductsPrivateList(Long userId) throws Exception{
+        List<ProductResponseDto.PrivateDto> privateProductList = mapToPrivateDto(userId);
 
-        if(responseDtoList.isEmpty())
+        if(privateProductList.isEmpty())
+            throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
+        else
+            return privateProductList;
+    }
+
+    // 숨김 상품 dto 매핑
+    private List<ProductResponseDto.PrivateDto> mapToPrivateDto(Long userId) throws Exception{
+        List<Product> productList = productRepository.findByUserIdAndIsPrivateTrue(userId);
+        List<ProductResponseDto.PrivateDto> privateProductList= new ArrayList<>();
+
+        for(Product product: productList){
+            // 이미지 배열로 변환
+            String json = objectMapper.readValue(product.getProductImage(), String.class);
+            List <String> imageList = convertJsonToImageList(json);
+
+            ProductResponseDto.PrivateDto dto=ProductResponseDto.PrivateDto.builder()
+                    .id(product.getId())
+                    .price(product.getPrice())
+                    .productName(product.getProductName())
+                    .productStatus(product.getProductStatus())
+                    .postStatus(product.getPostStatus())
+                    .productImage(imageList)
+                    .isPrivate(product.isPrivate())
+                    .createdAt(product.getCreatedAt())
+                    .build();
+
+            privateProductList.add(dto);
+        }
+
+        return privateProductList;
+    }
+
+    // 사용자 기부 내역
+    @Transactional
+    public List<DonationApplyResponseDto> myDonationApplyList(Long userId){
+        List<DonationApplyResponseDto> donationApplyList
+                =mapToDonationApplyResponseDto(userId, false);
+
+        if(donationApplyList.isEmpty())
             throw new IllegalArgumentException("현재 기부한 상품이 없습니다. 기부를 통해 환경을 도와주세요.");
         else
-            return responseDtoList;
+            return donationApplyList;
     }
 
+    // 사용자 기부 완료 내역
     @Transactional
-    public List<DonationApplyResponseDto> getMyDonationApplyCompleteService(Long userId){
+    public List<DonationApplyResponseDto> myDonationApplyCompleteList(Long userId){
         List<DonationApplyResponseDto> responseDtoList
-                = mapToDonationApplyResponseDtoComplete(userId);
-        if(responseDtoList.isEmpty()){
+                =  mapToDonationApplyResponseDto(userId, true);
+        if(responseDtoList.isEmpty())
             throw new IllegalArgumentException("현재 기부 진행이 완료된 내역이 없습니다.");
-        }
 
         else
             return responseDtoList;
     }
 
-//    //판매 내역
-//    private List<ProductResponseDto> mapToProductResponseDtoPostStatus(Long userId, String postStatus){
-//        List<Product> productList= productRepository.findByUserId(userId);
-//        List<ProductResponseDto> myProductList = new ArrayList<>();
-//
-//        for(Product p: productList){
-//            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
-//
-//            if(!p.getPostStatus().equals(postStatus))
-//                continue;
-//
-//            String array;
-//            try {
-//                array = objectMapper.readValue(p.getProductImage(), String.class);
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            ProductResponseDto dto=ProductResponseDto.builder()
-//                    .id(p.getId())
-//                    .price(p.getPrice())
-//                    .productName(p.getProductName())
-//                    .productStatus(p.getProductStatus())
-//                    .postStatus(p.getPostStatus())
-//                    .productImage(array)
-//                    .build();
-//
-//            myProductList.add(dto);
-//        }
-//
-//        return myProductList;
-//    }
-//
-//    //구매 내역
-//    private List<ProductResponseDto> mapToMyHistory(Long userId){
-//        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
-//        List<ProductResponseDto> myHistoryList=new ArrayList<>();
-//
-//        for(Product p: list){
-//            // JSON 배열 파싱
-//            String array;
-//            try {
-//                array = objectMapper.readValue(p.getProductImage(), String.class);
-//            } catch (JsonProcessingException e) {
-//                throw new RuntimeException(e);
-//            }
-//            ProductResponseDto dto=ProductResponseDto.builder()
-//                    .id(p.getId())
-//                    .price(p.getPrice())
-//                    .productName(p.getProductName())
-//                    .productStatus(p.getProductStatus())
-//                    .postStatus(p.getPostStatus())
-//                    .productImage(array)
-//                    .build();
-//
-//            myHistoryList.add(dto);
-//        }
-//
-//        return myHistoryList;
-//    }
-//
-//    // 숨김내역
-//    private List<ProductResponseDto> mapToProductPostResponseDtoPrivate(Long userId){
-//        List<Product> productList = productRepository.findByUser_IdAndIsPrivateTrue(userId);
-//        List<ProductResponseDto> privateProductList= new ArrayList<>();
-//
-//        for(Product p: productList){
-//            //상품 판매 상태가 요청과 같은 상품 리스트만 반환
-//
-//            ProductResponseDto dto=ProductResponseDto.builder()
-//                    .id(p.getId())
-//                    .price(p.getPrice())
-//                    .productName(p.getProductName())
-//                    .productStatus(p.getProductStatus())
-//                    .postStatus(p.getPostStatus())
-//                    .productImage(p.getProductImage())
-//                    .isPrivate(p.isPrivate())
-//                    .build();
-//
-//            privateProductList.add(dto);
-//        }
-//
-//        return privateProductList;
-//    }
+    // 내 기부 내역 응답 dto
+    private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId, boolean donationComplete){
+        // 신청한 기부 내역
+        List<DonationApply> list;
 
-    //내 기부 내역 응답 dto
-    private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId){
-        List<DonationApply> donationApplyList=donationApplyRepository.findByUserId(userId);
-        List<DonationApplyResponseDto> responseDtoList = new ArrayList<>();
+        // 기부 완료 내역만 조회
+        if(donationComplete)
+            list =donationApplyRepository.findByUserIdAndDonationComplete(userId);
+        // 기부 전체 내역 조회
+        else
+            list=donationApplyRepository.findByUserId(userId);
 
-        for(int i=0;i<donationApplyList.size();i++){
-            DonationApply donationApply = donationApplyList.get(i);
+        // dto 리스트로 변환
+        List<DonationApplyResponseDto> donationApplyList = new ArrayList<>();
+
+        for (int i=0;i<list.size();i++){
+           // 기부 신청 데이터
+            DonationApply donationApply = list.get(i);
+
+            // 날짜 포맷
             String date= donationApply.getCreatedAt()
                     .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
-            DonationApplyResponseDto dto= DonationApplyResponseDto.builder()
+            // dto 매핑
+            DonationApplyResponseDto responseDto= DonationApplyResponseDto.builder()
                     .id(donationApply.getId())
                     .date(date)
                     .clothesCount(donationApply.getClothesCount())
@@ -391,37 +372,10 @@ public class UserService {
                     .isDonationComplete(donationApply.isDonationComplete())
                     .build();
 
-            responseDtoList.add(dto);
+            donationApplyList.add(responseDto);
         }
 
-        return responseDtoList;
-    }
-
-
-    //기부 내역 중 기부 완료만 보기
-    private List<DonationApplyResponseDto> mapToDonationApplyResponseDtoComplete(Long userId){
-        List<DonationApply> donationApplyList=donationApplyRepository.findByUserId(userId);
-        List<DonationApplyResponseDto> responseDtoList = new ArrayList<>();
-
-        for(int i=0;i<donationApplyList.size();i++){
-            DonationApply donationApply = donationApplyList.get(i);
-            if(!donationApply.isDonationComplete())
-                continue;
-            String date= donationApply.getCreatedAt()
-                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-
-            DonationApplyResponseDto dto= DonationApplyResponseDto.builder()
-                    .id(donationApply.getId())
-                    .date(date)
-                    .clothesCount(donationApply.getClothesCount())
-                    .fashionCount(donationApply.getFashionCount())
-                    .isDonationComplete(donationApply.isDonationComplete())
-                    .build();
-
-            responseDtoList.add(dto);
-        }
-
-        return responseDtoList;
+        return donationApplyList;
     }
 
     // 스타일 태그 이름으로 Style 저장
@@ -510,4 +464,47 @@ public class UserService {
             return 500-currentPoint;
     }
 
+    //    @Transactional
+//    public List<ProductResponseDto> myHistoryService(Long userId){
+//        List<ProductResponseDto> list = mapToMyHistory(userId);
+//
+//        if(list.isEmpty())
+//            throw new IllegalArgumentException("현재 구매한 상품이 없습니다.");
+//
+//        else
+//            return list;
+//    }
+
+
+//
+//        return myProductList;
+//    }
+//
+//    //구매 내역
+//    private List<ProductResponseDto> mapToMyHistory(Long userId){
+//        List<Product> list =  productRepository.findSoldOutProductsByUserId(userId);
+//        List<ProductResponseDto> myHistoryList=new ArrayList<>();
+//
+//        for(Product p: list){
+//            // JSON 배열 파싱
+//            String array;
+//            try {
+//                array = objectMapper.readValue(p.getProductImage(), String.class);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
+//            ProductResponseDto dto=ProductResponseDto.builder()
+//                    .id(p.getId())
+//                    .price(p.getPrice())
+//                    .productName(p.getProductName())
+//                    .productStatus(p.getProductStatus())
+//                    .postStatus(p.getPostStatus())
+//                    .productImage(array)
+//                    .build();
+//
+//            myHistoryList.add(dto);
+//        }
+//
+//        return myHistoryList;
+//    }
 }

@@ -80,7 +80,7 @@ public class LoginService {
         user.setUserName("wear");
         user.setNickName("wear");
 
-        user.setUserId(signUpDto.getUserId());
+        user.setUserCreatedId(signUpDto.getUserId());
         user.setUserPassword(signUpDto.getUserPassword());
         user.setPoint(20);
         user.setLevel(EnvironmentLevel.SAPLING);

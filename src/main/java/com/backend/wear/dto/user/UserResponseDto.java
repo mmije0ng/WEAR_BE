@@ -16,17 +16,6 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserResponseDto {
-//    private Long id; //pk
-//    private String userName; //사용자 이름
-//    private String nickName;
-//    private String universityEmail;
-//    private String universityName;
-//    private List<String> style; //스타일 태그 이름 리스트
-//    private String profileImage;
-//    private String level;
-//    private String nextLevel;
-//    private Integer point;
-//    private Integer remainLevelPoint;
 
     @Getter
     @Builder

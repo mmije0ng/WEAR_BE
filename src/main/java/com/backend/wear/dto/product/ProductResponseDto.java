@@ -11,11 +11,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductResponseDto{
 
     // 상품 상세 dto
@@ -66,4 +61,45 @@ public class ProductResponseDto{
         private LocalDateTime createdAt;
     }
 
+    // 마이페이지 상품 내역
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class MyPageScreenDto{
+        private Long id;  //상품 아이디
+
+        private Integer price;
+
+        private String productName;
+
+        private String productStatus;
+
+        private String postStatus;
+
+        private List<String> productImage;
+
+        private LocalDateTime createdAt;
+    }
+
+    // 숨김 상품
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class PrivateDto{
+        private Long id;  //상품 아이디
+
+        private Integer price;
+
+        private String productName;
+
+        private String productStatus;
+
+        private String postStatus;
+
+        private List<String> productImage;
+
+        private boolean isPrivate;
+
+        private LocalDateTime createdAt;
+    }
 }
