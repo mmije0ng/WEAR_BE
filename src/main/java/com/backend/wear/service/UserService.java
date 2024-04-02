@@ -1,21 +1,22 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.*;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserRequestDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -216,7 +217,7 @@ public class UserService {
        return productList;
     }
 
-//    //판매 중, 완료 상품 불러오기
+    //판매 중, 완료 상품 불러오기
 //    @Transactional
 //    public List<ProductResponseDto> myProductsService(Long userId, String postStatus){
 //        List<ProductResponseDto> productResponseDtoList = mapToProductResponseDtoPostStatus(userId,postStatus);
@@ -231,7 +232,7 @@ public class UserService {
 //        else
 //            return productResponseDtoList;
 //    }
-//
+
 //    @Transactional
 //    public List<ProductResponseDto> myHistoryService(Long userId){
 //        List<ProductResponseDto> list = mapToMyHistory(userId);

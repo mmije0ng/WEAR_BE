@@ -1,7 +1,6 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.product;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

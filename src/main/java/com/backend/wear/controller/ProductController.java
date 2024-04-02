@@ -1,12 +1,11 @@
 package com.backend.wear.controller;
 
 import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.ProductRequestDto;
-import com.backend.wear.dto.ProductResponseDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -28,7 +27,7 @@ public class ProductController {
     // 카테고리별 최신순 조회
     // api/products/category?categoryName={}&userId={}
     @GetMapping("/category")
-    public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName, @RequestParam Long userId)
+    public ResponseEntity<?> findProductsByCategory(@RequestParam String categoryName, @RequestParam Long userId)
             throws RuntimeException
     {
         List<ProductResponseDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
@@ -44,10 +43,10 @@ public class ProductController {
         }
     }
 
-//    카테고리별 최신순, 판매 상태
-//    api/products/category/sale?categoryName={}&userId={}
+    // 카테고리별 최신순, 판매 상태
+    // api/products/category/sale?categoryName={}&userId={}
     @GetMapping("/category/sale")
-    public ResponseEntity<?> findProductsByCategoryName(@RequestParam String categoryName,
+    public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam String categoryName,
                                                         @RequestParam Long userId) throws Exception
     {
         List<ProductResponseDto.ScreenDto> list =

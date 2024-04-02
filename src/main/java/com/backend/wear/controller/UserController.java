@@ -1,6 +1,10 @@
 package com.backend.wear.controller;
 
 import com.backend.wear.dto.*;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserRequestDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")

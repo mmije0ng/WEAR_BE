@@ -1,9 +1,9 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.ProductRequestDto;
-import com.backend.wear.dto.ProductResponseDto;
-import com.backend.wear.dto.UserResponseDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.Category;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;

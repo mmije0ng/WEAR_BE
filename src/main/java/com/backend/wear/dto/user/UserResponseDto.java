@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.user;
 
 import com.backend.wear.entity.Style;
 import com.fasterxml.jackson.annotation.JsonInclude;
