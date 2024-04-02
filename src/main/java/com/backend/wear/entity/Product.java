@@ -93,7 +93,6 @@ public class Product extends BaseEntity {
         deletedAt= LocalDateTime.now();
     }
 
-
     // List<String>를 JSON 문자열로 변환하는 메서드
     private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -107,7 +106,7 @@ public class Product extends BaseEntity {
     }
 
     @Builder
-    public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category, Wish wish) {
+    public Product(String productName, int price, String productImage, String productContent, String productStatus, String postStatus, String place, boolean isPrivate, User user, Category category) {
         this.productName = productName;
         this.price = price;
         this.productImage = productImage;

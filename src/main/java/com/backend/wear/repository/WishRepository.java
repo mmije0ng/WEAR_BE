@@ -14,6 +14,4 @@ public interface WishRepository extends JpaRepository<Wish, Long> {
     //사용자가 찜한 상품
     Optional<Wish> findByUserIdAndProductId(Long userId, Long productId);
     List<Wish> findByUserId(Long userId);
-
-
 }

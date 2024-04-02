@@ -17,7 +17,6 @@ import java.util.*;
 @Service
 @Slf4j
 public class ChatService {
-
     private final ChatRoomRepository chatRoomRepository;
 
     private final ProductRepository productRepository;

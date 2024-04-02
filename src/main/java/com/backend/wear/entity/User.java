@@ -52,7 +52,6 @@ public class User extends BaseEntity {
     private String nickName;
 
     //대학교 이메일
-
     @Column(name="university_email")
     private String universityEmail;
 
@@ -97,9 +96,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Wish> wishList=new ArrayList<>();
 
-    //채팅방
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ChatRoom> chatRoomList=new ArrayList<>();
+//    //채팅방
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<ChatRoom> chatRoomList=new ArrayList<>();
 
     // 스타일 필드를 갱신하는 메서드
     public void updateStyle(List<Style> newStyleList) {

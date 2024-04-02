@@ -39,16 +39,16 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
 
-        String messageId = headerAccessor.getNativeHeader("id").get(0);
-        String chatRoomIdString = headerAccessor.getNativeHeader("chat_room_id").get(0); // 오타 수정
-
-        long chatRoomId = Long.parseLong(chatRoomIdString);
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).get();
-
-        if (chatRoom == null) {
-            // 채팅방이 없을 때 처리
-            return null;
-        }
+//        String messageId = headerAccessor.getNativeHeader("id").get(0);
+//        String chatRoomIdString = headerAccessor.getNativeHeader("chat_room_id").get(0); // 오타 수정
+//
+//        long chatRoomId = Long.parseLong(chatRoomIdString);
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).get();
+//
+//        if (chatRoom == null) {
+//            // 채팅방이 없을 때 처리
+//            return null;
+//        }
 
 //        String userType = "";
 //        // 판매자
