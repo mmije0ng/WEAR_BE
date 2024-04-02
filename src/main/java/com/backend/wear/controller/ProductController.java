@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -23,17 +25,17 @@ public class ProductController {
         this.productService=productService;
     }
 
-    //카테고리별 최신순 조회
-//    api/products/category?categoryName={}&pageNumber={}
+    // 카테고리별 최신순 조회
+    // api/products/category?categoryName={}&userId={}
     @GetMapping("/category")
-    public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName,@RequestParam Integer pageNumber)
+    public ResponseEntity<?> findAllProductsPage(@RequestParam String categoryName, @RequestParam Long userId)
+            throws RuntimeException
     {
-        System.out.println(categoryName);
-        Page page = productService.findProductsByCategory(categoryName, pageNumber);
+        List<ProductResponseDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
 
-        //페이지에 요소가 있는 경우
-        if(!page.isEmpty()){
-            return ResponseEntity.ok(page);
+        // 카테고리별 상품이 있는 경우
+        if(!list.isEmpty()){
+            return ResponseEntity.ok(list);
         }
 
         else{
@@ -43,15 +45,17 @@ public class ProductController {
     }
 
 //    카테고리별 최신순, 판매 상태
-//    api/products/category/sale?categoryName={}&postStatus={}&pageNumber={}
+//    api/products/category/sale?categoryName={}&userId={}
     @GetMapping("/category/sale")
     public ResponseEntity<?> findProductsByCategoryName(@RequestParam String categoryName,
-                                                        @RequestParam String postStatus, @RequestParam Integer pageNumber ){
-        Page page=productService.findProductsByCategoryOnSale(categoryName,postStatus,pageNumber);
+                                                        @RequestParam Long userId) throws Exception
+    {
+        List<ProductResponseDto.ScreenDto> list =
+                productService.findProductsByCategoryOnSale(categoryName, userId);
 
         //페이지에 요소가 있는 경우
-        if(!page.isEmpty()){
-            return ResponseEntity.ok(page);
+        if(!list.isEmpty()){
+            return ResponseEntity.ok(list);
         }
 
         else{
@@ -60,25 +64,11 @@ public class ProductController {
         }
     }
 
-
-    //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
-    //  /products/search?searchName={searchName}
-
-    /*@GetMapping("/products/search")
-    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {}*/
-
-
-
-    //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
-    //   /products/search/category?searchName={searchName}?categoryName={categoryName}
-
-
-
-    //상품 상세 페이지 불러오기
+    // 상품 상세 페이지 불러오기
     // api/products/{productId}
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId){
-        ProductResponseDto productPost;
+    public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId) throws Exception {
+        ProductResponseDto.DetailDto productPost;
         try {
             productPost = productService.getProductPost(productId);
         } catch (IllegalArgumentException e) {
@@ -88,8 +78,10 @@ public class ProductController {
         return ResponseEntity.ok(productPost);
     }
 
+    // 상품 등록
     @PostMapping("/new/{userId}")
-    public ResponseEntity<?> postProductPost(@PathVariable Long userId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
+    public ResponseEntity<?> postProductPost(@PathVariable Long userId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors)
+            throws Exception{
         try {
             productService.createProductPost(requestDTO,userId);
         } catch (IllegalArgumentException e) {
@@ -149,5 +141,27 @@ public class ProductController {
 
     }
 
+    // 상품 찜하기
+    @PostMapping("/select/{userId}/{productId}")
+    public ResponseEntity<?> selectProduct(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
+        try {
+            productService.selectProduct(userId,productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
 
+    // 상품 찜 해제
+    @DeleteMapping("/deselect/{userId}/{productId}")
+    public ResponseEntity<?> deselectProduct(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
+        try {
+            productService.deselectProduct(userId,productId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
 }

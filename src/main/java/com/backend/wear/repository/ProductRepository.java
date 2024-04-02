@@ -19,23 +19,17 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // isPrivate가 false인 상품들만 반환
-    Page<Product> findByIsPrivateFalse(Pageable pageable);
+    // 카테고리와 일치하는 상품 리스트
+    // 숨겨진 상품 제외
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.isPrivate = false")
+    List<Product> findProductsByCategoryName(@Param("categoryName") String categoryName);
 
-    // 카테고리별로 isPrivate가 false인 상품 조회
-    Page<Product> findByCategory_CategoryNameAndIsPrivateFalse(String categoryName, Pageable pageable);
-
-    // 판매 상태와 카테고리별로 isPrivate가 false인 상품 조회
-    Page<Product> findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(String postStatus, String categoryName, Pageable pageable);
-
-    //판매중인 상품만 조회
-    Page<Product> findByPostStatusAndIsPrivateFalse(String postStatus, Pageable pageable);
-
+    // 카테고리와 일치하는 판매 중인 상품 리스트
+    // 숨겨진 상품 제외
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND p.isPrivate = false")
+    List<Product> findProductByCategoryNameAndPostStatus(@Param("categoryName") String categoryName);
 
     //검색어별 상품 조회
-
-    //사용자 아이디로 판매자 조회
-    User findUserById(Long productId);
 
     List<Product> findByUserId(Long userId);
 

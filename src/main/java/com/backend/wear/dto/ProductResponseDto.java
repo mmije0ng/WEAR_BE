@@ -9,40 +9,62 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductResponseDto{
-    //상품 조회 시 응답  dto
-    private Long id;  //상품 아이디
 
-    private Integer price;
+    // 상품 상세 dto
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class DetailDto{
+        private Long id;  //상품 아이디
 
- //   @JsonProperty(value="product_name")
-    private String productName;
+        private UserResponseDto.ProductUserDto seller; //판매자
 
- //   @JsonProperty(value="product_status")
-    private String productStatus;
+        private Integer price;
 
-  //  @JsonProperty(value="post_status")
-    private String postStatus;
+        private String productName;
 
- //   @JsonProperty(value="product_image")
-    private String productImage;
+        private String productStatus;
 
-    private Boolean isSelected;
+        private String postStatus;
 
-    private UserResponseDto seller; //판매자
+        private String productContent;
 
-//    @JsonProperty(value="product_content")
-    private String productContent;
+        private List<String> productImage;
 
-    private String place; //거래 장소
+        private String place; //거래 장소
 
-    private Boolean isPrivate;
+        private LocalDateTime createdAt; // 상품 등록 시간
+    }
+
+    // 썸네일
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class ScreenDto{
+        private Long id;  //상품 아이디
+
+        private Integer price;
+
+        private String productName;
+
+        private String productStatus;
+
+        private String postStatus;
+
+        private List<String> productImage;
+
+        private Boolean isSelected;
+
+        private LocalDateTime createdAt;
+    }
+
 }

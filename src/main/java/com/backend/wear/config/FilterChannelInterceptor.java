@@ -29,6 +29,8 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
+    // stomp 연결 시도 시 호출
+    // 메시지가 채널로 전송되기 전 호출되는 메서드
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -37,38 +39,38 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
 
-        System.out.println(message.getClass());
-
-        String messagePk = headerAccessor.getNativeHeader("id").get(0);
-        String chatRoomIdString = headerAccessor.getNativeHeader("chat_rood_id").get(0); // 오타 수정
-        String messageContent = headerAccessor.getNativeHeader("message").get(0);
-        Long userId = Long.parseLong(headerAccessor.getNativeHeader("userId").get(0));
+        String messageId = headerAccessor.getNativeHeader("id").get(0);
+        String chatRoomIdString = headerAccessor.getNativeHeader("chat_room_id").get(0); // 오타 수정
 
         long chatRoomId = Long.parseLong(chatRoomIdString);
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).get();
 
-        String userType = "";
+        if (chatRoom == null) {
+            // 채팅방이 없을 때 처리
+            return null;
+        }
 
-        // 판매자
-     //   chatRoom.getProduct().getUser().getId()
-
-        if(chatRoom.getSeller().getId().equals(userId))
-            userType ="CUSTOMER";    // 구매자(Customer)
-        else
-            userType="SELLER";
-
-        ChatMessage chatMessage=new ChatMessage();
-        chatMessage.setMessage(messageContent); //메시지
-        chatMessage.setChatRoom(chatRoom); //채팅방
-        chatMessage.setUserId(userId); //유저 pk
-        chatMessage.setUserType(userType); //유저 타입 (판매자 인지 구매자 인지)
-
-        //채팅메시지 정보 db에 저장
-        chatMessageRepository.save(chatMessage);
-
-        // 추출한 값들을 사용하여 필요한 작업 수행
-        System.out.println("Message: " + messageContent);
-        System.out.println("Chat Room ID: " + chatRoomId);
+//        String userType = "";
+//        // 판매자
+//     //   chatRoom.getProduct().getUser().getId()
+//
+//        if(chatRoom.getSeller().getId().equals(userId))
+//            userType ="CUSTOMER";    // 구매자(Customer)
+//        else
+//            userType="SELLER";
+//
+//        ChatMessage chatMessage=new ChatMessage();
+//        chatMessage.setMessage(messageContent); //메시지
+//        chatMessage.setChatRoom(chatRoom); //채팅방
+//        chatMessage.setUserId(userId); //유저 pk
+//        chatMessage.setUserType(userType); //유저 타입 (판매자 인지 구매자 인지)
+//
+//        //채팅메시지 정보 db에 저장
+//        chatMessageRepository.save(chatMessage);
+//
+//        // 추출한 값들을 사용하여 필요한 작업 수행
+//        System.out.println("Message: " + messageContent);
+//        System.out.println("Chat Room ID: " + chatRoomId);
 
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
             System.out.println("msg: " + "conne");

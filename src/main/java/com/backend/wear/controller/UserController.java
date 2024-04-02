@@ -25,47 +25,48 @@ public class UserController {
         this.userService=userService;
     }
 
-    //마이페이지 사용자 정보
+    // 마이페이지 사용자 정보
     //api/users/{userId}
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyPageUser(@PathVariable Long userId) {
-        UserResponseDto userResponseDto;
+    public ResponseEntity<?> getMyPageUser(@PathVariable Long userId) throws Exception {
+        UserResponseDto.MyPageDto myPageDto;
 
         try{
-            userResponseDto=userService.getMyPageUserService(userId);
+            myPageDto=userService.getMyPageUserService(userId);
         }
         catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        return ResponseEntity.ok(userResponseDto);
+        return ResponseEntity.ok(myPageDto);
     }
 
-    //사용자 프로필
-    //api/users/profile/{userId}
+    // 사용자 프로필
+    // api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable Long userId){
-        UserResponseDto userResponseDto;
+    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) throws Exception{
+        UserResponseDto.ProfileDto profileDto;
 
         try{
-            userResponseDto=userService.getUserProfileService(userId);
+            profileDto =userService.getUserProfileService(userId);
 
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
 
-        return ResponseEntity.ok(userResponseDto);
+        return ResponseEntity.ok(profileDto);
     }
 
-    //사용자 프로필 수정
-    //api/users/profile/{userId}
+    // 사용자 프로필 수정
+    // api/users/profile/{userId}
     @PutMapping("/profile/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable Long userId,
-                                               @RequestBody UserRequestDto userRequestDto)
+                                               @RequestBody UserRequestDto.ProfileDto profileDto)
+    throws Exception
     {
         try {
-            userService.updateUserProfile(userId, userRequestDto);
+            userService.updateUserProfile(userId, profileDto);
             return ResponseEntity.ok().body("회원 정보가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -73,14 +74,14 @@ public class UserController {
         }
     }
 
-    //계정 정보
+    // 계정 정보
     // api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
     public ResponseEntity<?> getUserInfo(@PathVariable Long userId){
-        UserResponseDto userResponseDto;
+        UserResponseDto.InfoDto userResponseDto;
 
         try{
-            userResponseDto=userService.getUserInfo(userId);
+            userResponseDto=userService.getUserInfoService(userId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
@@ -89,12 +90,12 @@ public class UserController {
         return ResponseEntity.ok(userResponseDto);
     }
 
-    //계정 정보 저장
+    // 계정 정보 저장
     // api/users/userInfo/update/{userId}
     @PutMapping("/userInfo/update/{userId}")
-    public ResponseEntity<?> putUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto userRequestDto){
+    public ResponseEntity<?> updateUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto.InfoDto infodto){
         try {
-            userService.updateUserInfo(userId, userRequestDto);
+            userService.updateUserInfoService(userId, infodto);
             return ResponseEntity.ok().body("사용자 이름이 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -105,9 +106,9 @@ public class UserController {
     //비밀번호 변경하기
     // api/users/password/{userId}
     @PutMapping ("/password/{userId}")
-    public ResponseEntity<?> putPassword(@PathVariable Long userId, @RequestBody UserPasswordDto userPasswordDto){
+    public ResponseEntity<?> putPassword(@PathVariable Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto){
         try {
-            userService.updatePassword(userId, userPasswordDto);
+            userService.updatePassword(userId, passwordDto);
             return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -115,12 +116,12 @@ public class UserController {
         }
     }
 
-    //찜한 상품 리스트 보기
+    // 찜한 상품 리스트 보기
     // api/users/wishList/{userId}
     @GetMapping("/wishList/{userId}")
-    public ResponseEntity<?> getWishList(@PathVariable Long userId){
+    public ResponseEntity<?> getWishList(@PathVariable Long userId) throws Exception{
         try {
-            List<ProductResponseDto> wishList = userService.getWishListService(userId);
+            List<ProductResponseDto.ScreenDto> wishList = userService.getWishList(userId);
             return ResponseEntity.ok(wishList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -145,7 +146,6 @@ public class UserController {
     //판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
 
-  //  "http://43.201.189.171:8080/api/users/myProducts/onSale/1"
     @PutMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> postMyProductStatus(@PathVariable Long userId,
                                                  @RequestBody ProductRequestDto productRequestDto){
@@ -214,20 +214,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-    }
-
-    //문의
-    @GetMapping("/help")
-    public ResponseEntity<?> helpPage(){
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("문의 페이지");
-    }
-
-    //서비스
-    @GetMapping("/service")
-    public ResponseEntity<?> servicePage(){
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("서비스 페이지");
     }
 
     @GetMapping("/myHistory/{userId}")

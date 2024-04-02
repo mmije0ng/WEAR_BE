@@ -43,7 +43,6 @@ public class Product extends BaseEntity {
     @Column(name="product_image", columnDefinition = "json")
     private String productImage;
 
-
     //상품 내용, 설명
     @NotNull
     @Column(name="product_content")
@@ -78,8 +77,8 @@ public class Product extends BaseEntity {
     private Category category;
 
     //찜
-    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
-    private Wish wish;
+//    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+//    private List<Wish> wishList = new ArrayList<>();
 
     //찜 횟수, 조회수
     @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
@@ -123,7 +122,6 @@ public class Product extends BaseEntity {
         this.isPrivate = isPrivate;
         this.user = user;
         this.category = category;
-        this.wish = wish;
         this.count = count;
     }
 }

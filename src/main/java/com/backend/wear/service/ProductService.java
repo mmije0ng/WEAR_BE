@@ -15,28 +15,13 @@ import com.backend.wear.repository.WishRepository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.util.Json;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 @Service
 public class ProductService {
@@ -44,6 +29,8 @@ public class ProductService {
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+
+    private final ObjectMapper objectMapper;
 
     // List<String>를 JSON 문자열로 변환하는 메서드
     private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
@@ -58,96 +45,127 @@ public class ProductService {
     }
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,CategoryRepository categoryRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
+                          CategoryRepository categoryRepository,  ObjectMapper objectMapper){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.objectMapper = objectMapper;
     }
 
-    //카테고리별, 최신순
+    // 카테고리별, 최신순
     @Transactional
-    public Page<ProductResponseDto> findProductsByCategory(String categoryName, Integer pageNumber ){
-        Page<Product> productsPage;
+    public List<ProductResponseDto.ScreenDto> findProductsByCategory (
+            String categoryName, Long userId) throws RuntimeException {
 
-        //카테고리가 전체 일 때
-        if (categoryName.equals("전체")){
-            productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
+        // 카테고리와 일치하는 판매중인 상품 리스트 조회
+        List<Product> productList = categoryName.equals("전체") ?
+                productRepository.findAll() :
+                productRepository.findProductsByCategoryName(categoryName);
 
-            return productsPage.map(this::mapToProductResponseDto);
+        // 반환할 DTO 리스트 생성
+        List <ProductResponseDto.ScreenDto> productCategoryList = new ArrayList<>();
+
+        for (Product p : productList) {
+            // 상품 이미지 리스트 변환
+
+            List<String> imageList;
+            try {
+                String json = objectMapper.readValue(p.getProductImage(), String.class);
+                imageList = convertJsonToImageList(json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            // 사용자의 상품 찜 여부 확인
+            boolean isSelected = wishRepository.findByUserIdAndProductId(userId, p.getId()).isPresent();
+
+            // DTO 생성 및 리스트에 추가
+            productCategoryList.add(ProductResponseDto.ScreenDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(imageList)
+                    .isSelected(isSelected)
+                    .createdAt(p.getCreatedAt())
+                    .build());
         }
 
-        else{ //카테고리별
-            productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
-
-            return productsPage.map(this::mapToProductResponseDto);
-        }
+        return productCategoryList;
     }
 
     //카테고리별, 판매중, 최신순
     @Transactional
-    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
-        Page<Product> productsPage;
+    public List<ProductResponseDto.ScreenDto> findProductsByCategoryOnSale(
+            String categoryName,Long userId) throws Exception{
 
-        //전체, 판매중, 최신순
-        if(categoryName.equals("전체")){
-            productsPage=productRepository
-                    .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
+        // 카테고리와 일치하는 판매중인 상품 리스트 조회
+        List<Product> productList = categoryName.equals("전체") ?
+                productRepository.findAll() :
+                productRepository.findProductByCategoryNameAndPostStatus(categoryName);
+
+        // 반환할 DTO 리스트 생성
+        List<ProductResponseDto.ScreenDto> productCategoryOnSaleList = new ArrayList<>();
+
+        for (Product p : productList) {
+
+            List<String> imageList;
+            try {
+                String json = objectMapper.readValue(p.getProductImage(), String.class);
+                imageList = convertJsonToImageList(json);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            // 사용자의 상품 찜 여부 확인
+            boolean isSelected = wishRepository.findByUserIdAndProductId(userId, p.getId()).isPresent();
+
+            // DTO 생성 및 리스트에 추가
+            productCategoryOnSaleList.add(ProductResponseDto.ScreenDto.builder()
+                    .id(p.getId())
+                    .price(p.getPrice())
+                    .productName(p.getProductName())
+                    .productStatus(p.getProductStatus())
+                    .postStatus(p.getPostStatus())
+                    .productImage(imageList)
+                    .isSelected(isSelected)
+                    .createdAt(p.getCreatedAt())
+                    .build());
         }
 
-        //카테고리별 판매중 최신순
-        else{
-            productsPage =productRepository
-                    .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
-        }
-
-        return productsPage.map(this::mapToProductResponseDto);
-    }
-
-    private Pageable pageRequest(Integer pageNumber){
-        return PageRequest.of(pageNumber,50,
-                Sort.by("updatedAt").descending());
+        return productCategoryOnSaleList;
     }
 
     //상품 상세 조회
     @Transactional
-    public ProductResponseDto getProductPost(Long productId){
+    public ProductResponseDto.DetailDto getProductPost(Long productId) throws Exception {
         Product product  = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
 
-        return mapToProductPostResponseDto(product);
-    }
-
-    //카테고리 검색 dto
-    private ProductResponseDto mapToProductResponseDto(Product product) {
-        boolean isSelected = wishRepository.findByProductId(product.getId())
-                .map(Wish::isSelected) // Optional에 매핑된 isSelected 값을 반환
-                .orElse(false); // 기본값으로 false를 반 환
-
-       /* // JSON문자열을 List<String>으로 변환
-        String productImageJson = product.getProductImage();
-        List<String> productImageList = convertJsonToImageList(productImageJson);*/
-
-        return ProductResponseDto.builder()
-                .id(product.getId())
-                .price(product.getPrice())
-                .productName(product.getProductName())
-                .postStatus(product.getPostStatus())
-                .productStatus(product.getProductStatus())
-                .isSelected(isSelected)
-                .productImage(product.getProductImage())
-                .build();
-    }
-
-    //상세 페이지 상품 dto
-    private ProductResponseDto mapToProductPostResponseDto(Product product) {
+        // 판매자
         User user=product.getUser();
-        //판매자
-        UserResponseDto seller =mapToUserPostResponseDto(user);
 
-        //상품
-        return ProductResponseDto.builder()
+        // 판매자 프로필 이미지 배열로 변환
+        String jsonUser = objectMapper.readValue(user.getProfileImage(), String.class);
+        List<String> userImageList = convertJsonToImageList(jsonUser);
+
+
+        UserResponseDto.ProductUserDto seller =  UserResponseDto.ProductUserDto.builder()
+                .id(user.getId())
+                .nickName(user.getNickName())
+                .profileImage(userImageList)
+                .level(user.getLevel().getLabel())
+                .build();
+
+        // 상품 이미지 배열로 변환
+        String jsonProduct = objectMapper.readValue(product.getProductImage(), String.class);
+        List<String> productImageList = convertJsonToImageList(jsonProduct);
+
+        return ProductResponseDto.DetailDto.builder()
                 .id(product.getId())
                 .seller(seller)
                 .price(product.getPrice())
@@ -155,18 +173,9 @@ public class ProductService {
                 .productStatus(product.getProductStatus())
                 .postStatus(product.getPostStatus())
                 .productContent(product.getProductContent())
-                .productImage(product.getProductImage())
+                .productImage(productImageList)
                 .place(product.getPlace())
-                .build();
-    }
-
-    //상품 상세 페이지에서 사용자 정보
-    private UserResponseDto mapToUserPostResponseDto(User user){
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .nickName(user.getNickName())
-                .profileImage(user.getProfileImage())
-                .level(user.getLevel().getLabel())
+                .createdAt(product.getCreatedAt())
                 .build();
     }
 
@@ -184,8 +193,6 @@ public class ProductService {
 
         // List<String>을 JSON 문자열로 변환
         String productImageJson = convertImageListToJson(requestDTO.getProductImage());
-
-
 
         // 제공된 Product 객체의 데이터를 사용하여 새로운 Product 객체 생성
         Product newProduct = Product.builder()
@@ -305,4 +312,37 @@ public class ProductService {
         }
     }
 
+    // 상품 찜하기
+    @Transactional
+    public void selectProduct(Long userId, Long productId) throws Exception{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+        Wish wish = Wish.builder()
+                .user(user)
+                .product(product)
+                .build();
+
+        // 찜
+        wishRepository.save(wish);
+    }
+
+    // 상품 찜 해제
+    @Transactional
+    public void deselectProduct(Long userId, Long productId) throws Exception{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
+
+        Wish wish = wishRepository.findByUserIdAndProductId(userId,productId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 아이디와 상품 아이디가 일치하는 찜한 상품 없음"));
+
+        // 찜 해제
+        wishRepository.delete(wish);
+    }
 }

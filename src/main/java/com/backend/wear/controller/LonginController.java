@@ -22,6 +22,9 @@ public class LonginController {
     private String myUniversityName;
     private String myUniversityEmail;
 
+    @Value("${api.key}")
+    private String API_KEY;
+
     @Autowired
     public LonginController (LoginService loginService){
 
