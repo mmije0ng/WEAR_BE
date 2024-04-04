@@ -31,10 +31,12 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
 
     // stomp 연결 시도 시 호출
     // 메시지가 채널로 전송되기 전 호출되는 메서드
+    // 프런트 -> 서버로 메시지가 전송될 때
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
+        System.out.println(this.getClass().getName()+" 호출 완료");
         System.out.println("full message:" + message);  
         System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
@@ -78,5 +80,17 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
 
         //throw new MessagingException("no permission! ");
         return message;
+    }
+
+    // 발생한 예외에 관계없이 전송이 완료된 후 호출
+    // 클라이언트 -> 서버 메시지 전송 완료 후
+    @Override
+    public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex){
+        System.out.println(this.getClass().getName()+" 호출 완료");
+
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
+        System.out.println("full message:" + message);
+        System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
+        System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
     }
 }

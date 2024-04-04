@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ProductResponseDto{
     public static class DetailDto{
         private Long id;  //상품 아이디
 
-        private UserResponseDto.ProductUserDto seller; //판매자
+        private UserResponseDto.SellerDto seller; //판매자
 
         private Integer price;
 
@@ -34,9 +35,11 @@ public class ProductResponseDto{
 
         private List<String> productImage;
 
-        private String place; //거래 장소
+        private String place; // 거래 장소
 
-        private LocalDateTime createdAt; // 상품 등록 시간
+        private String createdTime; // 상품 등록 시간
+
+        private String time; // 몇분 전
     }
 
     // 상품 썸네일
@@ -58,7 +61,8 @@ public class ProductResponseDto{
 
         private Boolean isSelected;
 
-        private LocalDateTime createdAt;
+  //      private LocalDateTime createdAt;
+        private String time;
     }
 
     // 마이페이지 상품 내역
@@ -78,7 +82,9 @@ public class ProductResponseDto{
 
         private List<String> productImage;
 
-        private LocalDateTime createdAt;
+    //    private LocalDateTime createdAt;
+
+        private String time;
     }
 
     // 숨김 상품
@@ -100,6 +106,8 @@ public class ProductResponseDto{
 
         private boolean isPrivate;
 
-        private LocalDateTime createdAt;
+  //      private LocalDateTime createdAt;
+
+        private String time;
     }
 }

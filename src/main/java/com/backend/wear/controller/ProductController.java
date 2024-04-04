@@ -28,7 +28,7 @@ public class ProductController {
     // api/products/category?categoryName={}&userId={}
     @GetMapping("/category")
     public ResponseEntity<?> findProductsByCategory(@RequestParam String categoryName, @RequestParam Long userId)
-            throws RuntimeException
+            throws Exception
     {
         List<ProductResponseDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
 
@@ -79,7 +79,7 @@ public class ProductController {
 
     // 상품 등록
     @PostMapping("/new/{userId}")
-    public ResponseEntity<?> postProductPost(@PathVariable Long userId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors)
+    public ResponseEntity<?> postProductPost(@PathVariable(name="userId") Long userId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors)
             throws Exception{
         try {
             productService.createProductPost(requestDTO,userId);

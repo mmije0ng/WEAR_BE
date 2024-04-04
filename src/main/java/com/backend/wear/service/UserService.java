@@ -1,5 +1,6 @@
 package com.backend.wear.service;
 
+import com.backend.wear.dto.ConvertTime;
 import com.backend.wear.dto.donation.DonationApplyResponseDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
@@ -210,7 +211,8 @@ public class UserService {
                     .postStatus(product.getPostStatus())
                     .productImage(imageList)
                     .isSelected(isSelected)
-                    .createdAt(product.getCreatedAt())
+                    .time(ConvertTime.convertLocaldatetimeToTime(
+                            product.getCreatedAt()))
                     .build());
         }
 
@@ -257,7 +259,8 @@ public class UserService {
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
                     .productImage(imageList)
-                    .createdAt(product.getCreatedAt())
+                    .time(ConvertTime.convertLocaldatetimeToTime(
+                            product.getCreatedAt()))
                     .build();
 
             myProductList.add(dto);
@@ -307,7 +310,8 @@ public class UserService {
                     .postStatus(product.getPostStatus())
                     .productImage(imageList)
                     .isPrivate(product.isPrivate())
-                    .createdAt(product.getCreatedAt())
+                    .time(ConvertTime.convertLocaldatetimeToTime(
+                            product.getCreatedAt()))
                     .build();
 
             privateProductList.add(dto);

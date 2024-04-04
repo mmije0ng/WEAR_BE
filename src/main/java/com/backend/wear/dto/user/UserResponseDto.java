@@ -54,7 +54,7 @@ public class UserResponseDto {
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class ProductUserDto{
+    public static class SellerDto{
         private Long id; // pk
         private String nickName;
         private List<String> profileImage;
