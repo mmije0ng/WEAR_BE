@@ -3,6 +3,8 @@ package com.backend.wear.service;
 import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,20 +248,27 @@ public class UserService {
 
         for(Wish w: wishList){
             if(w.isSelected()){
+
                 Product p=w.getProduct();
+                // JSON 배열 파싱
+                String[] array = new String[0];
+                try {
+                    array = objectMapper.readValue(p.getProductImage(), String[].class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
                 ProductResponseDto dto=ProductResponseDto.builder()
                         .id(p.getId())
                         .price(p.getPrice())
                         .productName(p.getProductName())
                         .productStatus(p.getProductStatus())
                         .postStatus(p.getPostStatus())
-                        .productImage(p.getProductImage())
+                        .productImage(array)
                         .isSelected(p.getWish().isSelected())
                         .build();
                 mywishList.add(dto);
             }
         }
-
         return mywishList;
     }
 
@@ -273,6 +282,13 @@ public class UserService {
 
             if(!p.getPostStatus().equals(postStatus))
                 continue;
+            // JSON 배열 파싱
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(p.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
@@ -280,11 +296,12 @@ public class UserService {
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(p.getProductImage())
+                    .productImage(array)
                     .build();
 
             myProductList.add(dto);
         }
+
 
         return myProductList;
     }
@@ -295,12 +312,11 @@ public class UserService {
         List<ProductResponseDto> myHistoryList=new ArrayList<>();
 
 
-
         for(Product p: list){
             // JSON 배열 파싱
-            String array;
+            String[] array = new String[0];
             try {
-                array = objectMapper.readValue(p.getProductImage(), String.class);
+                array = objectMapper.readValue(p.getProductImage(), String[].class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -326,6 +342,13 @@ public class UserService {
 
         for(Product p: productList){
             //상품 판매 상태가 요청과 같은 상품 리스트만 반환
+            // JSON 배열 파싱
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(p.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
@@ -333,7 +356,7 @@ public class UserService {
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(p.getProductImage())
+                    .productImage(array)
                     .isPrivate(p.isPrivate())
                     .build();
 
