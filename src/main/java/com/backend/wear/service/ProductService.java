@@ -15,14 +15,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProductService {
+
+    private static final int pageSize=12;
+
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
@@ -54,133 +60,73 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    // 카테고리별, 최신순
+    // 카테고리별, 최신순 페이지네이션
     @Transactional
-    public List<ProductResponseInnerDto.ScreenDto> findProductsByCategory (
-            String categoryName, Long userId) throws Exception {
+    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber){
+        Page<Product> productsPage;
 
-        // 카테고리와 일치하는 판매중인 상품 리스트 조회
-        List<Product> productList = categoryName.equals("전체") ?
-                productRepository.findAll() :
-                productRepository.findProductsByCategoryName(categoryName);
-
-        // 반환할 DTO 리스트 생성
-        List <ProductResponseInnerDto.ScreenDto> productCategoryList = new ArrayList<>();
-
-        for (Product product : productList) {
-            // 상품 이미지 리스트 변환
-            // JSON 배열 파싱
-            String[] array = new String[0];
-            try {
-                array = objectMapper.readValue(product.getProductImage(), String[].class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            // 사용자의 상품 찜 여부 확인
-            boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
-
-            // DTO 생성 및 리스트에 추가
-            productCategoryList.add(ProductResponseInnerDto.ScreenDto.builder()
-                    .id(product.getId())
-                    .price(product.getPrice())
-                    .productName(product.getProductName())
-                    .productStatus(product.getProductStatus())
-                    .postStatus(product.getPostStatus())
-                    .productImage(array)
-                    .isSelected(isSelected)
-                    .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
-                    .build());
+        if(categoryName.equals("전체")){
+            productsPage = productRepository. findAllProductPage(pageRequest(pageNumber));
+        }
+        else{
+            productsPage = productRepository.findByCategoryNamePage(categoryName, pageRequest(pageNumber));
         }
 
-        return productCategoryList;
+        return productsPage.map(product -> mapToScreenDto(product, userId));
     }
 
-    //카테고리별, 판매중, 최신순
+    // 카테고리별, 판매중, 최신순 페이지네이션
     @Transactional
-    public List<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(
-            String categoryName,Long userId) throws Exception{
+    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
+        Page<Product> productsPage;
+        String postStatus ="onSale";
 
-        // 카테고리와 일치하는 판매중인 상품 리스트 조회
-        List<Product> productList = categoryName.equals("전체") ?
-                productRepository.findAll() :
-                productRepository.findProductByCategoryNameAndPostStatus(categoryName);
-
-        // 반환할 DTO 리스트 생성
-        List<ProductResponseInnerDto.ScreenDto> productCategoryOnSaleList = new ArrayList<>();
-
-        for (Product product : productList) {
-            // JSON 배열 파싱
-            String[] array = new String[0];
-            try {
-                array = objectMapper.readValue(product.getProductImage(), String[].class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            // 사용자의 상품 찜 여부 확인
-            boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
-
-            // DTO 생성 및 리스트에 추가
-            productCategoryOnSaleList.add(ProductResponseInnerDto.ScreenDto.builder()
-                    .id(product.getId())
-                    .price(product.getPrice())
-                    .productName(product.getProductName())
-                    .productStatus(product.getProductStatus())
-                    .postStatus(product.getPostStatus())
-                    .productImage(array)
-                    .isSelected(isSelected)
-                    .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
-                    .build());
+        // 전체, 판매중, 최신순
+        if(categoryName.equals("전체")){
+            productsPage=productRepository
+                    .findByPostStatusPage(pageRequest(pageNumber));
         }
 
-        return productCategoryOnSaleList;
+        //카 테고리별 판매중 최신순
+        else{
+            productsPage =productRepository
+                    .findByCategoryNameAndPostStatusPage(categoryName,pageRequest(pageNumber));
+        }
+
+        return productsPage.map(product -> mapToScreenDto(product, userId));
     }
 
-//    // 카테고리별, 최신순
-//    // 페이지네이션
-//    @Transactional
-//    public Page<ProductResponseDto> findProductsByCategory(String categoryName, Integer pageNumber ){
-//        Page<Product> productsPage;
-//
-//        //카테고리가 전체 일 때
-//        if (categoryName.equals("전체")){
-//            productsPage = productRepository.findByIsPrivateFalse(pageRequest(pageNumber));
-//
-//            return productsPage.map(this::mapToProductResponseDto);
-//        }
-//
-//        else{ //카테고리별
-//            productsPage = productRepository.findByCategory_CategoryNameAndIsPrivateFalse(categoryName,pageRequest(pageNumber));
-//
-//            return productsPage.map(this::mapToProductResponseDto);
-//        }
-//    }
-//
-//    //카테고리별, 판매중, 최신순
-//    @Transactional
-//    public Page<ProductResponseDto> findProductsByCategoryOnSale(String categoryName, String postStatus, Integer pageNumber ){
-//        Page<Product> productsPage;
-//
-//        //전체, 판매중, 최신순
-//        if(categoryName.equals("전체")){
-//            productsPage=productRepository
-//                    .findByPostStatusAndIsPrivateFalse(postStatus,pageRequest(pageNumber));
-//        }
-//
-//        //카테고리별 판매중 최신순
-//        else{
-//            productsPage =productRepository
-//                    .findByPostStatusAndCategory_CategoryNameAndIsPrivateFalse(postStatus,categoryName,pageRequest(pageNumber));
-//        }
-//
-//        return productsPage.map(this::mapToProductResponseDto);
-//    }
-//
-//    private Pageable pageRequest(Integer pageNumber){
-//        return PageRequest.of(pageNumber,12,
-//                Sort.by("updatedAt").descending());
-//    }
+    // 카테고리 검색 상품 dto 매핑
+    private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
+        // JSON 배열 파싱
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(product.getProductImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 사용자의 상품 찜 여부 확인
+        boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
+
+        // DTO 생성
+        return ProductResponseInnerDto.ScreenDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .productStatus(product.getProductStatus())
+                .postStatus(product.getPostStatus())
+                .productImage(array)
+                .isSelected(isSelected)
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .build();
+    }
+
+    // 상품 12개씩 최신순으로 정렬
+    private Pageable pageRequest(Integer pageNumber){
+        return
+                PageRequest.of(pageNumber, pageSize, Sort.by("updatedAt").descending());
+    }
 
     // 상품 상세 조회
     @Transactional

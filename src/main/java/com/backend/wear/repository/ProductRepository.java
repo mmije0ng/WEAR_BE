@@ -1,6 +1,9 @@
 package com.backend.wear.repository;
 
 import com.backend.wear.entity.Product;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,19 +16,21 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // 카테고리와 일치하는 상품 리스트
-    // 숨겨진 상품 제외
+    // 전체 상품 페이지 (숨김x)
+    @Query("SELECT p FROM Product p WHERE p.isPrivate = false")
+    Page<Product> findAllProductPage(Pageable pageable);
+
+    // 카테고리 이름과 일치하는 상품 페이지 (숨김x)
     @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.isPrivate = false")
-    List<Product> findProductsByCategoryName(@Param("categoryName") String categoryName);
+    Page<Product> findByCategoryNamePage(@Param("categoryName") String categoryName, Pageable pageable);
 
-    // 카테고리와 일치하는 판매 중인 상품 리스트
-    // 숨겨진 상품 제외
-    @Modifying
-    @Transactional
-    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND p.isPrivate = false")
-    List<Product> findProductByCategoryNameAndPostStatus(@Param("categoryName") String categoryName);
+    // 전체 판매 중인 상품 페이지 (숨김x)
+    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.isPrivate = false")
+    Page<Product> findByPostStatusPage(Pageable pageable);
 
-
+    // 카테고리 이름과 일치하는 판매 중인 상품 페이지 (숨김x)
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND  p.isPrivate = false")
+    Page<Product> findByCategoryNameAndPostStatusPage(@Param("categoryName") String categoryName, Pageable pageable);
 
     //검색어별 상품 조회
     /*List<Product> findByProductNameContainingIgnoreCase(String searchName);*/

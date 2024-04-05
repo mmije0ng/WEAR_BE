@@ -7,6 +7,7 @@ import com.backend.wear.dto.ProductResponseInnerDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -26,16 +27,17 @@ public class ProductController {
     }
 
     // 카테고리별 최신순 조회
-    // api/products/category?categoryName={}&userId={}
+    // api/products/category?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category")
-    public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId)
+    public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId,
+                                                    @RequestParam(name="pageNumber") Integer pageNumber)
             throws Exception
     {
-        List<ProductResponseInnerDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
+        Page <ProductResponseInnerDto.ScreenDto> page = productService.findProductsByCategory(categoryName, userId, pageNumber);
 
         // 카테고리별 상품이 있는 경우
-        if(!list.isEmpty()){
-            return ResponseEntity.ok(list);
+        if(!page.isEmpty()){
+            return ResponseEntity.ok(page);
         }
 
         else{
@@ -45,17 +47,18 @@ public class ProductController {
     }
 
     // 카테고리별 최신순, 판매 상태
-    // api/products/category/sale?categoryName={}&userId={}
+    // api/products/category/sale?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category/sale")
     public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam(name="categoryName") String categoryName,
-                                                        @RequestParam(name="userId") Long userId) throws Exception
+                                                        @RequestParam(name="userId") Long userId,
+                                                          @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
-        List<ProductResponseInnerDto.ScreenDto> list =
-                productService.findProductsByCategoryOnSale(categoryName, userId);
+        Page <ProductResponseInnerDto.ScreenDto> page =
+                productService.findProductsByCategoryOnSale(categoryName, userId, pageNumber);
 
         //페이지에 요소가 있는 경우
-        if(!list.isEmpty()){
-            return ResponseEntity.ok(list);
+        if(!page.isEmpty()){
+            return ResponseEntity.ok(page);
         }
 
         else{
