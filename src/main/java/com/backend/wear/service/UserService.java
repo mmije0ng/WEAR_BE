@@ -132,17 +132,15 @@ public class UserService {
         user.setUserName(profileDto.getUserName());
         user.setNickName(profileDto.getNickName());
 
-//        // 배열로 변환
-//        String[] array = new String[0];
-//        try {
-//            array = objectMapper.readValue(user.getProfileImage(), String[].class);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        String profileImage = convertImageListToJson(array);
-//
-//        user.setProfileImage(profileImage);
+        // 배열을 스트링으로 변환
+        String profileImage = user.getProfileImage();
+        try {
+            profileImage = objectMapper.readValue(user.getProfileImage(), String.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        user.setProfileImage(profileImage);
 
         setProfileStyle(user,profileDto.getStyle());
     }
