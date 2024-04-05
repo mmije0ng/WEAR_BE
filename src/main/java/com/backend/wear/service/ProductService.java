@@ -1,10 +1,6 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.ConvertTime;
-import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.product.ProductRequestDto;
-import com.backend.wear.dto.product.ProductResponseDto;
-import com.backend.wear.dto.user.UserResponseDto;
+import com.backend.wear.dto.*;
 import com.backend.wear.entity.Category;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
@@ -21,7 +17,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +28,13 @@ public class ProductService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    private final ObjectMapper objectMapper;
 
+    // ObjectMapper 생성
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    /* // JSON 배열 파싱
+     String[] array = objectMapper.readValue(jsonString, String[].class);
+ */
     // List<String>를 JSON 문자열로 변환하는 메서드
     private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -48,18 +48,16 @@ public class ProductService {
     }
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
-                          CategoryRepository categoryRepository,  ObjectMapper objectMapper){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,CategoryRepository categoryRepository){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
-        this.objectMapper = objectMapper;
     }
 
     // 카테고리별, 최신순
     @Transactional
-    public List<ProductResponseDto.ScreenDto> findProductsByCategory (
+    public List<ProductResponseInnerDto.ScreenDto> findProductsByCategory (
             String categoryName, Long userId) throws Exception {
 
         // 카테고리와 일치하는 판매중인 상품 리스트 조회
@@ -68,24 +66,29 @@ public class ProductService {
                 productRepository.findProductsByCategoryName(categoryName);
 
         // 반환할 DTO 리스트 생성
-        List <ProductResponseDto.ScreenDto> productCategoryList = new ArrayList<>();
+        List <ProductResponseInnerDto.ScreenDto> productCategoryList = new ArrayList<>();
 
         for (Product product : productList) {
             // 상품 이미지 리스트 변환
-            String json = objectMapper.readValue(product.getProductImage(), String.class);
-            List<String> imageList = convertJsonToImageList(json);
+            // JSON 배열 파싱
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(product.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             // 사용자의 상품 찜 여부 확인
             boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
             // DTO 생성 및 리스트에 추가
-            productCategoryList.add(ProductResponseDto.ScreenDto.builder()
+            productCategoryList.add(ProductResponseInnerDto.ScreenDto.builder()
                     .id(product.getId())
                     .price(product.getPrice())
                     .productName(product.getProductName())
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
-                    .productImage(imageList)
+                    .productImage(array)
                     .isSelected(isSelected)
                     .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                     .build());
@@ -96,7 +99,7 @@ public class ProductService {
 
     //카테고리별, 판매중, 최신순
     @Transactional
-    public List<ProductResponseDto.ScreenDto> findProductsByCategoryOnSale(
+    public List<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(
             String categoryName,Long userId) throws Exception{
 
         // 카테고리와 일치하는 판매중인 상품 리스트 조회
@@ -105,23 +108,28 @@ public class ProductService {
                 productRepository.findProductByCategoryNameAndPostStatus(categoryName);
 
         // 반환할 DTO 리스트 생성
-        List<ProductResponseDto.ScreenDto> productCategoryOnSaleList = new ArrayList<>();
+        List<ProductResponseInnerDto.ScreenDto> productCategoryOnSaleList = new ArrayList<>();
 
         for (Product product : productList) {
-            String json = objectMapper.readValue(product.getProductImage(), String.class);
-            List<String> imageList = convertJsonToImageList(json);
+            // JSON 배열 파싱
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(product.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             // 사용자의 상품 찜 여부 확인
             boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
             // DTO 생성 및 리스트에 추가
-            productCategoryOnSaleList.add(ProductResponseDto.ScreenDto.builder()
+            productCategoryOnSaleList.add(ProductResponseInnerDto.ScreenDto.builder()
                     .id(product.getId())
                     .price(product.getPrice())
                     .productName(product.getProductName())
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
-                    .productImage(imageList)
+                    .productImage(array)
                     .isSelected(isSelected)
                     .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                     .build());
@@ -132,7 +140,7 @@ public class ProductService {
 
     // 상품 상세 조회
     @Transactional
-    public ProductResponseDto.DetailDto getProductPost(Long productId) throws Exception {
+    public ProductResponseInnerDto.DetailDto getProductPost(Long productId) throws Exception {
         Product product  = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
@@ -141,21 +149,30 @@ public class ProductService {
         User user=product.getUser();
 
         // 판매자 프로필 이미지 배열로 변환
-        String jsonUser = objectMapper.readValue(user.getProfileImage(), String.class);
-        List<String> userImageList = convertJsonToImageList(jsonUser);
+        // JSON 배열 파싱
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(user.getProfileImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        UserResponseDto.SellerDto seller =  UserResponseDto.SellerDto.builder()
+        UserResponseInnerDto.SellerDto seller =  UserResponseInnerDto.SellerDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
-                .profileImage(userImageList)
+                .profileImage(array)
                 .level(user.getLevel().getLabel())
                 .build();
 
         // 상품 이미지 배열로 변환
-        String jsonProduct = objectMapper.readValue(product.getProductImage(), String.class);
-        List<String> productImageList = convertJsonToImageList(jsonProduct);
+        String[] productArray = new String[0];
+        try {
+            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        return ProductResponseDto.DetailDto.builder()
+        return ProductResponseInnerDto.DetailDto.builder()
                 .id(product.getId())
                 .seller(seller)
                 .price(product.getPrice())
@@ -163,14 +180,40 @@ public class ProductService {
                 .productStatus(product.getProductStatus())
                 .postStatus(product.getPostStatus())
                 .productContent(product.getProductContent())
-                .productImage(productImageList)
+                .productImage(productArray)
                 .place(product.getPlace())
                 .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))) // 수정
                 .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
-    // 상품 등록하기
+    @Transactional
+    public List<ProductResponseDto> searchProductByproductName(String searchName){
+        List<Product> products  = productRepository.findByProductName(searchName);
+
+        List<ProductResponseDto> responseDto = products.stream()
+                .map(ProductResponseDto::new)
+                .toList();
+
+        return responseDto;
+    }
+
+    //상품 검색하기(productName 검색, 카테고리 검색)
+    @Transactional
+    public List<ProductResponseDto> searchProductByproductNameAndCategory(String searchName, String categoryName){
+
+        List<Product> filteredProducts  = productRepository.findByProductNameAndCategoryName(searchName, categoryName);
+
+        List<ProductResponseDto> responseDto = filteredProducts.stream()
+                .map(ProductResponseDto::new)
+                .toList();
+
+        return responseDto;
+
+
+    }
+
+    //상품 등록하기
     @Transactional
     public void createProductPost(ProductPostRequestDto requestDTO, Long userId) throws Exception {
         User user = userRepository.findById(userId)

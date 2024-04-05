@@ -1,4 +1,4 @@
-package com.backend.wear.dto.product;
+package com.backend.wear.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

@@ -1,10 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.donation.DonationApplyResponseDto;
-import com.backend.wear.dto.product.ProductRequestDto;
-import com.backend.wear.dto.product.ProductResponseDto;
-import com.backend.wear.dto.user.UserRequestDto;
-import com.backend.wear.dto.user.UserResponseDto;
+import com.backend.wear.dto.*;
 import com.backend.wear.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +28,7 @@ public class UserController {
     //api/users/{userId}
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId) throws Exception {
-        UserResponseDto.MyPageDto myPageDto;
+        UserResponseInnerDto.MyPageDto myPageDto;
 
         try{
             myPageDto=userService.getMyPageUserService(userId);
@@ -48,7 +44,7 @@ public class UserController {
     // api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable Long userId) throws Exception{
-        UserResponseDto.ProfileDto profileDto;
+        UserResponseInnerDto.ProfileDto profileDto;
 
         try{
             profileDto =userService.getUserProfileService(userId);
@@ -81,7 +77,7 @@ public class UserController {
     // api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
     public ResponseEntity<?> getUserInfo(@PathVariable Long userId){
-        UserResponseDto.InfoDto userResponseDto;
+        UserResponseInnerDto.InfoDto userResponseDto;
 
         try{
             userResponseDto=userService.getUserInfoService(userId);
@@ -124,7 +120,7 @@ public class UserController {
     @GetMapping("/wishList/{userId}")
     public ResponseEntity<?> getWishList(@PathVariable Long userId) throws Exception{
         try {
-            List<ProductResponseDto.ScreenDto> wishList = userService.getWishList(userId);
+            List<ProductResponseInnerDto.ScreenDto> wishList = userService.getWishList(userId);
             return ResponseEntity.ok(wishList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -137,7 +133,7 @@ public class UserController {
     @GetMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId) throws Exception{
         try{
-            List<ProductResponseDto.MyPageScreenDto> myProductList =
+            List<ProductResponseInnerDto.MyPageScreenDto> myProductList =
                     userService.getMyProductsList(userId,"onSale");
             return ResponseEntity.ok(myProductList);
         } catch (IllegalArgumentException e) {
@@ -165,7 +161,7 @@ public class UserController {
     @GetMapping("/myProducts/soldOut/{userId}")
     public ResponseEntity<?> getMyProductsSoldOut(@PathVariable Long userId) throws Exception{
         try{
-            List<ProductResponseDto.MyPageScreenDto> myProductList =
+            List<ProductResponseInnerDto.MyPageScreenDto> myProductList =
                     userService.getMyProductsList(userId,"soldOut");
             return ResponseEntity.ok(myProductList);
         } catch (IllegalArgumentException e) {
@@ -180,7 +176,7 @@ public class UserController {
     public ResponseEntity<?> getMyProductsPrivate(@PathVariable Long userId) throws Exception{
 
         try{
-            List<ProductResponseDto.PrivateDto> privateList = userService.myyProductsPrivateList(userId);
+            List<ProductResponseInnerDto.PrivateDto> privateList = userService.myyProductsPrivateList(userId);
             return ResponseEntity.ok(privateList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

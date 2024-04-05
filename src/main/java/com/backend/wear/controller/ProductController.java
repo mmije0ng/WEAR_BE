@@ -1,8 +1,9 @@
 package com.backend.wear.controller;
 
 import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.product.ProductRequestDto;
-import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.ProductRequestDto;
+import com.backend.wear.dto.ProductResponseDto;
+import com.backend.wear.dto.ProductResponseInnerDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class ProductController {
     public ResponseEntity<?> findProductsByCategory(@RequestParam String categoryName, @RequestParam Long userId)
             throws Exception
     {
-        List<ProductResponseDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
+        List<ProductResponseInnerDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
 
         // 카테고리별 상품이 있는 경우
         if(!list.isEmpty()){
@@ -49,7 +50,7 @@ public class ProductController {
     public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam String categoryName,
                                                         @RequestParam Long userId) throws Exception
     {
-        List<ProductResponseDto.ScreenDto> list =
+        List<ProductResponseInnerDto.ScreenDto> list =
                 productService.findProductsByCategoryOnSale(categoryName, userId);
 
         //페이지에 요소가 있는 경우
@@ -64,10 +65,41 @@ public class ProductController {
     }
 
     // 상품 상세 페이지 불러오기
+    //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
+    //  /products/search?searchName={searchName}
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {
+
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductName(searchName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+    }
+
+    //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
+    //   /products/search/category?searchName={searchName}?categoryName={categoryName}
+    @GetMapping("/search/category")
+    public ResponseEntity<?> searchProductsby(@RequestParam String searchName, String categoryName) {
+
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductNameAndCategory(searchName, categoryName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+    }
+
+    //상품 상세 페이지 불러오기
     // api/products/{productId}
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId) throws Exception {
-        ProductResponseDto.DetailDto productPost;
+        ProductResponseInnerDto.DetailDto productPost;
         try {
             productPost = productService.getProductPost(productId);
         } catch (IllegalArgumentException e) {

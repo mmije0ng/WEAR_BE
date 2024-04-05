@@ -1,11 +1,6 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.ConvertTime;
-import com.backend.wear.dto.donation.DonationApplyResponseDto;
-import com.backend.wear.dto.product.ProductRequestDto;
-import com.backend.wear.dto.product.ProductResponseDto;
-import com.backend.wear.dto.user.UserRequestDto;
-import com.backend.wear.dto.user.UserResponseDto;
+import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,7 +56,7 @@ public class UserService {
 
     // 마이페이지 사용자 정보
     @Transactional
-    public UserResponseDto.MyPageDto getMyPageUserService(Long userId) throws Exception{
+    public UserResponseInnerDto.MyPageDto getMyPageUserService(Long userId) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         System.out.println("유저"+user.getUserName());
@@ -70,7 +65,7 @@ public class UserService {
     }
 
     // 마이페이지 응답 dto 매핑
-    private UserResponseDto.MyPageDto mapToMyPageDto(User user, Long userId) throws Exception{
+    private UserResponseInnerDto.MyPageDto mapToMyPageDto(User user, Long userId) throws Exception{
         String universityName = getUniversityNameByUser(userId); //대학 이름
         List<String> style = getUserStyleList(userId); //스타일 리스트
         String level=getCurrentLevel(userId); //현재 레벨
@@ -80,15 +75,19 @@ public class UserService {
 
         System.out.println("이름: "+user.getUserName());
 
-        String json = objectMapper.readValue(user.getProfileImage(), String.class);
-        List<String> imageList = convertJsonToImageList(json);
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(user.getProfileImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        return UserResponseDto.MyPageDto.builder()
+        return UserResponseInnerDto.MyPageDto.builder()
                 .userName(user.getNickName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .style(style)
-                .profileImage(imageList)
+                .profileImage(array)
                 .level(level)
                 .nextLevel(nextLevel)
                 .point(point)
@@ -98,7 +97,7 @@ public class UserService {
 
     // 마이페이지 프로필
     @Transactional
-    public UserResponseDto.ProfileDto getUserProfileService(Long userId) throws Exception{
+    public UserResponseInnerDto.ProfileDto getUserProfileService(Long userId) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -106,16 +105,20 @@ public class UserService {
     }
 
     // 마이페이지 프로필 응답 dto 매핑
-    private UserResponseDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
+    private UserResponseInnerDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
         List<String> styleList = getUserStyleList(userId); //스타일 리스트
 
-        String json = objectMapper.readValue(user.getProfileImage(), String.class);
-        List<String> imageList = convertJsonToImageList(json);
+        String[] array = new String[0];
+        try {
+            array = objectMapper.readValue(user.getProfileImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        return UserResponseDto.ProfileDto.builder()
+        return UserResponseInnerDto.ProfileDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
-                .profileImage(imageList)
+                .profileImage(array)
                 .style(styleList)
                 .build();
     }
@@ -129,17 +132,24 @@ public class UserService {
         user.setUserName(profileDto.getUserName());
         user.setNickName(profileDto.getNickName());
 
-        // List<String>을 JSON 문자열로 변환
-        String profileImage = convertImageListToJson(profileDto.getProfileImage());
-
-        user.setProfileImage(profileImage);
+//        // 배열로 변환
+//        String[] array = new String[0];
+//        try {
+//            array = objectMapper.readValue(user.getProfileImage(), String[].class);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        String profileImage = convertImageListToJson(array);
+//
+//        user.setProfileImage(profileImage);
 
         setProfileStyle(user,profileDto.getStyle());
     }
 
     // 유저 정보 조회
     @Transactional
-    public UserResponseDto.InfoDto getUserInfoService(Long userId){
+    public UserResponseInnerDto.InfoDto getUserInfoService(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -147,10 +157,10 @@ public class UserService {
     }
 
     // 사용자 정보 info 응답 dto
-    private UserResponseDto.InfoDto mapToInfoDto(User user, Long userId){
+    private UserResponseInnerDto.InfoDto mapToInfoDto(User user, Long userId){
         String universityName=getUniversityNameByUser(userId);
 
-        return UserResponseDto.InfoDto.builder()
+        return UserResponseInnerDto.InfoDto.builder()
                 .userName(user.getUserName())
                 .universityName(universityName)
                 .universityEmail(user.getUniversityEmail())
@@ -164,8 +174,8 @@ public class UserService {
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.setUserName(infoDto.getUserName());
-  //      user.setUniversityEmail(infoDto.getUniversityEmail());
-  //      updateUniversityName(userId, infoDto.getUniversityName());
+        //      user.setUniversityEmail(infoDto.getUniversityEmail());
+        //      updateUniversityName(userId, infoDto.getUniversityName());
     }
 
     // 비밀번호 변경
@@ -182,47 +192,51 @@ public class UserService {
 
     // 찜한 상품 불러오기
     @Transactional
-    public List<ProductResponseDto.ScreenDto> getWishList(Long userId) throws Exception{
+    public List<ProductResponseInnerDto.ScreenDto> getWishList(Long userId) throws Exception{
         // 찜 리스트
-       List<Wish> wishList = wishRepository.findByUserId(userId);
+        List<Wish> wishList = wishRepository.findByUserId(userId);
 
         // 찜한 상품 리스트 dto로 변환
-       List<ProductResponseDto.ScreenDto> productList = new ArrayList<>();
+        List<ProductResponseInnerDto.ScreenDto> productList = new ArrayList<>();
 
-       if(wishList.isEmpty())
-           throw new IllegalArgumentException("현재 찜한 상품이 없습니다.");
+        if(wishList.isEmpty())
+            throw new IllegalArgumentException("현재 찜한 상품이 없습니다.");
 
         for (Wish wish : wishList) {
             // 사용자가 찜한 상품
             Product product = wish.getProduct();
 
-            String json = objectMapper.readValue(product.getProductImage(), String.class);
-            List <String> imageList = convertJsonToImageList(json);
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(product.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
             // 사용자의 상품 찜 여부 확인
             boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
             // DTO 생성 및 리스트에 추가
-            productList.add(ProductResponseDto.ScreenDto.builder()
+            productList.add(ProductResponseInnerDto.ScreenDto.builder()
                     .id(product.getId())
                     .price(product.getPrice())
                     .productName(product.getProductName())
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
-                    .productImage(imageList)
+                    .productImage(array)
                     .isSelected(isSelected)
                     .time(ConvertTime.convertLocaldatetimeToTime(
                             product.getCreatedAt()))
                     .build());
         }
 
-       return productList;
+        return productList;
     }
 
     // 판매 중, 완료 상품 불러오기
     @Transactional
-    public List<ProductResponseDto.MyPageScreenDto> getMyProductsList(Long userId, String postStatus) throws Exception{
-        List<ProductResponseDto.MyPageScreenDto> productResponseDtoList =
+    public List<ProductResponseInnerDto.MyPageScreenDto> getMyProductsList(Long userId, String postStatus) throws Exception{
+        List<ProductResponseInnerDto.MyPageScreenDto> productResponseDtoList =
                 mapToMyPageScreenDto(userId,postStatus);
 
         if(productResponseDtoList.isEmpty()){
@@ -237,28 +251,32 @@ public class UserService {
     }
 
     // 판매 내역 상품 dto 매핑
-    private List<ProductResponseDto.MyPageScreenDto> mapToMyPageScreenDto(Long userId, String postStatus)
+    private List<ProductResponseInnerDto.MyPageScreenDto> mapToMyPageScreenDto(Long userId, String postStatus)
             throws Exception {
         // 사용자 판매 상품 조회
         List<Product> productList = productRepository.findByUserId(userId);
         // dto 리스트
-        List<ProductResponseDto.MyPageScreenDto> myProductList = new ArrayList<>();
+        List<ProductResponseInnerDto.MyPageScreenDto> myProductList = new ArrayList<>();
 
         for (Product product : productList) {
             //상품 판매 상태가 요청과 같은 상품 리스트만 반환
             if (!product.getPostStatus().equals(postStatus))
                 continue;
 
-            String json = objectMapper.readValue(product.getProductImage(), String.class);
-            List <String> imageList = convertJsonToImageList(json);
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(product.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
-            ProductResponseDto.MyPageScreenDto dto = ProductResponseDto.MyPageScreenDto.builder()
+            ProductResponseInnerDto.MyPageScreenDto dto = ProductResponseInnerDto.MyPageScreenDto.builder()
                     .id(product.getId())
                     .price(product.getPrice())
                     .productName(product.getProductName())
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
-                    .productImage(imageList)
+                    .productImage(array)
                     .time(ConvertTime.convertLocaldatetimeToTime(
                             product.getCreatedAt()))
                     .build();
@@ -283,8 +301,8 @@ public class UserService {
 
     // 숨김 처리 상품 보기
     @Transactional
-    public List<ProductResponseDto.PrivateDto> myyProductsPrivateList(Long userId) throws Exception{
-        List<ProductResponseDto.PrivateDto> privateProductList = mapToPrivateDto(userId);
+    public List<ProductResponseInnerDto.PrivateDto> myyProductsPrivateList(Long userId) throws Exception{
+        List<ProductResponseInnerDto.PrivateDto> privateProductList = mapToPrivateDto(userId);
 
         if(privateProductList.isEmpty())
             throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
@@ -293,22 +311,26 @@ public class UserService {
     }
 
     // 숨김 상품 dto 매핑
-    private List<ProductResponseDto.PrivateDto> mapToPrivateDto(Long userId) throws Exception{
+    private List<ProductResponseInnerDto.PrivateDto> mapToPrivateDto(Long userId) throws Exception{
         List<Product> productList = productRepository.findByUserIdAndIsPrivateTrue(userId);
-        List<ProductResponseDto.PrivateDto> privateProductList= new ArrayList<>();
+        List<ProductResponseInnerDto.PrivateDto> privateProductList= new ArrayList<>();
 
         for(Product product: productList){
             // 이미지 배열로 변환
-            String json = objectMapper.readValue(product.getProductImage(), String.class);
-            List <String> imageList = convertJsonToImageList(json);
+            String[] array = new String[0];
+            try {
+                array = objectMapper.readValue(product.getProductImage(), String[].class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
-            ProductResponseDto.PrivateDto dto=ProductResponseDto.PrivateDto.builder()
+            ProductResponseInnerDto.PrivateDto dto=ProductResponseInnerDto.PrivateDto.builder()
                     .id(product.getId())
                     .price(product.getPrice())
                     .productName(product.getProductName())
                     .productStatus(product.getProductStatus())
                     .postStatus(product.getPostStatus())
-                    .productImage(imageList)
+                    .productImage(array)
                     .isPrivate(product.isPrivate())
                     .time(ConvertTime.convertLocaldatetimeToTime(
                             product.getCreatedAt()))
@@ -352,7 +374,7 @@ public class UserService {
         // 기부 완료 내역만 조회
         if(donationComplete)
             list =donationApplyRepository.findByUserIdAndDonationComplete(userId);
-        // 기부 전체 내역 조회
+            // 기부 전체 내역 조회
         else
             list=donationApplyRepository.findByUserId(userId);
 
@@ -360,7 +382,7 @@ public class UserService {
         List<DonationApplyResponseDto> donationApplyList = new ArrayList<>();
 
         for (int i=0;i<list.size();i++){
-           // 기부 신청 데이터
+            // 기부 신청 데이터
             DonationApply donationApply = list.get(i);
 
             // 날짜 포맷
@@ -409,9 +431,9 @@ public class UserService {
     //대학교 이름 변경 (일단 인증 절차X)
     private void updateUniversityName(Long userId, String universityName){
 
-    //    University university = userRepository.findById(userId).get().getUniversity();
+        //    University university = userRepository.findById(userId).get().getUniversity();
 
-    //    university.setUniversityName(universityName);
+        //    university.setUniversityName(universityName);
     }
 
     //스타일 태그 이름만 조회

@@ -1,18 +1,14 @@
-package com.backend.wear.dto.product;
 
-import com.backend.wear.dto.user.UserResponseDto;
+package com.backend.wear.dto;
+
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-public class ProductResponseDto{
+public class ProductResponseInnerDto{
 
     // 상품 상세 dto
     @Getter
@@ -21,7 +17,7 @@ public class ProductResponseDto{
     public static class DetailDto{
         private Long id;  //상품 아이디
 
-        private UserResponseDto.SellerDto seller; //판매자
+        private UserResponseInnerDto.SellerDto seller; //판매자
 
         private Integer price;
 
@@ -33,7 +29,7 @@ public class ProductResponseDto{
 
         private String productContent;
 
-        private List<String> productImage;
+        private String[] productImage;
 
         private String place; // 거래 장소
 
@@ -57,11 +53,11 @@ public class ProductResponseDto{
 
         private String postStatus;
 
-        private List<String> productImage;
+        private String[] productImage;
 
         private Boolean isSelected;
 
-  //      private LocalDateTime createdAt;
+        //      private LocalDateTime createdAt;
         private String time;
     }
 
@@ -80,9 +76,9 @@ public class ProductResponseDto{
 
         private String postStatus;
 
-        private List<String> productImage;
+        private String[] productImage;
 
-    //    private LocalDateTime createdAt;
+        //    private LocalDateTime createdAt;
 
         private String time;
     }
@@ -102,11 +98,9 @@ public class ProductResponseDto{
 
         private String postStatus;
 
-        private List<String> productImage;
+        private String[] productImage;
 
         private boolean isPrivate;
-
-  //      private LocalDateTime createdAt;
 
         private String time;
     }

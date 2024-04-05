@@ -1,4 +1,4 @@
-package com.backend.wear.dto.user;
+package com.backend.wear.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -19,7 +19,7 @@ public class UserRequestDto {
     private Long id; //pk
     private String userName; //사용자 이름
     private String nickName;
-    private List<String> profileImage;
+    private  String[] profileImage;
     private List<String> style; //스타일 태그 이름 리스트
     private String universityEmail;
     private String universityName;
@@ -32,7 +32,7 @@ public class UserRequestDto {
     public static class ProfileDto {
         private String userName;
         private String nickName;
-        List<String> profileImage;
+        String[] profileImage;
         private List<String> style;
     }
 
