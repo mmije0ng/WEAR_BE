@@ -352,7 +352,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
         if(user != null){
-            //해당 사용자의 상품을 제대로 요청했는지 확인
+            //해당 사용자의 상품을 제대로 요청했는지 확 인
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));
 
