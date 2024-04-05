@@ -28,7 +28,7 @@ public class ProductController {
     // 카테고리별 최신순 조회
     // api/products/category?categoryName={}&userId={}
     @GetMapping("/category")
-    public ResponseEntity<?> findProductsByCategory(@RequestParam String categoryName, @RequestParam Long userId)
+    public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId)
             throws Exception
     {
         List<ProductResponseInnerDto.ScreenDto> list = productService.findProductsByCategory(categoryName, userId);
@@ -47,8 +47,8 @@ public class ProductController {
     // 카테고리별 최신순, 판매 상태
     // api/products/category/sale?categoryName={}&userId={}
     @GetMapping("/category/sale")
-    public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam String categoryName,
-                                                        @RequestParam Long userId) throws Exception
+    public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam(name="categoryName") String categoryName,
+                                                        @RequestParam(name="userId") Long userId) throws Exception
     {
         List<ProductResponseInnerDto.ScreenDto> list =
                 productService.findProductsByCategoryOnSale(categoryName, userId);
