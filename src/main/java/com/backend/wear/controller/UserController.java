@@ -43,7 +43,7 @@ public class UserController {
     // 사용자 프로필
     // api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) throws Exception{
+    public ResponseEntity<?> getUserProfile(@PathVariable(name="userId") Long userId) throws Exception{
         UserResponseInnerDto.ProfileDto profileDto;
 
         try{
@@ -60,7 +60,7 @@ public class UserController {
     // 사용자 프로필 수정
     // api/users/profile/{userId}
     @PutMapping("/profile/{userId}")
-    public ResponseEntity<?> updateUserProfile(@PathVariable Long userId,
+    public ResponseEntity<?> updateUserProfile(@PathVariable(name="userId") Long userId,
                                                @RequestBody UserRequestDto.ProfileDto profileDto)
     throws Exception
     {
@@ -76,7 +76,7 @@ public class UserController {
     // 계정 정보
     // api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
-    public ResponseEntity<?> getUserInfo(@PathVariable Long userId){
+    public ResponseEntity<?> getUserInfo(@PathVariable(name="userId") Long userId){
         UserResponseInnerDto.InfoDto userResponseDto;
 
         try{
@@ -92,7 +92,7 @@ public class UserController {
     // 계정 정보 저장
     // api/users/userInfo/update/{userId}
     @PutMapping("/userInfo/update/{userId}")
-    public ResponseEntity<?> updateUserInfo(@PathVariable Long userId,@RequestBody UserRequestDto.InfoDto infodto){
+    public ResponseEntity<?> updateUserInfo(@PathVariable(name="userId") Long userId,@RequestBody UserRequestDto.InfoDto infodto){
         try {
             userService.updateUserInfoService(userId, infodto);
             return ResponseEntity.ok().body("사용자 이름이 변경되었습니다.");
@@ -105,7 +105,7 @@ public class UserController {
     // 비밀번호 변경하기
     // api/users/password/{userId}
     @PutMapping ("/password/{userId}")
-    public ResponseEntity<?> putPassword(@PathVariable Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto){
+    public ResponseEntity<?> putPassword(@PathVariable(name="userId") Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto){
         try {
             userService.updatePassword(userId, passwordDto);
             return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
@@ -118,7 +118,7 @@ public class UserController {
     // 찜한 상품 리스트 보기
     // api/users/wishList/{userId}
     @GetMapping("/wishList/{userId}")
-    public ResponseEntity<?> getWishList(@PathVariable Long userId) throws Exception{
+    public ResponseEntity<?> getWishList(@PathVariable(name="userId") Long userId) throws Exception{
         try {
             List<ProductResponseInnerDto.ScreenDto> wishList = userService.getWishList(userId);
             return ResponseEntity.ok(wishList);
@@ -131,7 +131,7 @@ public class UserController {
     // 판매 중 상품 불러오기
     // api/users/myProducts/onSale/{userId}
     @GetMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> getMyProductsOnSale(@PathVariable Long userId) throws Exception{
+    public ResponseEntity<?> getMyProductsOnSale(@PathVariable(name="userId") Long userId) throws Exception{
         try{
             List<ProductResponseInnerDto.MyPageScreenDto> myProductList =
                     userService.getMyProductsList(userId,"onSale");
@@ -145,7 +145,7 @@ public class UserController {
     // 판매 중인 상품 판매 완료하기
     // api/users/myProducts/onSale/{userId}
     @PutMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> putPostStatus(@PathVariable Long userId,
+    public ResponseEntity<?> putPostStatus(@PathVariable(name="userId") Long userId,
                                                  @RequestBody ProductRequestDto requestDto){
         try{
             userService.changePostStatus(userId, requestDto);
@@ -159,7 +159,7 @@ public class UserController {
     // 판매 완료 상품 불러오기
     // api/users/myProducts/soldOut/{userId}
     @GetMapping("/myProducts/soldOut/{userId}")
-    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable Long userId) throws Exception{
+    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable(name="userId") Long userId) throws Exception{
         try{
             List<ProductResponseInnerDto.MyPageScreenDto> myProductList =
                     userService.getMyProductsList(userId,"soldOut");
@@ -173,7 +173,7 @@ public class UserController {
     // 숨김 처리 상품 불러오기
     // api/users/myProducts/private/{userId}
     @GetMapping("/myProducts/private/{userId}")
-    public ResponseEntity<?> getMyProductsPrivate(@PathVariable Long userId) throws Exception{
+    public ResponseEntity<?> getMyProductsPrivate(@PathVariable(name="userId") Long userId) throws Exception{
 
         try{
             List<ProductResponseInnerDto.PrivateDto> privateList = userService.myyProductsPrivateList(userId);
@@ -187,7 +187,7 @@ public class UserController {
     // 내 기부 내역 불러오기
     // api/users/myDonations/{userId}
     @GetMapping ("/myDonations/{userId}")
-    public ResponseEntity<?> getMyDonationApply(@PathVariable Long userId){
+    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId){
         try {;
             List <DonationApplyResponseDto> responseDtoList
                     =userService.myDonationApplyList(userId);
@@ -202,7 +202,7 @@ public class UserController {
     // 내 기부 내역 중 기부 완료 된 상품만 불러오기
     // api/users/complete/{userId}
     @GetMapping ("/myDonations/complete/{userId}")
-    public ResponseEntity<?> getMyDonationCompleteApplyComplete(@PathVariable Long userId){
+    public ResponseEntity<?> getMyDonationCompleteApplyComplete(@PathVariable(name="userId") Long userId){
         try {;
             List <DonationApplyResponseDto> responseDtoList
                     =userService.myDonationApplyCompleteList(userId);

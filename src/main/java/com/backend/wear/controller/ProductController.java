@@ -174,25 +174,27 @@ public class ProductController {
 
     // 상품 찜하기
     @PostMapping("/select/{userId}/{productId}")
-    public ResponseEntity<?> selectProduct(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
+    public ResponseEntity<?> selectProduct(@PathVariable(name="userId") Long userId ,@PathVariable(name="productId") Long productId)
+            throws Exception{
         try {
             productService.selectProduct(userId,productId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        return ResponseEntity.ok().body("상품 찜하기 성공.");
     }
 
     // 상품 찜 해제
     @DeleteMapping("/deselect/{userId}/{productId}")
-    public ResponseEntity<?> deselectProduct(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
+    public ResponseEntity<?> deselectProduct(@PathVariable(name="userId") Long userId ,@PathVariable(name="productId") Long productId)
+            throws Exception{
         try {
             productService.deselectProduct(userId,productId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        return ResponseEntity.ok().body("상품 찜 해제");
     }
 }
