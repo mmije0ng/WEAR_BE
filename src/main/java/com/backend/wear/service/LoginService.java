@@ -1,20 +1,41 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.LoginDto;
-import com.backend.wear.dto.LoginResponseDto;
+import com.backend.wear.dto.*;
+import com.backend.wear.entity.EnvironmentLevel;
+import com.backend.wear.entity.Style;
+import com.backend.wear.entity.University;
 import com.backend.wear.entity.User;
+import com.backend.wear.repository.StyleRepository;
+import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
+import com.univcert.api.UnivCert;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class LoginService {
 
     private final UserRepository userRepository;
+    private final StyleRepository styleRepository;
+    private final UniversityRepository universityRepository;
 
     @Autowired
-    public LoginService(UserRepository userRepository){
+    public LoginService(UserRepository userRepository,
+                        StyleRepository styleRepository,
+                        UniversityRepository universityRepository){
         this.userRepository=userRepository;
+        this.styleRepository=styleRepository;
+        this.universityRepository=universityRepository;
     }
 
     public LoginResponseDto loginByUser(LoginDto loginDto){
@@ -43,41 +64,46 @@ public class LoginService {
         }
     }
 
-    //대학 인증 메일 발송
-//    @PostMapping("/university/certify")
-//    public ResponseEntity<?> certifyUniversity
-//    (@RequestBody UnivCertRequestDto dto) throws IOException {
-//
-//        Map<String, Object> response =
-//                UnivCert.certify(API_KEY, dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
-//
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    //메일로 발송된 인증 코드 입력
-//    @PostMapping("/university/certifycode")
-//    public ResponseEntity<?> certifyUserCode(
-//            @RequestBody UnivCertRequestDto dto) throws IOException {
-//
-//        Map<String, Object> response =
-//                UnivCert.certifyCode(API_KEY, dto.getUniversityEmail(),
-//                        dto.getUniversityName(), dto.getCode());
-//
-//        Boolean success = (Boolean) response.get("success");
-//        if (success) { //인증 성공
-//            String universityName = (String) response.get("univName");
-//            String universityEmail = (String) response.get("certified_email");
-//
-//            UnivCertResponseDto responseDto = new UnivCertResponseDto(universityEmail, universityName, success);
-//
-//            return ResponseEntity.ok(responseDto);
-//        } else { //인증 실패
-//            Integer code = (Integer) response.get("code");
-//            String message = (String) response.get("message");
-//
-//            UnivCertFail responseDto = new UnivCertFail(code, success, message);
-//            return ResponseEntity.ok(responseDto);
-//        }
-//    }
+    public void userSignUp(SignUpDto signUpDto, String universityName,
+                           String email){
+        if(signUpDto.getUserPassword().equals(signUpDto.getUserCheckPassword()))
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 
+        University university = universityRepository.findByUniversityName(universityName);
+        if(university==null){ //새로운 대학
+            university= new University();
+            university.setUniversityName(universityName);
+            universityRepository.save(university);
+        }
+
+        User user=new User();
+        user.setUserName("wear");
+        user.setNickName("wear");
+
+        user.setUserId(signUpDto.getUserId());
+        user.setUserPassword(signUpDto.getUserPassword());
+        user.setPoint(20);
+        user.setLevel(EnvironmentLevel.SAPLING);
+        user.setProfileImage("\"C:\\Users\\user\\Downloads\\KakaoTalk_20240324_044410124.png\"");
+
+        setProfileStyle(user, signUpDto.getStyleList());
+
+        userRepository.save(user);
+    }
+
+    //스타일 태그 이름으로 Style 저장
+//    @Transactional
+    public void setProfileStyle (User user, List<String> style){
+        List<Style> newStyles = new ArrayList<>();
+
+        for(String s: style){
+            Style styleTag =new Style();
+            styleTag.setUser(user);
+            styleTag.setStyleName(s);
+
+            newStyles.add(styleTag);
+        }
+
+        user.setStyle(newStyles);
+    }
 }

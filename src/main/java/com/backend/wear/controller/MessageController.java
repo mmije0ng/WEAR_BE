@@ -28,11 +28,6 @@ public class MessageController {
     // pub/api/chat/message
     @MessageMapping("/api/chat/message")
     public void enter(MyMessage message) {
- //       log.info("채팅방 아이디: "+message.getId());
-
-        log.info(message.getMessage());
-        System.out.println(message.getMessage());
- //       messageService.saveMessage(message);
 
         //sub/api/chat/room/{roomId}
         sendingOperations.convertAndSend("/sub/api/chat/room/"+message.getChatRoomId(), message);

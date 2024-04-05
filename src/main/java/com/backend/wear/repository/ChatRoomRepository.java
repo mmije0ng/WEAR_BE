@@ -17,5 +17,4 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     //채팅방 중복 검사
     Optional<ChatRoom> findByProductIdAndCustomerId(Long productId, Long customerId);
-
 }

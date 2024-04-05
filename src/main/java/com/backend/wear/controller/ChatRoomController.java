@@ -1,5 +1,6 @@
 package com.backend.wear.controller;
 
+import com.backend.wear.dto.ChatMessageDto;
 import com.backend.wear.dto.ChatRoomDto;
 import com.backend.wear.dto.ChatRoomIdDto;
 import com.backend.wear.dto.ChatRoomProfileDto;
@@ -67,11 +68,11 @@ public class ChatRoomController {
                                        @RequestParam Long productId)
     {
         try{
-            ChatRoomDto dto=chatService.chatRoom(roomId, productId);
+            List<ChatMessageDto> list=chatService.enterChatRoom(roomId, productId);
 
             log.info("채팅방 입장 완료");
 
-            return ResponseEntity.ok().body(dto);
+            return ResponseEntity.ok().body(list);
         }
 
         catch (IllegalArgumentException e){
@@ -79,7 +80,6 @@ public class ChatRoomController {
                     .body(e.getMessage());
         }
     }
-
 
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")

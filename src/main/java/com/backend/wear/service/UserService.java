@@ -3,8 +3,6 @@ package com.backend.wear.service;
 import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +27,20 @@ public class UserService {
 
     private final ProductRepository productRepository;
 
-
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository,StyleRepository styleRepository,
+    public UserService(UserRepository userRepository, StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
-                       WishRepository wishRepository, ProductRepository productRepository){
+                       WishRepository wishRepository, ProductRepository productRepository, ObjectMapper objectMapper){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
         this.wishRepository=wishRepository;
         this.productRepository=productRepository;
+        this.objectMapper = objectMapper;
     }
-
-
-    // ObjectMapper 생성
-    ObjectMapper objectMapper = new ObjectMapper();
 
     //마이페이지 사용자 정보
     @Transactional
@@ -245,31 +240,20 @@ public class UserService {
 
     //찜한 상품
     private List<ProductResponseDto> mapToProductResponseWishDto(Long userId){
-
-
-
         //Wish 클래스 반환
         List<Wish> wishList = wishRepository.findByUserId(userId);
         List<ProductResponseDto> mywishList = new ArrayList<>();
 
         for(Wish w: wishList){
             if(w.isSelected()){
-
                 Product p=w.getProduct();
-                // JSON 배열 파싱
-                String[] array = new String[0];
-                try {
-                    array = objectMapper.readValue(p.getProductImage(), String[].class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
                 ProductResponseDto dto=ProductResponseDto.builder()
                         .id(p.getId())
                         .price(p.getPrice())
                         .productName(p.getProductName())
                         .productStatus(p.getProductStatus())
                         .postStatus(p.getPostStatus())
-                        .productImage(array)
+                        .productImage(p.getProductImage())
                         .isSelected(p.getWish().isSelected())
                         .build();
                 mywishList.add(dto);
@@ -289,13 +273,6 @@ public class UserService {
 
             if(!p.getPostStatus().equals(postStatus))
                 continue;
-            // JSON 배열 파싱
-            String[] array = new String[0];
-            try {
-                array = objectMapper.readValue(p.getProductImage(), String[].class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
 
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
@@ -303,7 +280,7 @@ public class UserService {
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(array)
+                    .productImage(p.getProductImage())
                     .build();
 
             myProductList.add(dto);
@@ -321,9 +298,9 @@ public class UserService {
 
         for(Product p: list){
             // JSON 배열 파싱
-            String[] array = new String[0];
+            String array;
             try {
-                array = objectMapper.readValue(p.getProductImage(), String[].class);
+                array = objectMapper.readValue(p.getProductImage(), String.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -349,13 +326,6 @@ public class UserService {
 
         for(Product p: productList){
             //상품 판매 상태가 요청과 같은 상품 리스트만 반환
-            // JSON 배열 파싱
-            String[] array = new String[0];
-            try {
-                array = objectMapper.readValue(p.getProductImage(), String[].class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
 
             ProductResponseDto dto=ProductResponseDto.builder()
                     .id(p.getId())
@@ -363,7 +333,7 @@ public class UserService {
                     .productName(p.getProductName())
                     .productStatus(p.getProductStatus())
                     .postStatus(p.getPostStatus())
-                    .productImage(array)
+                    .productImage(p.getProductImage())
                     .isPrivate(p.isPrivate())
                     .build();
 
