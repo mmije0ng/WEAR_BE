@@ -49,7 +49,7 @@ public class UserService {
     }
 
     // JSON 문자열을 List<String>으로 변환하는 메서드
-    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
+    private List<String> convertJson6ToImageList(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
@@ -83,7 +83,7 @@ public class UserService {
         }
 
         return UserResponseInnerDto.MyPageDto.builder()
-                .userName(user.getNickName())
+                .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .style(style)
