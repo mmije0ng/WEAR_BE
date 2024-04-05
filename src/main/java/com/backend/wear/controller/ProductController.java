@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -64,13 +66,35 @@ public class ProductController {
     //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
     //  /products/search?searchName={searchName}
 
-    /*@GetMapping("/products/search")
-    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {}*/
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {
 
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductName(searchName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+    }
 
 
     //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
     //   /products/search/category?searchName={searchName}?categoryName={categoryName}
+    @GetMapping("/search/category")
+    public ResponseEntity<?> searchProductsby(@RequestParam String searchName, String categoryName) {
+
+        try {
+            List<ProductResponseDto> responseDto = productService.searchProductByproductNameAndCategory(searchName, categoryName);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+    }
+
 
 
 
