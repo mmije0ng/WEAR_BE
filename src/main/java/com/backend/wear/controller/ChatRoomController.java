@@ -30,7 +30,7 @@ public class ChatRoomController {
         this.chatService=chatService;
     }
 
-    // 채팅방 생성
+    // 채팅방  생성
     // api/chat/room/create?productId={productId}&customerId={customerId}
     @PostMapping("/room/create") //상품 아이디, 클릭한 유저 아이디
     public ResponseEntity<?> createRoom(@RequestParam Long productId, @RequestParam Long customerId) {
