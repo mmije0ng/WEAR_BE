@@ -132,13 +132,18 @@ public class UserService {
         user.setUserName(profileDto.getUserName());
         user.setNickName(profileDto.getNickName());
 
-        // 배열을 스트링으로 변환
-        String profileImage = user.getProfileImage();
+        String[] array = profileDto.getProfileImage();
+        String profileImage;
+
         try {
-            profileImage = objectMapper.readValue(user.getProfileImage(), String.class);
+            // String 배열을 JSON 문자열로 변환
+            profileImage = objectMapper.writeValueAsString(array);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            // JsonProcessingException 처리
+            throw new RuntimeException("Failed to convert String[] to JSON string", e);
         }
+
+        System.out.println(profileImage); // JSON 형식의 문자열 출력
 
         user.setProfileImage(profileImage);
 
