@@ -36,6 +36,9 @@ public class User extends BaseEntity {
     @Column(name="user_created_id")
     private String userCreatedId;
 
+//    @Id
+//    String id;
+
     //사용자 패스워드
     @NotNull
     @Column(name="user_password")
@@ -72,7 +75,7 @@ public class User extends BaseEntity {
     private List<Style> style = new ArrayList<>();
 
     //프로필 이미지
-    @Column(name="profile_image", columnDefinition = "varchar(255) default 'default_image' ")
+    @Column(name="profile_image")
     private String profileImage;
 
     //대학교

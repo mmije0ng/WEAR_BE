@@ -10,11 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+
 public class UserRequestDto {
     private Long id; //pk
     private String userName; //사용자 이름
@@ -28,6 +24,8 @@ public class UserRequestDto {
     // 프로필 dto
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class ProfileDto {
         private String userName;
@@ -39,6 +37,8 @@ public class UserRequestDto {
     // info dto
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class InfoDto {
         String userName;
@@ -49,6 +49,8 @@ public class UserRequestDto {
     // 비밀번호 변경 dto
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class PasswordDto{
         private String newPassword;
