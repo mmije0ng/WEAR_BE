@@ -199,8 +199,6 @@ public class ProductService {
                 .toList();
 
         return responseDto;
-
-
     }
 
     //상품 등록하기
@@ -217,6 +215,18 @@ public class ProductService {
 
         // List<String>을 JSON 문자열로 변환
         String productImageJson = convertImageListToJson(requestDTO.getProductImage());
+
+//        // String[] 을 JSON 문자열로 변환
+//        String[] array =requestDTO.getProductImage();
+//        String productImage;
+//
+//        try {
+//            // String 배열을 JSON 문자열로 변환
+//            productImage = objectMapper.writeValueAsString(array);
+//        } catch (JsonProcessingException e) {
+//            // JsonProcessingException 처리
+//            throw new RuntimeException("Failed to convert String[] to JSON string", e);
+//        }
 
         // 제공된 Product 객체의 데이터를 사용하여 새로운 Product 객체 생성
         Product newProduct = Product.builder()

@@ -26,8 +26,13 @@ public class University extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 대학 이름
     @Column(name="university_name")
     private String universityName;
+
+    // 대학별 환경 점수
+    @Column(name="univeristy_point",columnDefinition = "integer default 0")
+    private Integer universityPoint;
 
     @OneToMany(mappedBy = "university", fetch = FetchType.LAZY)
     private List<User> userList = new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.backend.wear.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -28,11 +30,16 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
 
     //환경 레벨
     @NotNull
-    @Column(name="environment_level", columnDefinition = "varchar(255) default '새싹'")
-    private String environmentLevel;
+    @Enumerated(EnumType.STRING)
+    @Column(name="level")
+    private EnvironmentLevel level;
+
+    //환경 점수
+    @Min(value = 0)
+    @Column(name="point")
+    private Integer point;
 
     //프로필 이미지
-    @NotNull
     @Column(name="profile_image")
     private String profileImage;
 }
