@@ -17,6 +17,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 전체 상품 페이지 (숨김x)
+    // 차단 기능 수정 필요
     @Query("SELECT p FROM Product p WHERE p.isPrivate = false")
     Page<Product> findAllProductPage(Pageable pageable);
 
