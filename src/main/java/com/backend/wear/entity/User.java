@@ -68,7 +68,7 @@ public class User extends BaseEntity {
     private EnvironmentLevel level;
 
     //스타일
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Style> style = new ArrayList<>();
 
     //프로필 이미지
@@ -76,24 +76,24 @@ public class User extends BaseEntity {
     private String profileImage;
 
     //대학교
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="university_id")
     University university;
 
     //판매 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Product> productList = new ArrayList<>();
 
     //기부 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Donation> donationList=new ArrayList<>();
 
     //기부 신청 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<DonationApply> donationApplyList=new ArrayList<>();
 
     //찜목록
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Wish> wishList=new ArrayList<>();
 
 //    //채팅방

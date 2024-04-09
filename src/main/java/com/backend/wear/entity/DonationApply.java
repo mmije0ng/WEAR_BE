@@ -19,7 +19,7 @@ public class DonationApply extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY )
     @JoinColumn(name="user_id")
     private User user; //기부 신청자
 
