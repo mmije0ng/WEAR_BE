@@ -23,10 +23,6 @@ public class RecommendPlace extends BaseEntity {
     private Long id;
 
     // 대학 이름
-    @Column(name="university_name")
-    private String universityName;
-
-    // 대학 이름
     @Column(name="place_name")
     private String placeName;
 
@@ -34,4 +30,9 @@ public class RecommendPlace extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="university_id")
     University university;
+
+//    // 대학 이름
+//    @Column(name="university_name")
+//    private String universityName;
+
 }

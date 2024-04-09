@@ -5,10 +5,7 @@ import com.backend.wear.entity.Category;
 import com.backend.wear.entity.Product;
 import com.backend.wear.entity.User;
 import com.backend.wear.entity.Wish;
-import com.backend.wear.repository.CategoryRepository;
-import com.backend.wear.repository.ProductRepository;
-import com.backend.wear.repository.UserRepository;
-import com.backend.wear.repository.WishRepository;
+import com.backend.wear.repository.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,6 +31,8 @@ public class ProductService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
+    private final BlockedUserRepository blockedUserRepository;
+
     // ObjectMapper 생성
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -53,23 +52,27 @@ public class ProductService {
     }
 
     @Autowired
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,CategoryRepository categoryRepository){
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
+                          CategoryRepository categoryRepository, BlockedUserRepository blockedUserRepository){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.blockedUserRepository=blockedUserRepository;
     }
 
     // 카테고리별, 최신순 페이지네이션
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber){
         Page<Product> productsPage;
+        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
+        // 차단한 사용자가 없을 경우 어떻게..?
 
         if(categoryName.equals("전체")){
-            productsPage = productRepository. findAllProductPage(pageRequest(pageNumber));
+            productsPage = productRepository. findAllProductPage(blockedUserIdList, pageRequest(pageNumber));
         }
         else{
-            productsPage = productRepository.findByCategoryNamePage(categoryName, pageRequest(pageNumber));
+            productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
@@ -79,18 +82,20 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
         Page<Product> productsPage;
+        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
+
         String postStatus ="onSale";
 
         // 전체, 판매중, 최신순
         if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatusPage(pageRequest(pageNumber));
+                    .findByPostStatusPage(blockedUserIdList, pageRequest(pageNumber));
         }
 
-        //카 테고리별 판매중 최신순
+        //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                    .findByCategoryNameAndPostStatusPage(categoryName,pageRequest(pageNumber));
+                    .findByCategoryNameAndPostStatusPage(categoryName,blockedUserIdList, pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
@@ -98,6 +103,7 @@ public class ProductService {
 
     // 카테고리 검색 상품 dto 매핑
     private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
+
         // JSON 배열 파싱
         String[] array = new String[0];
         try {
