@@ -27,7 +27,7 @@ public class Wish extends Serializers.Base {
 //    private boolean isSelected;
 
     // 사용자
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 

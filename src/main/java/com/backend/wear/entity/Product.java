@@ -67,17 +67,17 @@ public class Product extends BaseEntity {
     private boolean isPrivate;
 
     //판매자
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 
     //카테고리
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id")
     private Category category;
 
     //채팅방
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
     private List<ChatRoom> chatRoomList=new ArrayList<>();
 
     public void setUpdatedAt(LocalDateTime updatedAt) {

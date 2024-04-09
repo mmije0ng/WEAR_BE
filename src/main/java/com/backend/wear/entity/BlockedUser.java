@@ -23,6 +23,11 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //차단한 사용자 로그인 아이디
+    @NotNull
+    @Column(name="user_created_id")
+    private String userCreatedId;;
+
     //닉네임
     @NotNull
     @Column(name="nick_name",unique = true)
@@ -42,4 +47,9 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
     //프로필 이미지
     @Column(name="profile_image")
     private String profileImage;
+
+    // 차단한 사용자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 }
