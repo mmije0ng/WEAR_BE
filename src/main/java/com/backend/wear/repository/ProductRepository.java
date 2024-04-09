@@ -17,20 +17,21 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 전체 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.isPrivate = false AND (:blockedUserIdList IS EMPTY OR p.user.id NOT IN :blockedUserIdList)")
-    Page<Product> findAllProductPage(List<Long> blockedUserIdList, Pageable pageable );
+    // 차단 기능 수정 필요
+    @Query("SELECT p FROM Product p WHERE p.isPrivate = false")
+    Page<Product> findAllProductPage(Pageable pageable);
 
     // 카테고리 이름과 일치하는 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.isPrivate = false  AND (:blockedUserIdList IS EMPTY OR p.user.id NOT IN :blockedUserIdList)")
-    Page<Product> findByCategoryNamePage(@Param("categoryName") String categoryName,List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.isPrivate = false")
+    Page<Product> findByCategoryNamePage(@Param("categoryName") String categoryName, Pageable pageable);
 
     // 전체 판매 중인 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.isPrivate = false  AND (:blockedUserIdList IS EMPTY OR p.user.id NOT IN :blockedUserIdList)")
-    Page<Product> findByPostStatusPage(List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.isPrivate = false")
+    Page<Product> findByPostStatusPage( Pageable pageable);
 
     // 카테고리 이름과 일치하는 판매 중인 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND  p.isPrivate = false  AND (:blockedUserIdList IS EMPTY OR p.user.id NOT IN :blockedUserIdList)")
-    Page<Product> findByCategoryNameAndPostStatusPage(@Param("categoryName") String categoryName, List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND  p.isPrivate = false ")
+    Page<Product> findByCategoryNameAndPostStatusPage(@Param("categoryName") String categoryName, Pageable pageable);
 
     //검색어별 상품 조회
     /*List<Product> findByProductNameContainingIgnoreCase(String searchName);*/

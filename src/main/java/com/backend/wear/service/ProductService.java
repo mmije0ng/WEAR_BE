@@ -65,14 +65,14 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber){
         Page<Product> productsPage;
-        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
-        // 차단한 사용자가 없을 경우 어떻게..?
+//        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
+//        // 차단한 사용자가 없을 경우 어떻게..?
 
         if(categoryName.equals("전체")){
-            productsPage = productRepository. findAllProductPage(blockedUserIdList, pageRequest(pageNumber));
+            productsPage = productRepository. findAllProductPage(pageRequest(pageNumber));
         }
         else{
-            productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
+            productsPage = productRepository.findByCategoryNamePage(categoryName, pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
@@ -82,20 +82,20 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
         Page<Product> productsPage;
-        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
+//        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
 
         String postStatus ="onSale";
 
         // 전체, 판매중, 최신순
         if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatusPage(blockedUserIdList, pageRequest(pageNumber));
+                    .findByPostStatusPage(pageRequest(pageNumber));
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                    .findByCategoryNameAndPostStatusPage(categoryName,blockedUserIdList, pageRequest(pageNumber));
+                    .findByCategoryNameAndPostStatusPage(categoryName,pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
