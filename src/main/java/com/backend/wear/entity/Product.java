@@ -76,10 +76,6 @@ public class Product extends BaseEntity {
     @JoinColumn(name="category_id")
     private Category category;
 
-    //찜
-//    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-//    private List<Wish> wishList = new ArrayList<>();
-
     //채팅방
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRoomList=new ArrayList<>();

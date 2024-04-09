@@ -31,13 +31,10 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //사용자 아이디
+    //사용자 로그인 아이디
     @NotNull
     @Column(name="user_created_id")
-    private String userCreatedId;
-
-//    @Id
-//    String id;
+    private String userCreatedId;;
 
     //사용자 패스워드
     @NotNull
