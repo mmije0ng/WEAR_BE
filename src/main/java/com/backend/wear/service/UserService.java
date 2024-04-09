@@ -217,7 +217,8 @@ public class UserService {
             }
 
             // 사용자의 상품 찜 여부 확인
-            boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
+            boolean isSelected = wishRepository
+                    .findByUserIdAndProductId(userId, product.getId()).isPresent();
 
             // DTO 생성 및 리스트에 추가
             productList.add(ProductResponseInnerDto.ScreenDto.builder()
