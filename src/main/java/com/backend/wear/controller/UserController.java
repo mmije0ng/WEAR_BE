@@ -176,7 +176,7 @@ public class UserController {
     public ResponseEntity<?> getMyProductsPrivate(@PathVariable(name="userId") Long userId) throws Exception{
 
         try{
-            List<ProductResponseInnerDto.PrivateDto> privateList = userService.myyProductsPrivateList(userId);
+            List<ProductResponseInnerDto.PrivateDto> privateList = userService.myProductsPrivateList(userId);
             return ResponseEntity.ok(privateList);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

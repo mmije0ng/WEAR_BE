@@ -27,7 +27,7 @@ public class UserResponseInnerDto {
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class ProfileDto{
-        private String userName; //사용자 이름
+  //      private String userName; //사용자 이름
         private String nickName;
         private List<String> style; //스타일 태그 이름 리스트
         private String[] profileImage;

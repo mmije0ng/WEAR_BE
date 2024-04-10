@@ -103,7 +103,7 @@ public class ProductResponseInnerDto{
         private String[] productImage;
 
         @JsonProperty("is_private")
-        private boolean isPrivate;
+        private Boolean isPrivate;
 
         private String time;
     }

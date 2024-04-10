@@ -122,7 +122,6 @@ public class UserService {
         }
 
         return UserResponseInnerDto.ProfileDto.builder()
-                .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .profileImage(array)
                 .style(styleList)
@@ -135,7 +134,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        user.setUserName(profileDto.getUserName());
+   //     user.setUserName(profileDto.getUserName());
         user.setNickName(profileDto.getNickName());
 
         String[] array = profileDto.getProfileImage();
@@ -311,7 +310,7 @@ public class UserService {
 
     // 숨김 처리 상품 보기
     @Transactional
-    public List<ProductResponseInnerDto.PrivateDto> myyProductsPrivateList(Long userId) throws Exception{
+    public List<ProductResponseInnerDto.PrivateDto> myProductsPrivateList(Long userId) throws Exception{
         List<ProductResponseInnerDto.PrivateDto> privateProductList = mapToPrivateDto(userId);
 
         if(privateProductList.isEmpty())
