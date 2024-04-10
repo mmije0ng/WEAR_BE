@@ -28,7 +28,7 @@ public class UserRequestDto {
     @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class ProfileDto {
-        private String userName;
+   //     private String userName;
         private String nickName;
         String[] profileImage;
         private List<String> style;
