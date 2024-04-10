@@ -27,7 +27,7 @@ public class University extends BaseEntity {
     private Long id;
 
     // 대학 이름
-    @Column(name="university_name")
+    @Column(name="university_name", unique = true)
     private String universityName;
 
     // 대학별 환경 점수

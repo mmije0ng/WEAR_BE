@@ -1,16 +1,16 @@
 package com.backend.wear.service;
 
+import com.backend.wear.config.WebSocketConfig;
 import com.backend.wear.dto.*;
-import com.backend.wear.entity.Category;
-import com.backend.wear.entity.Product;
-import com.backend.wear.entity.User;
-import com.backend.wear.entity.Wish;
+import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +35,8 @@ public class ProductService {
 
     // ObjectMapper 생성
     ObjectMapper objectMapper = new ObjectMapper();
+
+    private final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     /* // JSON 배열 파싱
      String[] array = objectMapper.readValue(jsonString, String[].class);
@@ -64,15 +66,21 @@ public class ProductService {
     // 카테고리별, 최신순 페이지네이션
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber){
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
         Page<Product> productsPage;
-//        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
-//        // 차단한 사용자가 없을 경우 어떻게..?
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        Long userUniversityId = user.getUniversity().getId();
+//        for(int i=0;i<blockedUserIdList.size();i++)
+//            log.info("차단 유저 아이디: "+blockedUserIdList.get(i));
 
         if(categoryName.equals("전체")){
-            productsPage = productRepository. findAllProductPage(pageRequest(pageNumber));
+            productsPage = productRepository. findAllProductPage(userUniversityId, blockedUserIdList,pageRequest(pageNumber));
         }
         else{
-            productsPage = productRepository.findByCategoryNamePage(categoryName, pageRequest(pageNumber));
+            productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
@@ -82,20 +90,20 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
         Page<Product> productsPage;
-//        List<Long> blockedUserIdList = blockedUserRepository.findByBlockedUserId(userId);
+       List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
 
         String postStatus ="onSale";
 
         // 전체, 판매중, 최신순
         if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatusPage(pageRequest(pageNumber));
+                    .findByPostStatusPage(blockedUserIdList, pageRequest(pageNumber));
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                    .findByCategoryNameAndPostStatusPage(categoryName,pageRequest(pageNumber));
+                    .findByCategoryNameAndPostStatusPage(categoryName,blockedUserIdList,pageRequest(pageNumber));
         }
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
@@ -381,5 +389,24 @@ public class ProductService {
 
         // 찜 해제
         wishRepository.delete(wish);
+    }
+
+    // 사용자 차단하기
+    public void blockedUser(Long userId, Long blockedUserId){
+        // 로그인한 사용자
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
+
+        // 차단하고 싶은 사용자
+        User blockedUser = userRepository.findById(blockedUserId)
+                .orElseThrow(() -> new IllegalArgumentException("차단하려고 하는 사용자를 찾지 못하였습니다."));
+
+        BlockedUser block = BlockedUser.builder()
+                .user(user)
+                .blockedUserId(blockedUserId)
+                .build();
+
+        // 사용자 차단
+        blockedUserRepository.save(block);
     }
 }

@@ -202,7 +202,7 @@ public class UserController {
     // 내 기부 내역 중 기부 완료 된 상품만 불러오기
     // api/users/complete/{userId}
     @GetMapping ("/myDonations/complete/{userId}")
-    public ResponseEntity<?> getMyDonationCompleteApplyComplete(@PathVariable(name="userId") Long userId){
+    public ResponseEntity<?> getMyDonationApplyComplete(@PathVariable(name="userId") Long userId){
         try {;
             List <DonationApplyResponseDto> responseDtoList
                     =userService.myDonationApplyCompleteList(userId);
@@ -212,6 +212,36 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
+    }
+
+    // 차단한 사용자 리스트 불러오기
+    // api/users/blockedUsers/{userId}
+    @GetMapping("/blockedUsers/{userId}")
+    public ResponseEntity<?> getBlockedUsersList(@PathVariable(name="userId") Long userId)
+            throws Exception{
+        try {;
+            List<BlockedUserResponseDto> blockedUserList = userService.getBlockedUsersList(userId);
+            return ResponseEntity.ok().body(blockedUserList);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 차단 사용자 해제하기
+    @DeleteMapping("/blockedUsers/unBlock/{userId}/{blockedUserId}")
+    public ResponseEntity<?> deleteBlockedUser(@PathVariable(name="userId") Long userId,
+                                               @PathVariable(name="blockedUserId")Long blockedUserId)
+            throws Exception{
+        try {
+            userService.deleteBlockedUser(userId,blockedUserId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+
+        return ResponseEntity.ok().body("차단이 해제되었습니다.");
     }
 
     // 구매내역
