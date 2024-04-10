@@ -56,7 +56,7 @@ public class ProductResponseInnerDto{
 
         private String[] productImage;
 
-        @JsonProperty("is_private")
+        @JsonProperty("is_selected")
         private Boolean isSelected;
 
         //      private LocalDateTime createdAt;
