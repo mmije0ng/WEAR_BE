@@ -4,6 +4,7 @@ import com.backend.wear.entity.DonationApply;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,5 +20,5 @@ public interface DonationApplyRepository extends JpaRepository<DonationApply, Lo
     @Modifying
     @Transactional
     @Query("SELECT d FROM DonationApply d WHERE d.user.id = :userId AND d.isDonationComplete = true")
-    List<DonationApply> findByUserIdAndDonationComplete(Long userId);
+    List<DonationApply> findByUserIdAndDonationComplete(@Param("userId") Long userId);
 }
