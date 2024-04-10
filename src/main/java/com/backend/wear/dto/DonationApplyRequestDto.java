@@ -8,6 +8,8 @@ import lombok.*;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DonationApplyRequestDto {
     private String userName; //기부 신청자 이름

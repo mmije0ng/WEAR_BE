@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -27,18 +29,22 @@ public class UserService {
 
     private final ProductRepository productRepository;
 
+    private final BlockedUserRepository blockedUserRepository;
+
     private final ObjectMapper objectMapper;
 
     @Autowired
     public UserService(UserRepository userRepository, StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
-                       WishRepository wishRepository, ProductRepository productRepository, ObjectMapper objectMapper){
+                       WishRepository wishRepository, ProductRepository productRepository, BlockedUserRepository blockedUserRepository,
+                       ObjectMapper objectMapper){
         this.userRepository=userRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
         this.wishRepository=wishRepository;
         this.productRepository=productRepository;
+        this.blockedUserRepository=blockedUserRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -406,6 +412,45 @@ public class UserService {
         }
 
         return donationApplyList;
+    }
+
+    // 차단한 사용자 리스트 불러오기
+    @Transactional
+    public List<BlockedUserResponseDto> getBlockedUsersList(Long userId){
+        // 차단한 사용자 아이디 불러오기
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+
+        if(blockedUserIdList.isEmpty())
+            throw new IllegalArgumentException("차단한 사용자가 없습니다.");
+
+        List<User> blockedUserList = userRepository.findByUserId(blockedUserIdList);
+
+        List<BlockedUserResponseDto> dtoList = blockedUserList.stream()
+                .flatMap(user -> {
+                    try {
+                        String[] array = objectMapper.readValue(user.getProfileImage(), String[].class);
+                        // 예외가 발생하지 않으면 해당 DTO를 반환
+                        return Stream.of(BlockedUserResponseDto.builder()
+                                .blockedUserId(user.getId())
+                                .blockedUserNickName(user.getNickName())
+                                .blockedUserProfileImage(array)
+                                .blockedUserLevel(user.getLevel().getLabel())
+                                .build());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+        return dtoList;
+    }
+
+    // 차단 해제
+    @Transactional
+    public void deleteBlockedUser(Long userId, Long blockedUserId){
+        BlockedUser blockedUser = blockedUserRepository.findByUserIdAndBlockedUserId(userId,blockedUserId)
+                .orElseThrow( () -> new IllegalArgumentException("차단 해제에서 차단한 사용자 불러오기 실패"));
+        // 차단해제
+        blockedUserRepository.delete(blockedUser);
     }
 
     // 스타일 태그 이름으로 Style 저장

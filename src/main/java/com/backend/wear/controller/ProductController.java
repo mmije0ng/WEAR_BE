@@ -128,7 +128,7 @@ public class ProductController {
 
     //상품상세/ 상품 정보 수정하기
     @PutMapping("/edit/{userId}/{productId}")
-    public ResponseEntity<?> updateProductPost(@PathVariable Long userId , @PathVariable Long productId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
+    public ResponseEntity<?> updateProductPost(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
             productService.updateProductPost(requestDTO,userId,productId);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
@@ -136,7 +136,7 @@ public class ProductController {
 
     //상품 상세/ 상품 판매 상태 변경하기
     @PutMapping("/soldOut/{userId}")
-    public ResponseEntity<?> updateProductPostStatus(@PathVariable Long userId,@RequestBody @Valid ProductRequestDto requestDto ,Errors errors) throws Exception{
+    public ResponseEntity<?> updateProductPostStatus(@PathVariable(name="userId") Long userId,@RequestBody @Valid ProductRequestDto requestDto ,Errors errors) throws Exception{
         try {
             productService.updateProductPostStatus(requestDto,userId);
         } catch (IllegalArgumentException e) {
@@ -199,5 +199,20 @@ public class ProductController {
                     .body(e.getMessage());
         }
         return ResponseEntity.ok().body("상품 찜 해제");
+    }
+
+    // 사용자 차단하기
+    // /api/products/block/{userId}/{blockedUserId}
+    @PostMapping("/block/{userId}/{blockedUserId}")
+    public ResponseEntity<?> blockedUser(@PathVariable(name="userId") Long userId
+            ,@PathVariable(name="blockedUserId") Long blockedUserId)
+            throws Exception{
+        try {
+            productService.blockedUser(userId,blockedUserId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("사용자 차단 완료");
     }
 }

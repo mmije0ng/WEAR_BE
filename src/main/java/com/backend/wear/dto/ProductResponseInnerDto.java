@@ -1,6 +1,7 @@
 
 package com.backend.wear.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -55,6 +56,7 @@ public class ProductResponseInnerDto{
 
         private String[] productImage;
 
+        @JsonProperty("is_private")
         private Boolean isSelected;
 
         //      private LocalDateTime createdAt;
@@ -100,6 +102,7 @@ public class ProductResponseInnerDto{
 
         private String[] productImage;
 
+        @JsonProperty("is_private")
         private boolean isPrivate;
 
         private String time;

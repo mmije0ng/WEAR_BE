@@ -20,7 +20,7 @@ public class DonationApplyController {
     // 기부 등록하기
     // api/donations/{userId}?charity={charity}
     @PostMapping("/{userId}")
-    public ResponseEntity<?> postDonationApply(@PathVariable("userId")Long userId,@RequestParam Integer charity,
+    public ResponseEntity<?> postDonationApply(@PathVariable(name="userId")Long userId,@RequestParam(name="charity") Integer charity,
                                                @RequestBody DonationApplyRequestDto donationApplyRequestDto){
             System.out.println(donationApplyRequestDto.getUserName());
         System.out.println(donationApplyRequestDto.getEmail());
