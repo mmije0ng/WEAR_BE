@@ -71,7 +71,7 @@ public class ProductController {
     //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
     //  /products/search?searchName={searchName}
     @GetMapping("/search")
-    public ResponseEntity<?> searchProducts(@RequestParam String searchName) {
+    public ResponseEntity<?> searchProducts(@RequestParam(name="searchName") String searchName) {
 
         try {
             List<ProductResponseDto> responseDto = productService.searchProductByproductName(searchName);
@@ -86,7 +86,7 @@ public class ProductController {
     //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
     //   /products/search/category?searchName={searchName}?categoryName={categoryName}
     @GetMapping("/search/category")
-    public ResponseEntity<?> searchProductsby(@RequestParam String searchName, String categoryName) {
+    public ResponseEntity<?> searchProductsby(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName) {
 
         try {
             List<ProductResponseDto> responseDto = productService.searchProductByproductNameAndCategory(searchName, categoryName);
@@ -149,7 +149,7 @@ public class ProductController {
 
     //상품 상세/ 상품 글 숨기기 || 숨김 해제하기
     @PutMapping("/private/{userId}/{productId}")
-    public ResponseEntity<?> updateProductPostPrivate(@PathVariable Long userId , @PathVariable Long productId) throws Exception{
+    public ResponseEntity<?> updateProductPostPrivate(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId) throws Exception{
         try {
             System.out.println(userId);
             System.out.println(productId);
@@ -164,7 +164,7 @@ public class ProductController {
 
     //상품 상세/ 상품 삭제하기
     @DeleteMapping("/delete/{userId}/{productId}")
-    public ResponseEntity<?> deleteProductPost(@PathVariable Long userId ,@PathVariable Long productId) throws Exception{
+    public ResponseEntity<?> deleteProductPost(@PathVariable(name="userId") Long userId ,@PathVariable(name="productId") Long productId) throws Exception{
         try {
             productService.deleteProductPost(userId,productId);
         } catch (IllegalArgumentException e) {

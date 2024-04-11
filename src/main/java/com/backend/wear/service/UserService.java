@@ -227,7 +227,7 @@ public class UserService {
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
                                 .isSelected(isSelected)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -272,7 +272,7 @@ public class UserService {
                                 .productStatus(product.getProductStatus())
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -321,7 +321,7 @@ public class UserService {
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
                                 .isPrivate(product.isPrivate())
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);

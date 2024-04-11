@@ -1,6 +1,5 @@
 package com.backend.wear.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -24,7 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:5173",
                         "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com", "http://43.201.189.171:8080",
                         "http://localhost:8080",
-                        "http://192.168.35.157:5173") // 허용할 Origin 설정
+                        "http://192.168.80.1:8080",
+                        "http://223.194.158.76:8080",
+                        "http://192.168.80.1:5173") // 허용할 Origin 설정
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정
                 .allowCredentials(true)
