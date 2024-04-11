@@ -178,6 +178,7 @@ public class ProductService {
             throw new RuntimeException(e);
         }
 
+
         return ProductResponseInnerDto.DetailDto.builder()
                 .id(product.getId())
                 .seller(seller)

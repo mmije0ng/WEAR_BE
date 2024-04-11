@@ -312,7 +312,6 @@ public class UserService {
                 .map(product -> {
                     try {
                         String[] array = objectMapper.readValue(product.getProductImage(), String[].class);
-
                         return ProductResponseInnerDto.PrivateDto.builder()
                                 .id(product.getId())
                                 .price(product.getPrice())
