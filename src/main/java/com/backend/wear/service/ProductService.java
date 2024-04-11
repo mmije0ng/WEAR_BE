@@ -77,7 +77,7 @@ public class ProductService {
 //            log.info("차단 유저 아이디: "+blockedUserIdList.get(i));
 
         if(categoryName.equals("전체")){
-            productsPage = productRepository. findAllProductPage(userUniversityId, blockedUserIdList,pageRequest(pageNumber));
+            productsPage = productRepository.findAllProductPage(userUniversityId, blockedUserIdList,pageRequest(pageNumber));
         }
         else{
             productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
@@ -112,6 +112,8 @@ public class ProductService {
     // 카테고리 검색 상품 dto 매핑
     private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
 
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+
         // JSON 배열 파싱
         String[] array = new String[0];
         try {
@@ -132,7 +134,7 @@ public class ProductService {
                 .postStatus(product.getPostStatus())
                 .productImage(array)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                 .build();
     }
 
@@ -187,7 +189,7 @@ public class ProductService {
                 .productImage(productArray)
                 .place(product.getPlace())
                 .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))) // 수정
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                 .build();
     }
 
