@@ -188,7 +188,7 @@ public class ProductService {
                 .productContent(product.getProductContent())
                 .productImage(productArray)
                 .place(product.getPlace())
-                .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))) // 수정
+                .createdTime(product.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
                 .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
                 .build();
     }
