@@ -126,6 +126,22 @@ public class ProductController {
 
     }
 
+    // 상품 상세/상품 정보 수정하기로 이동
+    @GetMapping("/edit/{userId}/{productId}")
+    public ResponseEntity<?> getProductPostToUpdate(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId)
+            throws Exception{
+
+        try {
+            ProductResponseInnerDto.EditDto editDto
+                    = productService.getProductPostToUpdate(userId, productId);
+            return ResponseEntity.ok(editDto);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
     //상품상세/ 상품 정보 수정하기
     @PutMapping("/edit/{userId}/{productId}")
     public ResponseEntity<?> updateProductPost(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId ,
