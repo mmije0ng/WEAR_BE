@@ -128,7 +128,8 @@ public class ProductController {
 
     //상품상세/ 상품 정보 수정하기
     @PutMapping("/edit/{userId}/{productId}")
-    public ResponseEntity<?> updateProductPost(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId , @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
+    public ResponseEntity<?> updateProductPost(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId ,
+                                               @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
             productService.updateProductPost(requestDTO,userId,productId);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }

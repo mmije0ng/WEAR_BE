@@ -226,7 +226,7 @@ public class UserService {
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
                                 .isSelected(isSelected)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -271,7 +271,7 @@ public class UserService {
                                 .productStatus(product.getProductStatus())
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -280,7 +280,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // 판매 중 상품 완료로 변경
+    // 상품 상태 변경
     @Transactional
     public void changePostStatus(Long userId, ProductRequestDto requestDto){
         // 아이디로 상품 조회
@@ -289,7 +289,6 @@ public class UserService {
 
         // 상품 상태 변경
         product.setPostStatus(requestDto.getPostStatus());
-       //  product.setPostStatus("soldOut");
     }
 
     // 숨김 처리 상품 보기
@@ -319,7 +318,7 @@ public class UserService {
                                 .postStatus(product.getPostStatus())
                                 .productImage(array)
                                 .isPrivate(product.isPrivate())
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                                 .build();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);

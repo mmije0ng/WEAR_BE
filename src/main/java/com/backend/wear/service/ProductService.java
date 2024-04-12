@@ -90,9 +90,7 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
         Page<Product> productsPage;
-       List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
-
-        String postStatus ="onSale";
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
 
         // 전체, 판매중, 최신순
         if(categoryName.equals("전체")){
@@ -111,8 +109,6 @@ public class ProductService {
 
     // 카테고리 검색 상품 dto 매핑
     private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
-
-        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
 
         // JSON 배열 파싱
         String[] array = new String[0];
@@ -134,14 +130,14 @@ public class ProductService {
                 .postStatus(product.getPostStatus())
                 .productImage(array)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
     // 상품 12개씩 최신순으로 정렬
     private Pageable pageRequest(Integer pageNumber){
         return
-                PageRequest.of(pageNumber, pageSize, Sort.by("updatedAt").descending());
+                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
     }
 
     // 상품 상세 조회
@@ -187,9 +183,10 @@ public class ProductService {
                 .productContent(product.getProductContent())
                 .productImage(productArray)
                 .place(product.getPlace())
-                .createdTime(product.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                 .isSelected(isSelected)
+                .isPrivate(product.isPrivate())
                 .build();
     }
 
@@ -279,7 +276,7 @@ public class ProductService {
         // updatedAt 업데이트
         product.setUpdatedAt(product.getUpdatedAt());
 
-        productRepository.save(product);
+       // productRepository.save(product);
     }
 
     // 상품 판매 상태 변경 (판매 완료 또는 판매 중)
@@ -305,7 +302,7 @@ public class ProductService {
             product.setUpdatedAt(product.getUpdatedAt());
 
             // 변경된 상품 정보를 저장합니다.
-            productRepository.save(product);
+        //    productRepository.save(product);
         }
     }
 
@@ -327,7 +324,7 @@ public class ProductService {
             }
             // updatedAt 업데이트
             product.setUpdatedAt(product.getUpdatedAt());
-            productRepository.save(product);
+            //productRepository.save(product);
         }
     }
 
@@ -338,7 +335,7 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
-        if(user != null){
+        if(user != null) {
             //해당 사용자의 상품을 제대로 요청했는지 확인
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("상품을 찾지 못하였습니다."));

@@ -40,6 +40,9 @@ public class ProductResponseInnerDto{
 
         @JsonProperty("is_selected")
         private Boolean isSelected;
+
+        @JsonProperty("is_private")
+        private Boolean isPrivate;
     }
 
     // 상품 썸네일
@@ -109,5 +112,29 @@ public class ProductResponseInnerDto{
         private Boolean isPrivate;
 
         private String time;
+    }
+
+    // 상품 수정 dto
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class EditDto{
+        private Long id;  //상품 아이디
+
+        private String[] productImage;
+
+        private String productName;
+
+        private String categoryName;
+
+        private String productStatus;
+
+        private String productContent;
+
+        private String postStatus;
+
+        private Integer price;
+
+        private String place;
     }
 }
