@@ -7,6 +7,7 @@ import com.backend.wear.repository.DonationApplyRepository;
 import com.backend.wear.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DonationApplyService {
@@ -22,6 +23,7 @@ public class DonationApplyService {
     }
 
     // 기부 신청
+    @Transactional
     public void donationApplyService(Long userId, Integer charityNumber, DonationApplyRequestDto dto){
         // 아이디로 사용자 조회 (기부 신청자)
         User applyUser = userRepository.findById(userId)
@@ -38,7 +40,6 @@ public class DonationApplyService {
                 .clothesCount(dto.getClothesCount())
                 .fashionCount(dto.getFashionCount())
                 .boxCount(dto.getBoxCount())
-                .isDonationComplete(false)
                 .build();
 
         donationApplyRepository.save(donationApply);
