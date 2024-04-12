@@ -17,7 +17,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 전체 상품 페이지 (숨김x)
-    // 차단 기능 수정 필요
+    // 차단한 사용자 안 보이도록, 같은 대학 상품만 보이도록
     @Query("SELECT p FROM Product p WHERE p.isPrivate = false AND p.user.university.id =:userUniversityId " +
             "AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList))")
     Page<Product> findAllProductPage(@Param("userUniversityId")Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, Pageable pageable);
