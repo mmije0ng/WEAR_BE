@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -59,21 +60,4 @@ public class DonationApply extends BaseEntity {
     //기부 상태, 완료/미완료
     @Column(name="is_donation_complete", columnDefinition = "boolean default false")
     private boolean isDonationComplete;
-
-    @Builder
-    public DonationApply(User user, Integer charityNumber, String userName, String address, String phone,
-                         String email, String donationItem, Integer clothesCount, Integer fashionCount, Integer boxCount,
-                         boolean isDonationComplete){
-        this.user=user;
-        this.charityNumber=charityNumber;
-        this.userName=userName;
-        this.address=address;
-        this.phone=phone;
-        this.email=email;
-        this.donationItem=donationItem;
-        this.clothesCount=clothesCount;
-        this.fashionCount=fashionCount;
-        this.boxCount=boxCount;
-        this.isDonationComplete=isDonationComplete;
-    }
 }
