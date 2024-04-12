@@ -146,7 +146,7 @@ public class ProductService {
 
     // 상품 상세 조회
     @Transactional
-    public ProductResponseInnerDto.DetailDto getProductPost(Long productId) throws Exception {
+    public ProductResponseInnerDto.DetailDto getProductPost(Long userId, Long productId) throws Exception {
         Product product  = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
@@ -174,6 +174,9 @@ public class ProductService {
                 .level(user.getLevel().getLabel())
                 .build();
 
+        // 사용자의 상품 찜 여부 확인
+        boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
+
         return ProductResponseInnerDto.DetailDto.builder()
                 .id(product.getId())
                 .seller(seller)
@@ -186,6 +189,7 @@ public class ProductService {
                 .place(product.getPlace())
                 .createdTime(product.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
                 .time(ConvertTime.convertLocaldatetimeToTime(product.getUpdatedAt()))
+                .isSelected(isSelected)
                 .build();
     }
 

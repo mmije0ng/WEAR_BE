@@ -100,11 +100,11 @@ public class ProductController {
 
     //상품 상세 페이지 불러오기
     // api/products/{productId}
-    @GetMapping("/{productId}")
-    public ResponseEntity<?> getProductPost(@PathVariable("productId") Long productId) throws Exception {
+    @GetMapping("/{userId}/{productId}")
+    public ResponseEntity<?> getProductPost(@PathVariable("userId") Long userId,@PathVariable("productId") Long productId) throws Exception {
         ProductResponseInnerDto.DetailDto productPost;
         try {
-            productPost = productService.getProductPost(productId);
+            productPost = productService.getProductPost(userId, productId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
