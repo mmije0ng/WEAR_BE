@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -29,7 +30,9 @@ public class Style extends BaseEntity {
     @JoinColumn(name="user_id")
     User user;
 
-    public Style(String styleName){
-        this.styleName=styleName;
-    }
+//    @Builder
+//    public Style(String styleName, User user){
+//        this.styleName=styleName;
+//        this.user=user;
+//    }
 }

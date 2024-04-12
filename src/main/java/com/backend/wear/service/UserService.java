@@ -151,7 +151,7 @@ public class UserService {
 
         user.setProfileImage(profileImage);
 
-        setProfileStyle(user,profileDto.getStyle());
+        setProfileStyle(userId, user, profileDto.getStyle());
     }
 
     // 유저 정보 조회
@@ -412,20 +412,23 @@ public class UserService {
 
     // 스타일 태그 이름으로 Style 저장
     @Transactional
-    public void setProfileStyle (User user, List<String> style){
-        List<Style> newStyles = new ArrayList<>();
+    public void setProfileStyle (Long userId, User user, List<String> styleNameList) {
 
-        styleRepository.deleteAllByUserId(user.getId());
+        // styleNameList에 포함되어 있지 않은 스타일 삭제
+        styleRepository.deleteByUserIdAndStyleNameNotIn(userId, styleNameList);
 
-        for(String s: style){
-            Style styleTag =new Style();
-            styleTag.setUser(user);
-            styleTag.setStyleName(s);
+        // styleNameList에 포함되어 있지만 style 테이블에 없는 스타일 삽입
+        for (String styleName : styleNameList) {
+            Style existingStyle = styleRepository.findStyleByStyleNameAndUserId(styleName, userId);
 
-            newStyles.add(styleTag);
+            if (existingStyle == null) {
+                Style newStyle = Style.builder()
+                        .styleName(styleName)
+                        .user(user)
+                        .build();
+                styleRepository.save(newStyle);
+            }
         }
-
-        user.setStyle(newStyles);
     }
 
     //대학교 이름 조회
@@ -444,16 +447,12 @@ public class UserService {
 
     //스타일 태그 이름만 조회
     private List<String> getUserStyleList(Long userId){
-        List<Style> allStyle = styleRepository.findByUserId(userId);
+        List<Style> styleList = styleRepository.findByUserId(userId);
 
-        //Style 태그에서 styleName만 추출
-        List<String> style = new ArrayList<>();
-
-        for(Style s: allStyle){
-            style.add(s.getStyleName());
-        }
-
-        return style;
+        // Style 태그에서 styleName만 추출하여 리스트로 반환
+        return styleList.stream()
+                .map(Style::getStyleName) // Style 객체를 styleName으로 매핑
+                .collect(Collectors.toList()); // 리스트로 변환하여 반환
     }
 
     //현재 레벨 조회
