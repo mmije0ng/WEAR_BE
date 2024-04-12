@@ -170,20 +170,6 @@ public class UserController {
         }
     }
 
-    // 판매 완료인 상품 판매 중으로 변경
-    // api/users/myProducts/soldOut/{userId}
-    @PutMapping("/myProducts/soldOut/{userId}")
-    public ResponseEntity<?> putPostStatusOnSale(@PathVariable(name="userId") Long userId,
-                                           @RequestBody ProductRequestDto requestDto){
-        try{
-            userService.changePostStatus(userId, requestDto);
-            return ResponseEntity.ok().body("상품이 판매중으로 변경되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
-
     // 숨김 처리 상품 불러오기
     // api/users/myProducts/private/{userId}
     @GetMapping("/myProducts/private/{userId}")
