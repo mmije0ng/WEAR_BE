@@ -37,6 +37,9 @@ public class ProductResponseInnerDto{
         private String createdTime; // 상품 등록 시간
 
         private String time; // 몇분 전
+
+        @JsonProperty("is_selected")
+        private Boolean isSelected;
     }
 
     // 상품 썸네일

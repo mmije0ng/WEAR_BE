@@ -17,8 +17,6 @@ public interface DonationApplyRepository extends JpaRepository<DonationApply, Lo
     List <DonationApply> findByUserId(Long userId);
 
     // 기부 완료 내역
-    @Modifying
-    @Transactional
     @Query("SELECT d FROM DonationApply d WHERE d.user.id = :userId AND d.isDonationComplete = true")
     List<DonationApply> findByUserIdAndDonationComplete(@Param("userId") Long userId);
 }

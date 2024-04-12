@@ -285,7 +285,7 @@ public class UserService {
     public void changePostStatus(Long userId, ProductRequestDto requestDto){
         // 아이디로 상품 조회
         Product product=productRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
+                .orElseThrow(() -> new IllegalArgumentException("아이디와 일치하는 상품 없음.")  );
 
         // 상품 상태 변경
         //product.setPostStatus(requestDto.getPostStatus());
