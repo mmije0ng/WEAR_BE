@@ -131,10 +131,10 @@ public class ProductResponseInnerDto{
 
         private String productContent;
 
-        private String postStatus;
-
         private Integer price;
 
         private String place;
+
+        private String postStatus;
     }
 }

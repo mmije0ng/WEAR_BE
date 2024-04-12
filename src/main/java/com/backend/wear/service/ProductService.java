@@ -111,7 +111,7 @@ public class ProductService {
     private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
 
         // JSON 배열 파싱
-        String[] array = new String[0];
+        String[] array;
         try {
             array = objectMapper.readValue(product.getProductImage(), String[].class);
         } catch (JsonProcessingException e) {
@@ -151,11 +151,10 @@ public class ProductService {
         User user=product.getUser();
 
         // JSON 배열 파싱
-
         // 판매자 프로필 이미지 배열로 변환
-        String[] profileArray = new String[0];
+        String[] profileArray;
         // 상품 이미지 배열로 변환
-        String[] productArray = new String[0];
+        String[] productArray;
         try {
             profileArray = objectMapper.readValue(user.getProfileImage(), String[].class);
             productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
@@ -242,6 +241,36 @@ public class ProductService {
                 .build();
 
         productRepository.save(newProduct);
+    }
+
+    // 상품 수정을 위한 정보
+    @Transactional
+    public ProductResponseInnerDto.EditDto getProductPostToUpdate(Long userId, Long productId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException(" 찾지 못하였습니다."));
+
+        // 상품 이미지 배열로 변환
+        String[] productArray;
+        try {
+            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return ProductResponseInnerDto.EditDto.builder()
+                .id(product.getId())
+                .productImage(productArray)
+                .productName(product.getProductName())
+                .categoryName(product.getCategory().getCategoryName())
+                .productStatus(product.getProductStatus())
+                .productContent(product.getProductContent())
+                .price(product.getPrice())
+                .place(product.getPlace())
+                .postStatus(product.getPostStatus())
+                .build();
     }
 
     // 상품 정보 변경(전체를 받아서 전체를 변경)
