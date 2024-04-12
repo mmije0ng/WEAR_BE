@@ -137,12 +137,11 @@ public class UserService {
    //     user.setUserName(profileDto.getUserName());
         user.setNickName(profileDto.getNickName());
 
-        String[] array = profileDto.getProfileImage();
         String profileImage;
 
         try {
             // String 배열을 JSON 문자열로 변환
-            profileImage = objectMapper.writeValueAsString(array);
+            profileImage = objectMapper.writeValueAsString(profileDto.getProfileImage());
         } catch (JsonProcessingException e) {
             // JsonProcessingException 처리
             throw new RuntimeException("Failed to convert String[] to JSON string", e);
@@ -289,8 +288,8 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("상품 상태를 변경하는데 실패하였습니다.")  );
 
         // 상품 상태 변경
-        product.setPostStatus(requestDto.getPostStatus());
-        // product.setPostStatus("soldOut");
+        //product.setPostStatus(requestDto.getPostStatus());
+         product.setPostStatus("soldOut");
     }
 
     // 숨김 처리 상품 보기

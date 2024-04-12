@@ -154,11 +154,15 @@ public class ProductService {
         // 판매자
         User user=product.getUser();
 
-        // 판매자 프로필 이미지 배열로 변환
         // JSON 배열 파싱
-        String[] array = new String[0];
+
+        // 판매자 프로필 이미지 배열로 변환
+        String[] profileArray = new String[0];
+        // 상품 이미지 배열로 변환
+        String[] productArray = new String[0];
         try {
-            array = objectMapper.readValue(user.getProfileImage(), String[].class);
+            profileArray = objectMapper.readValue(user.getProfileImage(), String[].class);
+            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -166,18 +170,9 @@ public class ProductService {
         UserResponseInnerDto.SellerDto seller =  UserResponseInnerDto.SellerDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
-                .profileImage(array)
+                .profileImage(profileArray)
                 .level(user.getLevel().getLabel())
                 .build();
-
-        // 상품 이미지 배열로 변환
-        String[] productArray = new String[0];
-        try {
-            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
 
         return ProductResponseInnerDto.DetailDto.builder()
                 .id(product.getId())
@@ -232,18 +227,6 @@ public class ProductService {
 
         // List<String>을 JSON 문자열로 변환
         String productImageJson = convertImageListToJson(requestDTO.getProductImage());
-
-//        // String[] 을 JSON 문자열로 변환
-//        String[] array =requestDTO.getProductImage();
-//        String productImage;
-//
-//        try {
-//            // String 배열을 JSON 문자열로 변환
-//            productImage = objectMapper.writeValueAsString(array);
-//        } catch (JsonProcessingException e) {
-//            // JsonProcessingException 처리
-//            throw new RuntimeException("Failed to convert String[] to JSON string", e);
-//        }
 
         // 제공된 Product 객체의 데이터를 사용하여 새로운 Product 객체 생성
         Product newProduct = Product.builder()
@@ -395,6 +378,7 @@ public class ProductService {
     }
 
     // 사용자 차단하기
+    @Transactional
     public void blockedUser(Long userId, Long blockedUserId){
         // 로그인한 사용자
         User user = userRepository.findById(userId)
