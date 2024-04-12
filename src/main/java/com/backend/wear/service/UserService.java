@@ -4,14 +4,16 @@ import com.backend.wear.dto.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +35,17 @@ public class UserService {
 
     private final ObjectMapper objectMapper;
 
+    private static final int pageSize=12;
+
+    // JSON 문자열을 String[]으로 변환하는 메서드
+    private  String[] convertImageJsonToArray(String productImageJson) {
+        try {
+            return objectMapper.readValue(productImageJson, String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse JSON", e);
+        }
+    }
+
     @Autowired
     public UserService(UserRepository userRepository, StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
@@ -46,18 +59,6 @@ public class UserService {
         this.productRepository=productRepository;
         this.blockedUserRepository=blockedUserRepository;
         this.objectMapper = objectMapper;
-    }
-
-    // List<String>를 JSON 문자열로 변환하는 메서드
-    private String convertImageListToJson(List<String> imageList) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(imageList);
-    }
-
-    // JSON 문자열을 List<String>으로 변환하는 메서드
-    private List<String> convertJson6ToImageList(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
 
     // 마이페이지 사용자 정보
@@ -81,19 +82,15 @@ public class UserService {
 
         System.out.println("이름: "+user.getUserName());
 
-        String[] array = new String[0];
-        try {
-            array = objectMapper.readValue(user.getProfileImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        // JSON 배열 파싱
+        String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
 
         return UserResponseInnerDto.MyPageDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .style(style)
-                .profileImage(array)
+                .profileImage(profileImageArray)
                 .level(level)
                 .nextLevel(nextLevel)
                 .point(point)
@@ -114,16 +111,12 @@ public class UserService {
     private UserResponseInnerDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
         List<String> styleList = getUserStyleList(userId); //스타일 리스트
 
-        String[] array = new String[0];
-        try {
-            array = objectMapper.readValue(user.getProfileImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        // JSON 배열 파싱
+        String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
 
         return UserResponseInnerDto.ProfileDto.builder()
                 .nickName(user.getNickName())
-                .profileImage(array)
+                .profileImage(profileImageArray)
                 .style(styleList)
                 .build();
     }
@@ -199,92 +192,83 @@ public class UserService {
 
     // 찜한 상품 불러오기
     @Transactional
-    public List<ProductResponseInnerDto.ScreenDto> getWishList(Long userId) throws Exception{
-        // 찜 리스트
-        List<Wish> wishList = wishRepository.findByUserId(userId);
+    public Page<ProductResponseInnerDto.ScreenDto> getMyWishPage(Long userId, Integer pageNumber) throws Exception{
 
-        if (wishList.isEmpty())
+        // 찜 리스트
+        Page <Wish> myWishPage = wishRepository.findByUserId(userId, pageRequest(pageNumber));
+
+        if (myWishPage.isEmpty())
             throw new IllegalArgumentException("현재 찜한 상품이 없습니다.");
 
-        // 찜한 상품 리스트 dto로 변환
-        return wishList.stream()
-                .map(wish -> {
-                    Product product = wish.getProduct();
+        // 찜한 상품 반환
+        return myWishPage.map(wish ->  mapToScreenDto (userId, wish));
+    }
 
-                    try {
-                        String[] array = objectMapper.readValue(product.getProductImage(), String[].class);
+    // 찜한 상품 상품 dto 매핑
+    private ProductResponseInnerDto.ScreenDto mapToScreenDto(Long userId, Wish wish) {
 
-                        // 사용자의 상품 찜 여부 확인
-                        boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
+        Product product = productRepository.findById(wish.getProduct().getId())
+                .orElseThrow(() -> new IllegalArgumentException("찜한 상품 찾기 실패"));
 
-                        // DTO 생성 및 반환
-                        return ProductResponseInnerDto.ScreenDto.builder()
-                                .id(product.getId())
-                                .price(product.getPrice())
-                                .productName(product.getProductName())
-                                .productStatus(product.getProductStatus())
-                                .postStatus(product.getPostStatus())
-                                .productImage(array)
-                                .isSelected(isSelected)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
-                                .build();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        // JSON 배열 파싱
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
+
+        // 사용자의 상품 찜 여부 확인
+        boolean isSelected
+                = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
+
+        // DTO 생성 및 반환
+        return ProductResponseInnerDto.ScreenDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .productStatus(product.getProductStatus())
+                .postStatus(product.getPostStatus())
+                .productImage(productImageArray)
+                .isSelected(isSelected)
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .build();
     }
 
     // 판매 중, 완료 상품 불러오기
     @Transactional
-    public List<ProductResponseInnerDto.MyPageScreenDto> getMyProductsList(Long userId, String postStatus) throws Exception{
-        List<ProductResponseInnerDto.MyPageScreenDto> productResponseDtoList =
-                mapToMyPageScreenDto(userId,postStatus);
+    public Page<ProductResponseInnerDto.MyPageScreenDto> getMyProductsPage(Long userId, String postStatus, Integer pageNumber) {
 
-        if(productResponseDtoList.isEmpty()){
+        // 사용자 아이디로 판매 상품 페이지네이션
+        Page<Product> myProductsPage  = productRepository.findByUserIdAndPostStatus(userId, postStatus, pageRequest(pageNumber));
+
+        if(myProductsPage.isEmpty()){
             if(postStatus.equals("onSale"))
                 throw new IllegalArgumentException("현재 판매중인 상품이 없습니다.");
             else
                 throw new IllegalArgumentException("현재 판매 완료한 상품이 없습니다.");
         }
 
-        else
-            return productResponseDtoList;
+        return myProductsPage.map(product -> mapToMyPageScreenDto(postStatus, product));
     }
 
     // 판매 내역 상품 dto 매핑
-    private List<ProductResponseInnerDto.MyPageScreenDto> mapToMyPageScreenDto(Long userId, String postStatus) throws Exception {
-        // 사용자 판매 상품 조회
-        List<Product> productList = productRepository.findByUserId(userId);
+    private ProductResponseInnerDto.MyPageScreenDto mapToMyPageScreenDto(String postStatus, Product product) {
 
-        // dto 리스트
-        return productList.stream()
-                .filter(product -> product.getPostStatus().equals(postStatus))
-                .map(product -> {
-                    try {
-                        String[] array = objectMapper.readValue(product.getProductImage(), String[].class);
+        // JSON 배열 파싱
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
-                        return ProductResponseInnerDto.MyPageScreenDto.builder()
-                                .id(product.getId())
-                                .price(product.getPrice())
-                                .productName(product.getProductName())
-                                .productStatus(product.getProductStatus())
-                                .postStatus(product.getPostStatus())
-                                .productImage(array)
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
-                                .build();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        return ProductResponseInnerDto.MyPageScreenDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .productStatus(product.getProductStatus())
+                .postStatus(postStatus)
+                .productImage(productImageArray)
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .build();
     }
 
     // 상품 상태 변경
     @Transactional
     public void changePostStatus(Long userId, ProductRequestDto requestDto){
         // 아이디로 상품 조회
-        Product product=productRepository.findById(requestDto.getId())
+        Product product=productRepository.findByIdAndUserId(requestDto.getId(), userId)
                 .orElseThrow(() -> new IllegalArgumentException("아이디와 일치하는 상품 없음.")  );
 
         // 상품 상태 변경
@@ -293,38 +277,31 @@ public class UserService {
 
     // 숨김 처리 상품 보기
     @Transactional
-    public List<ProductResponseInnerDto.PrivateDto> myProductsPrivateList(Long userId) throws Exception{
-        List<ProductResponseInnerDto.PrivateDto> privateProductList = mapToPrivateDto(userId);
+    public Page<ProductResponseInnerDto.PrivateDto> getMyPrivateProductsPage(Long userId, Integer pageNumber) throws Exception {
+        Page <Product> myPrivateProductsPage
+                = productRepository.findByUserIdAndIsPrivateTrue(userId, pageRequest(pageNumber));
 
-        if(privateProductList.isEmpty())
+        if(myPrivateProductsPage .isEmpty())
             throw new IllegalArgumentException("현재 숨김 처리한 상품이 없습니다.");
-        else
-            return privateProductList;
+
+        return myPrivateProductsPage.map(this::mapToPrivateDto);
     }
 
     // 숨김 상품 dto 매핑
-    private List<ProductResponseInnerDto.PrivateDto> mapToPrivateDto(Long userId) throws Exception {
-        List<Product> productList = productRepository.findByUserIdAndIsPrivateTrue(userId);
+    private ProductResponseInnerDto.PrivateDto mapToPrivateDto(Product product)  {
 
-        return productList.stream()
-                .map(product -> {
-                    try {
-                        String[] array = objectMapper.readValue(product.getProductImage(), String[].class);
-                        return ProductResponseInnerDto.PrivateDto.builder()
-                                .id(product.getId())
-                                .price(product.getPrice())
-                                .productName(product.getProductName())
-                                .productStatus(product.getProductStatus())
-                                .postStatus(product.getPostStatus())
-                                .productImage(array)
-                                .isPrivate(product.isPrivate())
-                                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
-                                .build();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
+
+        return ProductResponseInnerDto.PrivateDto.builder()
+                .id(product.getId())
+                .price(product.getPrice())
+                .productName(product.getProductName())
+                .productStatus(product.getProductStatus())
+                .postStatus(product.getPostStatus())
+                .productImage(productImageArray)
+                .isPrivate(product.isPrivate())
+                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .build();
     }
 
     // 사용자 기부 내역
@@ -384,6 +361,7 @@ public class UserService {
         List<BlockedUserResponseDto> dtoList = blockedUserList.stream()
                 .flatMap(user -> {
                     try {
+
                         String[] array = objectMapper.readValue(user.getProfileImage(), String[].class);
                         // 예외가 발생하지 않으면 해당 DTO를 반환
                         return Stream.of(BlockedUserResponseDto.builder()
@@ -442,6 +420,12 @@ public class UserService {
         //    University university = userRepository.findById(userId).get().getUniversity();
 
         //    university.setUniversityName(universityName);
+    }
+
+    // 상품 12개씩 최신순으로 정렬
+    private Pageable pageRequest(Integer pageNumber){
+        return
+                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
     }
 
     //스타일 태그 이름만 조회

@@ -30,19 +30,13 @@ public class ProductController {
     // api/products/category?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category")
     public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId,
-                                                    @RequestParam(name="pageNumber") Integer pageNumber)
-            throws Exception
-    {
-        Page <ProductResponseInnerDto.ScreenDto> page = productService.findProductsByCategory(categoryName, userId, pageNumber);
-
-        // 카테고리별 상품이 있는 경우
-        if(!page.isEmpty()){
-            return ResponseEntity.ok(page);
-        }
-
-        else{
+                                                    @RequestParam(name="pageNumber") Integer pageNumber) throws Exception {
+        try {
+            Page <ProductResponseInnerDto.ScreenDto> productsPage = productService.findProductsByCategory(categoryName, userId, pageNumber);
+            return ResponseEntity.ok(productsPage);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("카테고리와 일치하는 상품이 없습니다.");
+                    .body(e.getMessage());
         }
     }
 
@@ -53,17 +47,14 @@ public class ProductController {
                                                         @RequestParam(name="userId") Long userId,
                                                           @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
-        Page <ProductResponseInnerDto.ScreenDto> page =
-                productService.findProductsByCategoryOnSale(categoryName, userId, pageNumber);
 
-        //페이지에 요소가 있는 경우
-        if(!page.isEmpty()){
-            return ResponseEntity.ok(page);
-        }
-
-        else{
+        try {
+            Page <ProductResponseInnerDto.ScreenDto> productsPage =
+                    productService.findProductsByCategoryOnSale(categoryName, userId, pageNumber);
+            return ResponseEntity.ok(productsPage);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("카테고리와 일치하는 판매중인 상품이 없습니다.");
+                    .body(e.getMessage());
         }
     }
 
@@ -102,14 +93,14 @@ public class ProductController {
     // api/products/{productId}
     @GetMapping("/{userId}/{productId}")
     public ResponseEntity<?> getProductPost(@PathVariable("userId") Long userId,@PathVariable("productId") Long productId) throws Exception {
-        ProductResponseInnerDto.DetailDto productPost;
+        ;
         try {
-            productPost = productService.getProductPost(userId, productId);
+            ProductResponseInnerDto.DetailDto productPost = productService.getProductPost(userId, productId);
+            return ResponseEntity.ok(productPost);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        return ResponseEntity.ok(productPost);
     }
 
     // 상품 등록

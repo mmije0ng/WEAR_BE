@@ -53,6 +53,15 @@ public class ProductService {
         return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
 
+    // JSON 문자열을 String[]으로 변환하는 메서드
+    private  String[] convertImageJsonToArray(String productImageJson) {
+        try {
+            return objectMapper.readValue(productImageJson, String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse JSON", e);
+        }
+    }
+
     @Autowired
     public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
                           CategoryRepository categoryRepository, BlockedUserRepository blockedUserRepository){
@@ -65,7 +74,8 @@ public class ProductService {
 
     // 카테고리별, 최신순 페이지네이션
     @Transactional
-    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber){
+    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber)
+            throws Exception{
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
@@ -83,12 +93,17 @@ public class ProductService {
             productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
         }
 
+        // 카테고리별 상품이 없는 경우
+        if(productsPage.isEmpty())
+            throw new IllegalArgumentException("카테고리와 일치하는 판매중인 상품이 없습니다.");
+
         return productsPage.map(product -> mapToScreenDto(product, userId));
     }
 
     // 카테고리별, 판매중, 최신순 페이지네이션
     @Transactional
-    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber ){
+    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber )
+            throws Exception{
         Page<Product> productsPage;
         List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
 
@@ -104,6 +119,10 @@ public class ProductService {
                     .findByCategoryNameAndPostStatusPage(categoryName,blockedUserIdList,pageRequest(pageNumber));
         }
 
+        // 카테고리별 상품이 없는 경우
+        if(productsPage.isEmpty())
+            throw new IllegalArgumentException("카테고리와 일치하는 판매중인 상품이 없습니다.");
+
         return productsPage.map(product -> mapToScreenDto(product, userId));
     }
 
@@ -111,12 +130,7 @@ public class ProductService {
     private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
 
         // JSON 배열 파싱
-        String[] array;
-        try {
-            array = objectMapper.readValue(product.getProductImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
         // 사용자의 상품 찜 여부 확인
         boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
@@ -128,7 +142,7 @@ public class ProductService {
                 .productName(product.getProductName())
                 .productStatus(product.getProductStatus())
                 .postStatus(product.getPostStatus())
-                .productImage(array)
+                .productImage(productImageArray)
                 .isSelected(isSelected)
                 .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
                 .build();
@@ -152,20 +166,16 @@ public class ProductService {
 
         // JSON 배열 파싱
         // 판매자 프로필 이미지 배열로 변환
-        String[] profileArray;
+        String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
+
         // 상품 이미지 배열로 변환
-        String[] productArray;
-        try {
-            profileArray = objectMapper.readValue(user.getProfileImage(), String[].class);
-            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        // JSON 배열 파싱
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
         UserResponseInnerDto.SellerDto seller =  UserResponseInnerDto.SellerDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
-                .profileImage(profileArray)
+                .profileImage(profileImageArray)
                 .level(user.getLevel().getLabel())
                 .build();
 
@@ -180,7 +190,7 @@ public class ProductService {
                 .productStatus(product.getProductStatus())
                 .postStatus(product.getPostStatus())
                 .productContent(product.getProductContent())
-                .productImage(productArray)
+                .productImage(productImageArray)
                 .place(product.getPlace())
                 .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
                 .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
@@ -252,17 +262,12 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(" 찾지 못하였습니다."));
 
-        // 상품 이미지 배열로 변환
-        String[] productArray;
-        try {
-            productArray  = objectMapper.readValue(product.getProductImage(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        // JSON 배열 파싱
+        String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
         return ProductResponseInnerDto.EditDto.builder()
                 .id(product.getId())
-                .productImage(productArray)
+                .productImage(productImageArray )
                 .productName(product.getProductName())
                 .categoryName(product.getCategory().getCategoryName())
                 .productStatus(product.getProductStatus())
@@ -409,7 +414,7 @@ public class ProductService {
 
     // 사용자 차단하기
     @Transactional
-    public void blockedUser(Long userId, Long blockedUserId){
+    public void blockedUser(Long userId, Long blockedUserId) throws Exception{
         // 로그인한 사용자
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));

@@ -65,7 +65,6 @@ public class ProductResponseInnerDto{
         @JsonProperty("is_selected")
         private Boolean isSelected;
 
-        //      private LocalDateTime createdAt;
         private String time;
     }
 
@@ -85,8 +84,6 @@ public class ProductResponseInnerDto{
         private String postStatus;
 
         private String[] productImage;
-
-        //    private LocalDateTime createdAt;
 
         private String time;
     }

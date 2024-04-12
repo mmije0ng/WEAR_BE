@@ -9,6 +9,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -16,7 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @Table(name="wish")
 @Entity
-public class Wish extends Serializers.Base {
+public class Wish extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +36,4 @@ public class Wish extends Serializers.Base {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
-
-    @Builder
-    public Wish(User user, Product product){
-        this.user=user;
-        this.product=product;
-    }
 }

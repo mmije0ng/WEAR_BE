@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -49,19 +50,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // 사용자 아이디로 상품 조회
-    List<Product> findByUserId(Long userId);
+    // 페이지네이션 적용
+    Page<Product> findByUserIdAndPostStatus(Long userId, String postStatus, Pageable pageable);
 
     // 판매 상품 중 숨김 상품 조회
-    @Modifying
-    @Transactional
     @Query("SELECT p FROM Product p WHERE p.user.id = :userId AND p.isPrivate = true")
-    List<Product> findByUserIdAndIsPrivateTrue(@Param("userId") Long userId);
+    Page <Product> findByUserIdAndIsPrivateTrue(@Param("userId") Long userId, Pageable pageable);
 
     //상품 삭제하기
     @Modifying
     @Transactional
     @Query("delete from Product p where p.user.id = :userId and p.id = :productId")
     void deleteByUserAndProduct(@Param("userId") Long userId, @Param("productId") Long productId);
+
+    // 판매자 아이디와 상품 아이디로 조회
+    Optional<Product> findByIdAndUserId(Long productId, Long userId);
 
     // 구매내역
   //  @Query("SELECT p FROM Product p WHERE p.user.id != :userId AND p.productStatus = 'soldOut'")
