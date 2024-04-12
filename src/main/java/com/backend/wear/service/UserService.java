@@ -288,8 +288,8 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("아이디와 일치하는 상품 없음.")  );
 
         // 상품 상태 변경
-        //product.setPostStatus(requestDto.getPostStatus());
-         product.setPostStatus("soldOut");
+        product.setPostStatus(requestDto.getPostStatus());
+       //  product.setPostStatus("soldOut");
     }
 
     // 숨김 처리 상품 보기
