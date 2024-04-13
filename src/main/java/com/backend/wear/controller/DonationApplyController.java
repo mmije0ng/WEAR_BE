@@ -1,6 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.DonationApplyRequestDto;
+import com.backend.wear.dto.donation.DonationApplyRequestDto;
 import com.backend.wear.service.DonationApplyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

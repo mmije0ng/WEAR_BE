@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.donation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

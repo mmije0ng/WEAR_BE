@@ -1,13 +1,7 @@
 package com.backend.wear.config;
 
-import com.backend.wear.dto.ChatMessageDto;
-import com.backend.wear.entity.ChatMessage;
-import com.backend.wear.entity.ChatRoom;
 import com.backend.wear.repository.ChatMessageRepository;
 import com.backend.wear.repository.ChatRoomRepository;
-import com.backend.wear.repository.ProductRepository;
-import com.backend.wear.service.MessageService;
-import com.backend.wear.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.chat;
 
 import lombok.Builder;
 import lombok.Data;

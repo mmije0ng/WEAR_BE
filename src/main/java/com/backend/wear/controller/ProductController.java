@@ -1,9 +1,8 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.ProductPostRequestDto;
-import com.backend.wear.dto.ProductRequestDto;
-import com.backend.wear.dto.ProductResponseDto;
-import com.backend.wear.dto.ProductResponseInnerDto;
+import com.backend.wear.dto.product.ProductPostRequestDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -32,7 +29,7 @@ public class ProductController {
     public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId,
                                                     @RequestParam(name="pageNumber") Integer pageNumber) throws Exception {
         try {
-            Page <ProductResponseInnerDto.ScreenDto> productsPage = productService.findProductsByCategory(categoryName, userId, pageNumber);
+            Page <ProductResponseDto.ScreenDto> productsPage = productService.findProductsByCategory(categoryName, userId, pageNumber);
             return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -48,7 +45,7 @@ public class ProductController {
                                                           @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
         try {
-            Page <ProductResponseInnerDto.ScreenDto> productsPage =
+            Page <ProductResponseDto.ScreenDto> productsPage =
                     productService.findProductsByCategoryOnSale(categoryName, userId, pageNumber);
             return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
@@ -82,7 +79,7 @@ public class ProductController {
                                                       @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
         try {
-            Page <ProductResponseInnerDto.ScreenDto> productsPage
+            Page <ProductResponseDto.ScreenDto> productsPage
                     = productService.searchProductByProductNameAndCategory(searchName, categoryName, userId, pageNumber);
             return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
@@ -100,7 +97,7 @@ public class ProductController {
                                                       @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
         try {
-            Page <ProductResponseInnerDto.ScreenDto> productsPage
+            Page <ProductResponseDto.ScreenDto> productsPage
                     = productService. searchProductByProductNameAndCategoryOnSale(searchName, categoryName, userId, pageNumber);
             return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
@@ -116,7 +113,7 @@ public class ProductController {
     public ResponseEntity<?> getProductPost(@PathVariable("userId") Long userId,@PathVariable("productId") Long productId) throws Exception {
         ;
         try {
-            ProductResponseInnerDto.DetailDto productPost = productService.getProductPost(userId, productId);
+            ProductResponseDto.DetailDto productPost = productService.getProductPost(userId, productId);
             return ResponseEntity.ok(productPost);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -144,7 +141,7 @@ public class ProductController {
             throws Exception{
 
         try {
-            ProductResponseInnerDto.EditDto editDto
+            ProductResponseDto.EditDto editDto
                     = productService.getProductPostToUpdate(userId, productId);
             return ResponseEntity.ok(editDto);
 

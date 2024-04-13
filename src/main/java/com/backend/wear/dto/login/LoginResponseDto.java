@@ -1,6 +1,5 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.login;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -9,13 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CategoryResponseDto {
+public class LoginResponseDto {
 
-    private Long id;
-    private String categoryName;
+    private Long id; //pk
+    private String message;
 }

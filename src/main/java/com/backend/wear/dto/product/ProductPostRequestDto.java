@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.product;
 
 
 import com.backend.wear.entity.Category;

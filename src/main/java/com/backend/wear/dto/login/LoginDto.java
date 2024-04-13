@@ -1,27 +1,25 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.login;
 
-import com.backend.wear.entity.Style;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-//@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SignUpDto {
+public class LoginDto {
 
-    private String userId;
+    private String userCreatedId;
     private String userPassword;
     private String userCheckPassword;
 //    private String universityName;
 //    private String universityEmail;
-    private List<String> styleList=new ArrayList<>();
+//    private List<String> list;
 }

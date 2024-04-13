@@ -1,10 +1,6 @@
 package com.backend.wear.service;
 
-import com.backend.wear.controller.ChatRoomController;
-import com.backend.wear.dto.ChatMessageSendDto;
-import com.backend.wear.entity.ChatMessage;
-import com.backend.wear.entity.ChatRoom;
-import com.backend.wear.entity.MyMessage;
+import com.backend.wear.dto.chat.ChatMessageSendDto;
 import com.backend.wear.repository.ChatMessageRepository;
 import com.backend.wear.repository.ChatRoomRepository;
 import jakarta.transaction.Transactional;
