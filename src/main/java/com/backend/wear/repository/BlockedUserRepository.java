@@ -17,6 +17,10 @@ public interface BlockedUserRepository extends JpaRepository<BlockedUser, Long> 
     @Query("SELECT b.blockedUserId FROM BlockedUser b WHERE b.user.id=:userId")
     List<Long> findByUserId(@Param("userId") Long userId);
 
+    // 나를 차단한 유저 리스트 찾기
+    @Query("SELECT b.user.id FROM BlockedUser b WHERE b.blockedUserId=:userId")
+    List<Long> findByUserIdBlocked(@Param("userId") Long userId);
+
     @Query("SELECT b FROM BlockedUser b WHERE b.user.id=:userId AND b.blockedUserId=:blockedUserId")
     Optional<BlockedUser> findByUserIdAndBlockedUserId(@Param("userId")Long userID, @Param("blockedUserId")Long blockedUserId);
 }

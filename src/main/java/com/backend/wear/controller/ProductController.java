@@ -47,7 +47,6 @@ public class ProductController {
                                                         @RequestParam(name="userId") Long userId,
                                                           @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
-
         try {
             Page <ProductResponseInnerDto.ScreenDto> productsPage =
                     productService.findProductsByCategoryOnSale(categoryName, userId, pageNumber);
@@ -58,15 +57,34 @@ public class ProductController {
         }
     }
 
-    // 상품 상세 페이지 불러오기
     //검색어 입력 후 검색어별, 최신순(default)으로 조회하기
-    //  /products/search?searchName={searchName}
-    @GetMapping("/search")
-    public ResponseEntity<?> searchProducts(@RequestParam(name="searchName") String searchName) {
+    //  /products/search?searchName={searchName}&userId={userId}&pageNumber={pageNumber}
+//    @GetMapping("/search")
+//    public ResponseEntity<?> searchProducts(@RequestParam(name="searchName") String searchName,@RequestParam(name="userId") Long userId,
+//                                            @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
+//
+//        try {
+//            Page <ProductResponseInnerDto.ScreenDto> productsPage
+//                    = productService.searchProductByproductName(searchName, userId, pageNumber);
+//            return ResponseEntity.ok(productsPage);
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(e.getMessage());
+//        }
+//
+//    }
+
+    //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
+    //  /products/search/category?searchName={searchName}&userId={userId}&pageNumber={pageNumber}
+    @GetMapping("/search/category")
+    public ResponseEntity<?> searchProductsByCategory(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
+                                                      @RequestParam(name="userId") Long userId,
+                                                      @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
         try {
-            List<ProductResponseDto> responseDto = productService.searchProductByproductName(searchName);
-            return ResponseEntity.ok(responseDto);
+            Page <ProductResponseInnerDto.ScreenDto> productsPage
+                    = productService.searchProductByProductNameAndCategory(searchName, categoryName, userId, pageNumber);
+            return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
@@ -74,14 +92,17 @@ public class ProductController {
 
     }
 
-    //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
-    //   /products/search/category?searchName={searchName}?categoryName={categoryName}
-    @GetMapping("/search/category")
-    public ResponseEntity<?> searchProductsby(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName) {
+    // 검색어별, 카테고리별, 판매중인 상품 최신순(default)으로 조회하기
+    //   /products/search/category/sale?searchName={}&categoryName={}&userId=1{}&pageNumber={}
+    @GetMapping("/search/category/sale")
+    public ResponseEntity<?> searchProductsByCategoryOnSale(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
+                                                      @RequestParam(name="userId") Long userId,
+                                                      @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
         try {
-            List<ProductResponseDto> responseDto = productService.searchProductByproductNameAndCategory(searchName, categoryName);
-            return ResponseEntity.ok(responseDto);
+            Page <ProductResponseInnerDto.ScreenDto> productsPage
+                    = productService. searchProductByProductNameAndCategoryOnSale(searchName, categoryName, userId, pageNumber);
+            return ResponseEntity.ok(productsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());

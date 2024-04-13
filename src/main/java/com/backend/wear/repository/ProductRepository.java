@@ -20,34 +20,50 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 전체 상품 페이지 (숨김x)
     // 차단한 사용자 안 보이도록, 같은 대학 상품만 보이도록
     @Query("SELECT p FROM Product p WHERE p.isPrivate = false AND p.user.university.id =:userUniversityId " +
-            "AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList))")
-    Page<Product> findAllProductPage(@Param("userUniversityId")Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, Pageable pageable);
+            "AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findAllProductPage(@Param("userUniversityId")Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
     // 카테고리 이름과 일치하는 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName " +
-            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList))")
-    Page<Product> findByCategoryNamePage(@Param("categoryName") String categoryName,
-                                         @Param("blockedUserIdList") List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByCategoryNamePage(@Param("categoryName") String categoryName, @Param("userUniversityId") Long userUniversityId,
+                                         @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
     // 전체 판매 중인 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.isPrivate = false " +
-            "AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList))")
-    Page<Product> findByPostStatusPage(@Param("blockedUserIdList") List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.isPrivate = false AND p.user.university.id = :userUniversityId " +
+            "AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByPostStatusPage(@Param("userUniversityId") Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
     // 카테고리 이름과 일치하는 판매 중인 상품 페이지 (숨김x)
-    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' " +
-            "AND  p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList))")
-    Page<Product> findByCategoryNameAndPostStatusPage(@Param("categoryName") String categoryName,@Param("blockedUserIdList") List<Long> blockedUserIdList, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.category.categoryName = :categoryName AND p.postStatus='onSale' AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByCategoryNameAndPostStatusPage(@Param("categoryName") String categoryName,
+                                                      @Param("userUniversityId") Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
-    //검색어별 상품 조회
+    //검색어별 전체 상품 조회
     /*List<Product> findByProductNameContainingIgnoreCase(String searchName);*/
-    @Query("select p from Product p where p.productName LIKE %:searchName%")
-    List<Product> findByProductName(@Param("searchName") String searchName);
+    @Query("SELECT p FROM Product p WHERE p.productName LIKE %:searchName%  AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByProductName(@Param("searchName") String searchName, @Param("userUniversityId") Long userUniversityId,
+                                    @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
-    //검색어별 , 카테고리별 상품 조회
-    @Query("select p from Product p where p.productName LIKE %:searchName% AND p.category.categoryName = :categoryName")
-    List<Product> findByProductNameAndCategoryName(@Param("searchName") String searchName, @Param("categoryName") String categoryName);
+    //검색어, 카테고리별 상품 조회
+    @Query("SELECT p FROM Product p WHERE p.productName LIKE %:searchName% AND p.category.categoryName = :categoryName AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByProductNameAndCategoryName(@Param("searchName") String searchName, @Param("categoryName") String categoryName,
+                                                   @Param("userUniversityId") Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
+    // 검색어별 전체 판매중 상품 조회
+    @Query("SELECT p FROM Product p WHERE p.postStatus='onSale' AND p.productName LIKE %:searchName%  AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByProductNameOnSale(@Param("searchName") String searchName, @Param("userUniversityId") Long userUniversityId,
+                                    @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
+
+    //검색어, 카테고리별, 판매중 상품 조회
+    @Query("SELECT p FROM Product p WHERE  p.postStatus='onSale' AND  p.productName LIKE %:searchName% AND p.category.categoryName = :categoryName AND p.user.university.id = :userUniversityId " +
+            "AND p.isPrivate = false AND (:blockedUserIdList IS NULL OR p.user.id NOT IN (:blockedUserIdList)) AND (:userIdListBlocked IS NULL OR p.user.id NOT IN (:userIdListBlocked))")
+    Page<Product> findByProductNameAndCategoryNameOnSale(@Param("searchName") String searchName, @Param("categoryName") String categoryName,
+                                                   @Param("userUniversityId") Long userUniversityId, @Param("blockedUserIdList") List<Long> blockedUserIdList, @Param("userIdListBlocked") List<Long> userIdListBlocked, Pageable pageable);
 
     // 사용자 아이디로 상품 조회
     // 페이지네이션 적용
