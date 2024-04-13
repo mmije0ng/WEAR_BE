@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.blockeduser;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

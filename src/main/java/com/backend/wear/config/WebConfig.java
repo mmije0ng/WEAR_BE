@@ -25,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com",
                         "http://43.201.189.171:8080"
                         ) // 허용할 Origin 설정
+              //  .allowedOrigins("**")
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드 설정
                 .allowCredentials(true)

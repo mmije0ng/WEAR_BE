@@ -1,15 +1,14 @@
 
-package com.backend.wear.dto;
+package com.backend.wear.dto.product;
 
+import com.backend.wear.dto.user.UserResponseDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
-public class ProductResponseInnerDto{
+public class ProductResponseDto {
 
     // 상품 상세 dto
     @Getter
@@ -18,7 +17,7 @@ public class ProductResponseInnerDto{
     public static class DetailDto{
         private Long id;  //상품 아이디
 
-        private UserResponseInnerDto.SellerDto seller; //판매자
+        private UserResponseDto.SellerDto seller; //판매자
 
         private Integer price;
 

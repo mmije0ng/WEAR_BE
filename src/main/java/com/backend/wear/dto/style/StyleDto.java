@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.style;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,13 +7,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class LoginResponseDto {
+public class StyleDto {
 
-    private Long id; //pk
-    private String message;
+    //스타일 태그 이름만 dto로
+    private List<String> style;
 }

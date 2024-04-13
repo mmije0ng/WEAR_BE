@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.chat;
 
 
 import com.backend.wear.entity.ChatMessage;

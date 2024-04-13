@@ -1,20 +1,16 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.*;
+import com.backend.wear.dto.chat.ChatMessageSendDto;
+import com.backend.wear.dto.chat.ChatRoomDto;
+import com.backend.wear.dto.chat.ChatRoomProfileDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import com.backend.wear.entity.ChatRoom;
 import com.backend.wear.service.ChatService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

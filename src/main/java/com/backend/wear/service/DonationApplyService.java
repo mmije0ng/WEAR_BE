@@ -1,6 +1,6 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.DonationApplyRequestDto;
+import com.backend.wear.dto.donation.DonationApplyRequestDto;
 import com.backend.wear.entity.DonationApply;
 import com.backend.wear.entity.EnvironmentLevel;
 import com.backend.wear.entity.User;

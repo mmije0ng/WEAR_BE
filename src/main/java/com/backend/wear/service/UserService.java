@@ -1,6 +1,12 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.*;
+import com.backend.wear.dto.blockeduser.BlockedUserResponseDto;
+import com.backend.wear.dto.donation.DonationApplyResponseDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserRequestDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,7 +67,7 @@ public class UserService {
 
     // 마이페이지 사용자 정보
     @Transactional
-    public UserResponseInnerDto.MyPageDto getMyPageUserService(Long userId) throws Exception{
+    public UserResponseDto.MyPageDto getMyPageUserService(Long userId) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         System.out.println("유저"+user.getUserName());
@@ -70,7 +76,7 @@ public class UserService {
     }
 
     // 마이페이지 응답 dto 매핑
-    private UserResponseInnerDto.MyPageDto mapToMyPageDto(User user, Long userId) throws Exception{
+    private UserResponseDto.MyPageDto mapToMyPageDto(User user, Long userId) throws Exception{
         String universityName = getUniversityNameByUser(userId); //대학 이름
         List<String> style = getUserStyleList(userId); //스타일 리스트
         String level=getCurrentLevel(userId); //현재 레벨
@@ -83,7 +89,7 @@ public class UserService {
         // JSON 배열 파싱
         String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
 
-        return UserResponseInnerDto.MyPageDto.builder()
+        return UserResponseDto.MyPageDto.builder()
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
@@ -98,7 +104,7 @@ public class UserService {
 
     // 마이페이지 프로필
     @Transactional
-    public UserResponseInnerDto.ProfileDto getUserProfileService(Long userId) throws Exception{
+    public UserResponseDto.ProfileDto getUserProfileService(Long userId) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -106,13 +112,13 @@ public class UserService {
     }
 
     // 마이페이지 프로필 응답 dto 매핑
-    private UserResponseInnerDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
+    private UserResponseDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
         List<String> styleList = getUserStyleList(userId); //스타일 리스트
 
         // JSON 배열 파싱
         String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
 
-        return UserResponseInnerDto.ProfileDto.builder()
+        return UserResponseDto.ProfileDto.builder()
                 .nickName(user.getNickName())
                 .profileImage(profileImageArray)
                 .style(styleList)
@@ -147,7 +153,7 @@ public class UserService {
 
     // 유저 정보 조회
     @Transactional
-    public UserResponseInnerDto.InfoDto getUserInfoService(Long userId){
+    public UserResponseDto.InfoDto getUserInfoService(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -155,10 +161,10 @@ public class UserService {
     }
 
     // 사용자 정보 info 응답 dto
-    private UserResponseInnerDto.InfoDto mapToInfoDto(User user, Long userId){
+    private UserResponseDto.InfoDto mapToInfoDto(User user, Long userId){
         String universityName=getUniversityNameByUser(userId);
 
-        return UserResponseInnerDto.InfoDto.builder()
+        return UserResponseDto.InfoDto.builder()
                 .userName(user.getUserName())
                 .universityName(universityName)
                 .universityEmail(user.getUniversityEmail())
@@ -190,7 +196,7 @@ public class UserService {
 
     // 찜한 상품 불러오기
     @Transactional
-    public Page<ProductResponseInnerDto.ScreenDto> getMyWishPage(Long userId, Integer pageNumber) throws Exception{
+    public Page<ProductResponseDto.ScreenDto> getMyWishPage(Long userId, Integer pageNumber) throws Exception{
 
         // 찜 리스트
         Page <Wish> myWishPage = wishRepository.findByUserId(userId, pageRequest(pageNumber));
@@ -203,7 +209,7 @@ public class UserService {
     }
 
     // 찜한 상품 상품 dto 매핑
-    private ProductResponseInnerDto.ScreenDto mapToScreenDto(Long userId, Wish wish) {
+    private ProductResponseDto.ScreenDto mapToScreenDto(Long userId, Wish wish) {
 
         Product product = productRepository.findById(wish.getProduct().getId())
                 .orElseThrow(() -> new IllegalArgumentException("찜한 상품 찾기 실패"));
@@ -216,7 +222,7 @@ public class UserService {
                 = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
         // DTO 생성 및 반환
-        return ProductResponseInnerDto.ScreenDto.builder()
+        return ProductResponseDto.ScreenDto.builder()
                 .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())
@@ -230,7 +236,7 @@ public class UserService {
 
     // 판매 중, 완료 상품 불러오기
     @Transactional
-    public Page<ProductResponseInnerDto.MyPageScreenDto> getMyProductsPage(Long userId, String postStatus, Integer pageNumber) {
+    public Page<ProductResponseDto.MyPageScreenDto> getMyProductsPage(Long userId, String postStatus, Integer pageNumber) {
 
         // 사용자 아이디로 판매 상품 페이지네이션
         Page<Product> myProductsPage  = productRepository.findByUserIdAndPostStatus(userId, postStatus, pageRequest(pageNumber));
@@ -246,12 +252,12 @@ public class UserService {
     }
 
     // 판매 내역 상품 dto 매핑
-    private ProductResponseInnerDto.MyPageScreenDto mapToMyPageScreenDto(String postStatus, Product product) {
+    private ProductResponseDto.MyPageScreenDto mapToMyPageScreenDto(String postStatus, Product product) {
 
         // JSON 배열 파싱
         String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
-        return ProductResponseInnerDto.MyPageScreenDto.builder()
+        return ProductResponseDto.MyPageScreenDto.builder()
                 .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())
@@ -275,7 +281,7 @@ public class UserService {
 
     // 숨김 처리 상품 보기
     @Transactional
-    public Page<ProductResponseInnerDto.PrivateDto> getMyPrivateProductsPage(Long userId, Integer pageNumber) throws Exception {
+    public Page<ProductResponseDto.PrivateDto> getMyPrivateProductsPage(Long userId, Integer pageNumber) throws Exception {
         Page <Product> myPrivateProductsPage
                 = productRepository.findByUserIdAndIsPrivateTrue(userId, pageRequest(pageNumber));
 
@@ -286,11 +292,11 @@ public class UserService {
     }
 
     // 숨김 상품 dto 매핑
-    private ProductResponseInnerDto.PrivateDto mapToPrivateDto(Product product)  {
+    private ProductResponseDto.PrivateDto mapToPrivateDto(Product product)  {
 
         String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
-        return ProductResponseInnerDto.PrivateDto.builder()
+        return ProductResponseDto.PrivateDto.builder()
                 .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())

@@ -1,6 +1,9 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.*;
+import com.backend.wear.dto.login.LoginDto;
+import com.backend.wear.dto.login.LoginResponseDto;
+import com.backend.wear.dto.login.SignUpDto;
 import com.backend.wear.entity.EnvironmentLevel;
 import com.backend.wear.entity.Style;
 import com.backend.wear.entity.University;
@@ -8,19 +11,11 @@ import com.backend.wear.entity.User;
 import com.backend.wear.repository.StyleRepository;
 import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
-import com.univcert.api.UnivCert;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class LoginService {

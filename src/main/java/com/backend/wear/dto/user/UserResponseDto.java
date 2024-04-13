@@ -1,4 +1,4 @@
-package com.backend.wear.dto;
+package com.backend.wear.dto.user;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-public class UserResponseInnerDto {
+public class UserResponseDto {
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

@@ -1,6 +1,11 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.*;
+import com.backend.wear.dto.blockeduser.BlockedUserResponseDto;
+import com.backend.wear.dto.donation.DonationApplyResponseDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserRequestDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.service.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -10,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,7 +33,7 @@ public class UserController {
     // /api/users/{userId}
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId) throws Exception {
-        UserResponseInnerDto.MyPageDto myPageDto;
+        UserResponseDto.MyPageDto myPageDto;
 
         try{
             myPageDto=userService.getMyPageUserService(userId);
@@ -46,7 +49,7 @@ public class UserController {
     // /api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable(name="userId") Long userId) throws Exception{
-        UserResponseInnerDto.ProfileDto profileDto;
+        UserResponseDto.ProfileDto profileDto;
 
         try{
             profileDto =userService.getUserProfileService(userId);
@@ -79,7 +82,7 @@ public class UserController {
     // /api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
     public ResponseEntity<?> getUserInfo(@PathVariable(name="userId") Long userId){
-        UserResponseInnerDto.InfoDto userResponseDto;
+        UserResponseDto.InfoDto userResponseDto;
 
         try{
             userResponseDto=userService.getUserInfoService(userId);
@@ -124,7 +127,7 @@ public class UserController {
     public ResponseEntity<?> getWishList(@PathVariable(name="userId") Long userId,
                                          @RequestParam(name="pageNumber") Integer pageNumber) throws Exception{
         try {
-            Page <ProductResponseInnerDto.ScreenDto> myWishPage = userService.getMyWishPage(userId, pageNumber);
+            Page <ProductResponseDto.ScreenDto> myWishPage = userService.getMyWishPage(userId, pageNumber);
             return ResponseEntity.ok(myWishPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -138,7 +141,7 @@ public class UserController {
     public ResponseEntity<?> getMyProductsOnSale(@PathVariable(name="userId") Long userId,
                                                  @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
         try{
-            Page<ProductResponseInnerDto.MyPageScreenDto> myProductsPage =
+            Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"onSale", pageNumber);
             return ResponseEntity.ok(myProductsPage);
         } catch (IllegalArgumentException e) {
@@ -167,7 +170,7 @@ public class UserController {
     public ResponseEntity<?> getMyProductsSoldOut(@PathVariable(name="userId") Long userId,
                                                   @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
         try{
-            Page<ProductResponseInnerDto.MyPageScreenDto> myProductsPage =
+            Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"soldOut", pageNumber);
             return ResponseEntity.ok(myProductsPage);
         } catch (IllegalArgumentException e) {
@@ -183,7 +186,7 @@ public class UserController {
                                                   @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
 
         try{
-            Page<ProductResponseInnerDto.PrivateDto> myPrivateProductsPage
+            Page<ProductResponseDto.PrivateDto> myPrivateProductsPage
                     = userService.getMyPrivateProductsPage(userId, pageNumber);
             return ResponseEntity.ok(myPrivateProductsPage);
         } catch (IllegalArgumentException e) {

@@ -1,7 +1,10 @@
 package com.backend.wear.service;
 
-import com.backend.wear.config.WebSocketConfig;
 import com.backend.wear.dto.*;
+import com.backend.wear.dto.product.ProductPostRequestDto;
+import com.backend.wear.dto.product.ProductRequestDto;
+import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 
@@ -74,7 +77,7 @@ public class ProductService {
 
     // 카테고리별, 최신순 페이지네이션
     @Transactional
-    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber)
+    public Page<ProductResponseDto.ScreenDto> findProductsByCategory(String categoryName, Long userId, Integer pageNumber)
             throws Exception{
 
         User user = userRepository.findById(userId)
@@ -108,7 +111,7 @@ public class ProductService {
 
     // 카테고리별, 판매중, 최신순 페이지네이션
     @Transactional
-    public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber )
+    public Page<ProductResponseDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber )
             throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
@@ -164,8 +167,8 @@ public class ProductService {
     // 차단 유저 상품 보이지 않도록
     // 같은 대학 상품만 보이도록 페이지네이션 적용
     @Transactional
-    public Page <ProductResponseInnerDto.ScreenDto> searchProductByProductNameAndCategory(String searchName, String categoryName,
-                                                                                          Long userId, Integer pageNumber) throws Exception{
+    public Page <ProductResponseDto.ScreenDto> searchProductByProductNameAndCategory(String searchName, String categoryName,
+                                                                                     Long userId, Integer pageNumber) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
@@ -194,8 +197,8 @@ public class ProductService {
     // 상품 검색
     // 카테고리별, 판매 중인 상품만 보기
     @Transactional
-    public Page <ProductResponseInnerDto.ScreenDto> searchProductByProductNameAndCategoryOnSale(String searchName, String categoryName,
-                                                                                          Long userId, Integer pageNumber) throws Exception{
+    public Page <ProductResponseDto.ScreenDto> searchProductByProductNameAndCategoryOnSale(String searchName, String categoryName,
+                                                                                           Long userId, Integer pageNumber) throws Exception{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
@@ -219,7 +222,7 @@ public class ProductService {
     }
 
     // 카테고리 검색 상품 dto 매핑
-    private ProductResponseInnerDto.ScreenDto mapToScreenDto(Product product, Long userId){
+    private ProductResponseDto.ScreenDto mapToScreenDto(Product product, Long userId){
 
         // JSON 배열 파싱
         String[] productImageArray = convertImageJsonToArray(product.getProductImage());
@@ -228,7 +231,7 @@ public class ProductService {
         boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
         // DTO 생성
-        return ProductResponseInnerDto.ScreenDto.builder()
+        return ProductResponseDto.ScreenDto.builder()
                 .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())
@@ -248,7 +251,7 @@ public class ProductService {
 
     // 상품 상세 조회
     @Transactional
-    public ProductResponseInnerDto.DetailDto getProductPost(Long userId, Long productId) throws Exception {
+    public ProductResponseDto.DetailDto getProductPost(Long userId, Long productId) throws Exception {
         Product product  = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "상품을 찾지 못하였습니다."));
@@ -264,7 +267,7 @@ public class ProductService {
         // JSON 배열 파싱
         String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
-        UserResponseInnerDto.SellerDto seller =  UserResponseInnerDto.SellerDto.builder()
+        UserResponseDto.SellerDto seller =  UserResponseDto.SellerDto.builder()
                 .id(user.getId())
                 .nickName(user.getNickName())
                 .profileImage(profileImageArray)
@@ -274,7 +277,7 @@ public class ProductService {
         // 사용자의 상품 찜 여부 확인
         boolean isSelected = wishRepository.findByUserIdAndProductId(userId, product.getId()).isPresent();
 
-        return ProductResponseInnerDto.DetailDto.builder()
+        return ProductResponseDto.DetailDto.builder()
                 .id(product.getId())
                 .seller(seller)
                 .price(product.getPrice())
@@ -323,7 +326,7 @@ public class ProductService {
 
     // 상품 수정을 위한 정보
     @Transactional
-    public ProductResponseInnerDto.EditDto getProductPostToUpdate(Long userId, Long productId){
+    public ProductResponseDto.EditDto getProductPostToUpdate(Long userId, Long productId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
@@ -333,7 +336,7 @@ public class ProductService {
         // JSON 배열 파싱
         String[] productImageArray = convertImageJsonToArray(product.getProductImage());
 
-        return ProductResponseInnerDto.EditDto.builder()
+        return ProductResponseDto.EditDto.builder()
                 .id(product.getId())
                 .productImage(productImageArray )
                 .productName(product.getProductName())
@@ -383,7 +386,7 @@ public class ProductService {
 
     // 상품 판매 상태 변경 (판매 완료 또는 판매 중)
     @Transactional
-    public void updateProductPostStatus( ProductRequestDto requestDto ,Long userId ) throws Exception {
+    public void updateProductPostStatus(ProductRequestDto requestDto , Long userId ) throws Exception {
 
         System.out.println(requestDto);
         User user = userRepository.findById(userId)
