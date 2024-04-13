@@ -81,17 +81,23 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
         Page<Product> productsPage;
-        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+
+        // 대학 아이디 pk
         Long userUniversityId = user.getUniversity().getId();
+
+        // 내간 차단한 유저 아이디 리스트
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+
+        // 나를 차단한 유저 아이디 리스트
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
 //        for(int i=0;i<blockedUserIdList.size();i++)
 //            log.info("차단 유저 아이디: "+blockedUserIdList.get(i));
 
-        if(categoryName.equals("전체")){
-            productsPage = productRepository.findAllProductPage(userUniversityId, blockedUserIdList,pageRequest(pageNumber));
-        }
-        else{
-            productsPage = productRepository.findByCategoryNamePage(categoryName,blockedUserIdList, pageRequest(pageNumber));
-        }
+        if(categoryName.equals("전체"))
+            productsPage = productRepository.findAllProductPage(userUniversityId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
+
+        else
+            productsPage = productRepository.findByCategoryNamePage(categoryName,userUniversityId,blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
 
         // 카테고리별 상품이 없는 경우
         if(productsPage.isEmpty())
@@ -104,19 +110,24 @@ public class ProductService {
     @Transactional
     public Page<ProductResponseInnerDto.ScreenDto> findProductsByCategoryOnSale(String categoryName, Long userId, Integer pageNumber )
             throws Exception{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
         Page<Product> productsPage;
+        Long userUniversityId = user.getUniversity().getId();
         List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
 
         // 전체, 판매중, 최신순
         if(categoryName.equals("전체")){
             productsPage=productRepository
-                    .findByPostStatusPage(blockedUserIdList, pageRequest(pageNumber));
+                    .findByPostStatusPage(userUniversityId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
         }
 
         //카테고리별 판매중 최신순
         else{
             productsPage =productRepository
-                    .findByCategoryNameAndPostStatusPage(categoryName,blockedUserIdList,pageRequest(pageNumber));
+                    .findByCategoryNameAndPostStatusPage(categoryName,userUniversityId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
         }
 
         // 카테고리별 상품이 없는 경우
@@ -124,6 +135,87 @@ public class ProductService {
             throw new IllegalArgumentException("카테고리와 일치하는 판매중인 상품이 없습니다.");
 
         return productsPage.map(product -> mapToScreenDto(product, userId));
+    }
+
+    // 상품 검색
+    // 차단 유저 상품 보이지 않도록
+    // 같은 대학 상품만 보이도록 페이지네이션 적용
+//    @Transactional
+//    public Page <ProductResponseInnerDto.ScreenDto> searchProductByproductName(String searchName, Long userId, Integer pageNumber) throws Exception{
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+//
+//        // 대학 아이디 pk
+//        Long userUniversityId = user.getUniversity().getId();
+//        // 차단 유저 리스트
+//        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+//
+//        Page <Product> productsPage
+//                = productRepository.findByProductName(searchName, userUniversityId, blockedUserIdList, pageRequest(pageNumber));
+//
+//        // 검색어와 일치하는 상품이 없는 경우
+//        if(productsPage.isEmpty())
+//            throw new IllegalArgumentException("검색어와 일치하는 상품이 없습니다.");
+//
+//        return productsPage.map(product -> mapToScreenDto(product, userId));
+//    }
+
+    //상품 검색하기(productName 검색, 카테고리 검색)
+    // 차단 유저 상품 보이지 않도록
+    // 같은 대학 상품만 보이도록 페이지네이션 적용
+    @Transactional
+    public Page <ProductResponseInnerDto.ScreenDto> searchProductByProductNameAndCategory(String searchName, String categoryName,
+                                                                                          Long userId, Integer pageNumber) throws Exception{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        Long userUniversityId = user.getUniversity().getId();
+        // 내간 차단한 유저 아이디 리스트
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        // 나를 차단한 유저 아이디 리스트
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
+
+        Page <Product>  filteredProductsPage;
+
+        if(categoryName.equals("전체")) // 검색어와 일치하는 전체 상품 조회
+            filteredProductsPage = productRepository.findByProductName(searchName, userUniversityId,
+                    blockedUserIdList, userIdListBlocked,pageRequest(pageNumber));
+        else // 검색어, 카테고리 일치
+            filteredProductsPage  = productRepository.findByProductNameAndCategoryName(searchName, categoryName, userUniversityId,
+                    blockedUserIdList,userIdListBlocked,pageRequest(pageNumber));
+
+        // 검색어와 일치하는 상품이 없는 경우
+        if(filteredProductsPage.isEmpty())
+            throw new IllegalArgumentException("검색어, 카테고리와 일치하는 상품이 없습니다.");
+
+        return filteredProductsPage.map(product -> mapToScreenDto(product, userId));
+    }
+
+    // 상품 검색
+    // 카테고리별, 판매 중인 상품만 보기
+    @Transactional
+    public Page <ProductResponseInnerDto.ScreenDto> searchProductByProductNameAndCategoryOnSale(String searchName, String categoryName,
+                                                                                          Long userId, Integer pageNumber) throws Exception{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        Long userUniversityId = user.getUniversity().getId();
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
+
+        Page <Product>  filteredProductsPage;
+
+        if(categoryName.equals("전체")) // 검색어와 일치하는 전체, 판매 중 상품 조회
+            filteredProductsPage = productRepository.findByProductNameOnSale(searchName, userUniversityId,
+                    blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
+        else // 검색어, 카테고리와 일치하는 판매 중 상품 조회
+            filteredProductsPage  = productRepository.findByProductNameAndCategoryNameOnSale(searchName,categoryName,userUniversityId,
+                    blockedUserIdList,userIdListBlocked,pageRequest((pageNumber)));
+        // 검색어와 일치하는 상품이 없는 경우
+        if(filteredProductsPage.isEmpty())
+            throw new IllegalArgumentException("검색어, 카테고리와 일치하는 판매중인 상품이 없습니다.");
+
+        return filteredProductsPage.map(product -> mapToScreenDto(product, userId));
     }
 
     // 카테고리 검색 상품 dto 매핑
@@ -197,30 +289,6 @@ public class ProductService {
                 .isSelected(isSelected)
                 .isPrivate(product.isPrivate())
                 .build();
-    }
-
-    @Transactional
-    public List<ProductResponseDto> searchProductByproductName(String searchName){
-        List<Product> products  = productRepository.findByProductName(searchName);
-
-        List<ProductResponseDto> responseDto = products.stream()
-                .map(ProductResponseDto::new)
-                .toList();
-
-        return responseDto;
-    }
-
-    //상품 검색하기(productName 검색, 카테고리 검색)
-    @Transactional
-    public List<ProductResponseDto> searchProductByproductNameAndCategory(String searchName, String categoryName){
-
-        List<Product> filteredProducts  = productRepository.findByProductNameAndCategoryName(searchName, categoryName);
-
-        List<ProductResponseDto> responseDto = filteredProducts.stream()
-                .map(ProductResponseDto::new)
-                .toList();
-
-        return responseDto;
     }
 
     //상품 등록하기
