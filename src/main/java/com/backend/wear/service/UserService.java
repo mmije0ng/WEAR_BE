@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Service
 public class UserService {
 
@@ -306,77 +304,74 @@ public class UserService {
 
     // 사용자 기부 내역
     @Transactional
-    public List<DonationApplyResponseDto> myDonationApplyList(Long userId){
-        List<DonationApplyResponseDto> donationApplyList
-                =mapToDonationApplyResponseDto(userId, false);
+    public Page <DonationApplyResponseDto> myDonationApplysPage(Long userId, Integer pageNumber){
+        Page <DonationApplyResponseDto> myDonationApplysPage
+                =mapToDonationApplyResponseDto(userId, pageNumber, false);
 
-        if(donationApplyList.isEmpty())
-            throw new IllegalArgumentException("현재 기부한 상품이 없습니다. 기부를 통해 환경을 도와주세요.");
+        if(myDonationApplysPage.isEmpty())
+            throw new IllegalArgumentException("현재 기부한 상품이 없습니다.");
         else
-            return donationApplyList;
+            return myDonationApplysPage;
     }
 
     // 사용자 기부 완료 내역
     @Transactional
-    public List<DonationApplyResponseDto> myDonationApplyCompleteList(Long userId){
-        List<DonationApplyResponseDto> responseDtoList
-                =  mapToDonationApplyResponseDto(userId, true);
-        if(responseDtoList.isEmpty())
+    public Page <DonationApplyResponseDto> myDonationApplysCompletePage(Long userId, Integer pageNumber){
+        Page <DonationApplyResponseDto> myDonationApplysCompletePage
+                =  mapToDonationApplyResponseDto(userId, pageNumber, true);
+        if(myDonationApplysCompletePage.isEmpty())
             throw new IllegalArgumentException("현재 기부 진행이 완료된 내역이 없습니다.");
 
         else
-            return responseDtoList;
+            return myDonationApplysCompletePage;
+    }
+
+    // 기부 완료 여부에 따른 기부 내역 조회 페이지네이션
+    private Page<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId,Integer pageNumber, boolean donationComplete){
+        // 기부 내역 조회
+        Page <DonationApply> donationApplyPage = donationComplete ?
+                donationApplyRepository.findByUserIdAndDonationComplete(userId, pageRequest(pageNumber)) :
+                donationApplyRepository.findByUserId(userId, pageRequest(pageNumber));
+
+        return donationApplyPage.map(this::mapToDonationApplyResponseDto);
     }
 
     // 내 기부 내역 응답 dto
-    private List<DonationApplyResponseDto> mapToDonationApplyResponseDto(Long userId, boolean donationComplete){
-        // 기부 내역 조회
-        List<DonationApply> list = donationComplete ?
-                donationApplyRepository.findByUserIdAndDonationComplete(userId) :
-                donationApplyRepository.findByUserId(userId);
-
-        // dto 리스트로 변환
-        return list.stream()
-                .map(donationApply -> DonationApplyResponseDto.builder()
-                        .id(donationApply.getId())
-                        .date(donationApply.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
-                        .clothesCount(donationApply.getClothesCount())
-                        .fashionCount(donationApply.getFashionCount())
-                        .isDonationComplete(donationApply.isDonationComplete())
-                        .build())
-                .collect(Collectors.toList());
+    private DonationApplyResponseDto mapToDonationApplyResponseDto(DonationApply donationApply){
+        return DonationApplyResponseDto.builder()
+                .id(donationApply.getId())
+                .date(donationApply.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                .clothesCount(donationApply.getClothesCount())
+                .fashionCount(donationApply.getFashionCount())
+                .isDonationComplete(donationApply.isDonationComplete())
+                .build();
     }
+
 
     // 차단한 사용자 리스트 불러오기
     @Transactional
-    public List<BlockedUserResponseDto> getBlockedUsersList(Long userId){
+    public Page <BlockedUserResponseDto> getBlockedUsersPage(Long userId, Integer pageNumber){
         // 차단한 사용자 아이디 불러오기
-        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        List<Long> blockedUsersIdList = blockedUserRepository.findByUserId(userId);
 
-        if(blockedUserIdList.isEmpty())
+        if(blockedUsersIdList.isEmpty())
             throw new IllegalArgumentException("차단한 사용자가 없습니다.");
 
-        List<User> blockedUserList = userRepository.findByUserId(blockedUserIdList);
+        Page <User> blockedUsersPage = userRepository.findByUserId(blockedUsersIdList, pageRequest(pageNumber));
 
-        List<BlockedUserResponseDto> dtoList = blockedUserList.stream()
-                .flatMap(user -> {
-                    try {
-
-                        String[] array = objectMapper.readValue(user.getProfileImage(), String[].class);
-                        // 예외가 발생하지 않으면 해당 DTO를 반환
-                        return Stream.of(BlockedUserResponseDto.builder()
-                                .blockedUserId(user.getId())
-                                .blockedUserNickName(user.getNickName())
-                                .blockedUserProfileImage(array)
-                                .blockedUserLevel(user.getLevel().getLabel())
-                                .build());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
-        return dtoList;
+        return blockedUsersPage.map(this::mapToBlockedUserResponseDto);
     }
+
+    private BlockedUserResponseDto mapToBlockedUserResponseDto(User user){
+        String[] array = convertImageJsonToArray(user.getProfileImage());
+        return BlockedUserResponseDto.builder()
+                .blockedUserId(user.getId())
+                .blockedUserNickName(user.getNickName())
+                .blockedUserProfileImage(array)
+                .blockedUserLevel(user.getLevel().getLabel())
+                .build();
+    }
+
 
     // 차단 해제
     @Transactional

@@ -193,13 +193,14 @@ public class UserController {
     }
 
     // 내 기부 내역 불러오기
-    // /api/users/myDonations/{userId}
+    // /api/users/myDonations/{userId}?pageNumber={pageNumber}
     @GetMapping ("/myDonations/{userId}")
-    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId) throws Exception{
-        try {;
-            List <DonationApplyResponseDto> responseDtoList
-                    =userService.myDonationApplyList(userId);
-            return ResponseEntity.ok().body(responseDtoList);
+    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber)
+            throws Exception{
+        try {
+            Page <DonationApplyResponseDto> myDonationApplyPage
+                    =userService.myDonationApplysPage(userId, pageNumber);
+            return ResponseEntity.ok().body(myDonationApplyPage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -208,13 +209,14 @@ public class UserController {
     }
 
     // 내 기부 내역 중 기부 완료 된 상품만 불러오기
-    // /api/users/complete/{userId}
+    // /api/users/complete/{userId}?pageNumber={pageNumber}
     @GetMapping ("/myDonations/complete/{userId}")
-    public ResponseEntity<?> getMyDonationApplyComplete(@PathVariable(name="userId") Long userId) throws Exception{
+    public ResponseEntity<?> getMyDonationApplyComplete(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber)
+            throws Exception{
         try {;
-            List <DonationApplyResponseDto> responseDtoList
-                    =userService.myDonationApplyCompleteList(userId);
-            return ResponseEntity.ok().body(responseDtoList);
+            Page <DonationApplyResponseDto>  myDonationApplyCompletePage
+                    =userService.myDonationApplysCompletePage(userId, pageNumber);
+            return ResponseEntity.ok().body(myDonationApplyCompletePage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -223,13 +225,13 @@ public class UserController {
     }
 
     // 차단한 사용자 리스트 불러오기
-    // /api/users/blockedUsers/{userId}
+    // /api/users/blockedUsers/{userId}?pageNumber={pageNumber}
     @GetMapping("/blockedUsers/{userId}")
-    public ResponseEntity<?> getBlockedUsersList(@PathVariable(name="userId") Long userId)
+    public ResponseEntity<?> getBlockedUsersList(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber)
             throws Exception{
-        try {;
-            List<BlockedUserResponseDto> blockedUserList = userService.getBlockedUsersList(userId);
-            return ResponseEntity.ok().body(blockedUserList);
+        try {
+            Page<BlockedUserResponseDto> blockedUserPage = userService.getBlockedUsersPage(userId, pageNumber);
+            return ResponseEntity.ok().body(blockedUserPage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -241,16 +243,14 @@ public class UserController {
     // /api/users/blockedUsers/unBlock/{userId}/{blockedUserId}
     @DeleteMapping("/blockedUsers/unBlock/{userId}/{blockedUserId}")
     public ResponseEntity<?> deleteBlockedUser(@PathVariable(name="userId") Long userId,
-                                               @PathVariable(name="blockedUserId")Long blockedUserId)
-            throws Exception{
+                                               @PathVariable(name="blockedUserId")Long blockedUserId) throws Exception{
         try {
             userService.deleteBlockedUser(userId,blockedUserId);
+            return ResponseEntity.ok().body("차단이 해제되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-
-        return ResponseEntity.ok().body("차단이 해제되었습니다.");
     }
 
     // 구매내역
