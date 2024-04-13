@@ -441,16 +441,13 @@ public class UserService {
 
     // 다음 레벨
     private String getNextLevel(String currentLevel){
-        if (currentLevel.equals("씨앗"))
-            return "새싹";
-        else if(currentLevel.equals("새싹"))
-            return "목화";
-        else if(currentLevel.equals("목화"))
-            return "꽃";
-        else if(currentLevel.equals("꽃"))
-            return "옷";
-        else
-            return "레벨 달성 완료";
+        return switch (currentLevel) {
+            case "씨앗" -> "새싹";
+            case "새싹" -> "목화";
+            case "목화" -> "꽃";
+            case "꽃" -> "옷";
+            default -> "레벨 달성 완료";
+        };
     }
 
     //현재 포인트
