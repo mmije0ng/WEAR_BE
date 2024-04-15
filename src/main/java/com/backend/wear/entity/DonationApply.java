@@ -46,15 +46,15 @@ public class DonationApply extends BaseEntity {
     private String donationItem;
 
     //의류 수량
-    @Column(name = "clothes_count")
+    @Column(name = "clothes_count", columnDefinition = "integer default 0")
     private Integer clothesCount;
 
     //잡화 수량
-    @Column(name="fashion_count")
+    @Column(name="fashion_count", columnDefinition = "integer default 0")
     private Integer fashionCount;
 
     //박스 수량
-    @Column(name="box_count")
+    @Column(name="box_count", columnDefinition = "integer default 0")
     private Integer boxCount;
 
     //기부 상태, 완료/미완료

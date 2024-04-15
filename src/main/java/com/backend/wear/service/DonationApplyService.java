@@ -60,7 +60,7 @@ public class DonationApplyService {
     private void checkUserPointLevel(User user, Integer point){
         if(point%100!=0) return;
 
-        switch(point/100){
+        switch(point){
             case 100:
                 user.setLevel( EnvironmentLevel.SAPLING);
                 break;
