@@ -1,6 +1,7 @@
 package com.backend.wear.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 // CreatedAt 포맷 클래스 (몇분전 등)
@@ -37,5 +38,16 @@ public class ConvertTime {
 
         diffTime=diffTime/MONTH;
         return diffTime+"년 전";
+    }
+
+    public static String convertChatLocaldatetimeToTime(LocalDateTime createdAt){
+        // 데이터베이스에서 조회한 createdAt 값
+        createdAt = LocalDateTime.parse("2024-04-20 12:42:32", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        // 출력 형식 설정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("a hh:mm");
+
+        // 변환
+        return createdAt.format(formatter);
     }
 }

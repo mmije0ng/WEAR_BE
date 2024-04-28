@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class UserResponseDto {
     @Getter
@@ -51,4 +53,33 @@ public class UserResponseDto {
         private String[] profileImage;
         private String level;
     }
+
+    // 채팅 판매자 정보
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class SellerInfo{
+        private Long sellerId;
+        private String sellerNickName;
+        private String[] sellerProfileImage;
+        private String sellerLevel;
+
+        // 메시지, 시간
+        private Map<String, String> sellerMessageMap;
+    }
+
+    // 채팅 구매자 정보
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class CustomerInfo{
+        private Long customerId;
+        private String customerNickName;
+        private String[] customerProfileImage;
+        private String customerLevel;
+
+        // 메시지, 시간
+        private Map<String, String> customerMessageMap;
+    }
+
 }

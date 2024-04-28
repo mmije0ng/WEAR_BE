@@ -140,29 +140,6 @@ public class ProductService {
         return productsPage.map(product -> mapToScreenDto(product, userId));
     }
 
-    // 상품 검색
-    // 차단 유저 상품 보이지 않도록
-    // 같은 대학 상품만 보이도록 페이지네이션 적용
-//    @Transactional
-//    public Page <ProductResponseInnerDto.ScreenDto> searchProductByproductName(String searchName, Long userId, Integer pageNumber) throws Exception{
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
-//
-//        // 대학 아이디 pk
-//        Long userUniversityId = user.getUniversity().getId();
-//        // 차단 유저 리스트
-//        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
-//
-//        Page <Product> productsPage
-//                = productRepository.findByProductName(searchName, userUniversityId, blockedUserIdList, pageRequest(pageNumber));
-//
-//        // 검색어와 일치하는 상품이 없는 경우
-//        if(productsPage.isEmpty())
-//            throw new IllegalArgumentException("검색어와 일치하는 상품이 없습니다.");
-//
-//        return productsPage.map(product -> mapToScreenDto(product, userId));
-//    }
-
     //상품 검색하기(productName 검색, 카테고리 검색)
     // 차단 유저 상품 보이지 않도록
     // 같은 대학 상품만 보이도록 페이지네이션 적용

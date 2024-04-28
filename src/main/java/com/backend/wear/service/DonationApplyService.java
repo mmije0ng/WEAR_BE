@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @Service
 public class DonationApplyService {
 
@@ -57,7 +60,7 @@ public class DonationApplyService {
         log.info("기부 완료후 레벨: "+applyUser.getLevel().getLabel());
     }
 
-    private void checkUserPointLevel(User user, Integer point){
+    void checkUserPointLevel(User user, Integer point){
         if(point%100!=0) return;
 
         switch(point){
@@ -74,6 +77,7 @@ public class DonationApplyService {
                 user.setLevel(EnvironmentLevel.CLOTHES);
                 break;
         }
+
     }
 
 }

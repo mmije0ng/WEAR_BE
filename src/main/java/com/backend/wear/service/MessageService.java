@@ -1,9 +1,7 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.chat.ChatMessageSendDto;
 import com.backend.wear.repository.ChatMessageRepository;
 import com.backend.wear.repository.ChatRoomRepository;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,8 @@ public class MessageService {
         this.chatRoomRepository = chatRoomRepository;
     }
 
-    // 메시지 저장
-    @Transactional
-    public void saveMessage(ChatMessageSendDto dto) {
-
-    }
+//    @Transactional
+//    public void saveMessage() {
+//
+//    }
 }

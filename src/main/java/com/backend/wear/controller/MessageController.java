@@ -1,6 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.chat.ChatMessageSendDto;
+import com.backend.wear.dto.chat.ChatMessageResponseDto;
 import com.backend.wear.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,16 +21,20 @@ public class MessageController {
     private final MessageService messageService;
     private static Logger log = LoggerFactory.getLogger(MessageController.class);
 
-    //메시지 보내기
+    // 메시지 보내기
     // pub/api/chat/message
     @MessageMapping("/api/chat/message")
-    public void sendMessage (ChatMessageSendDto dto, SimpMessageHeaderAccessor accessor) {
+    public void sendMessage (ChatMessageResponseDto dto, SimpMessageHeaderAccessor accessor) {
 
         //sub/api/chat/room/{roomId}
 
-        // 메시지 저장 로지
+        log.info("채팅방 아이디: "+dto.getChatRoomId());
+        log.info("보낸사람 아이디: "+dto.getSenderId());
+        log.info("메시지 내용: "+dto.getContent());
 
+        // 메시지 저장 로직
 
+        // 구독자들에게 메시지 전달
         sendingOperations.convertAndSend("/sub/api/chat/room/"+dto.getChatRoomId(), dto);
     }
 }
