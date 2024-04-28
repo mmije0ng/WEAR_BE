@@ -1,12 +1,10 @@
 package com.backend.wear.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.sql.Timestamp;
@@ -16,7 +14,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true)
 @DynamicInsert
+@DynamicUpdate
 @Entity
 @Table(name = "chat_message")
 public class ChatMessage extends BaseEntity {
@@ -26,28 +27,18 @@ public class ChatMessage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    //채팅방 ID
-//    private String roomId;
-
-//    @OneToOne
-//    @JoinColumn(name="sender_id")
-//    private User sender;
-//
-//    //채팅 방
+    // 채팅 방 ID
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
-    //내용
-    private String message;
+    // 내용(메시지)
+    private String content;
 
-    //유저 pk
-    private Long userId;
+    // 보낸사람 pk
+    private Long senderId;
 
-    private String userType; // SELLER, CUSTOMER
-
-    //생성시간
-    private String timeStamp;
-
-    private boolean isMine;
+    // 보낸사람 타입
+    // seller, customer
+    private String userType;
 }

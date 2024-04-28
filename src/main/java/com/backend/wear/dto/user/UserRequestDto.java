@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserRequestDto {
     private Long id; //pk
     private String userName; //사용자 이름
