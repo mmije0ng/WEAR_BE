@@ -7,12 +7,12 @@ import lombok.*;
 
 import java.util.List;
 
+//채팅방 dto
 public class ChatRoomResponseDto {
-    //채팅방 dto
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    // 채팅방 생성 여부 dto
+    // 채팅방 정보 dto
     public static class DetailDto{
         private Long chatRoomId; //pk
 
@@ -40,15 +40,16 @@ public class ChatRoomResponseDto {
         private String userType;
     }
 
+    // 채팅방 생성 여부 dto
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    // 채팅방 생성 여부 dto
     public static class CreatedDto{
         Long chatRoomId;
         Boolean isCreated;
     }
 
+    // 나의 채팅 내역 dto
     @Getter
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

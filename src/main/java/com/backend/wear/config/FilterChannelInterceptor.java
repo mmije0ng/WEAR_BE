@@ -1,13 +1,10 @@
 package com.backend.wear.config;
 
-import com.backend.wear.dto.chat.ChatMessageDtoTemp;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
@@ -31,22 +28,8 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         // 메시지의 본문(body) 추출
         Object payload = message.getPayload();
         System.out.println("Message Payload: " + payload.getClass());;
-   //     System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
+        System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
-
-//        // 메시지의 페이로드를 ChatMessageDto 객체로 변환
-//        ChatMessageDtoTemp dto = null;
-//        try {
-//            dto = objectMapper.readValue(new String((byte[]) message.getPayload()), ChatMessageDtoTemp.class);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        System.out.println(dto);
-
-
-
-        //throw new MessagingException("no permission! ");
         return message;
     }
 
