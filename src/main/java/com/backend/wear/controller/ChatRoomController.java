@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173",
-        "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com","http://localhost:8080"})
 public class ChatRoomController {
     private final ChatService chatService;
     private static Logger log = LoggerFactory.getLogger(ChatRoomController.class);
@@ -25,7 +23,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 생성
-    // api/chat/room/create?productId={productId}&userId={userId}
+    // /api/chat/room/create?productId={productId}&userId={userId}
     @PostMapping("/room/create") //상품 아이디, 클릭한 유저 아이디
     public ResponseEntity<?> createRoom(@RequestParam(name="productId") Long productId, @RequestParam(name="userId") Long userId) throws Exception{
 
@@ -40,7 +38,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 입장
-    // api/chat/room/enter?chatRoomId={chatRoomId}&userId={userId}
+    // /api/chat/room/enter?chatRoomId={chatRoomId}&userId={userId}
     @GetMapping("/room/enter")
     public ResponseEntity<?> enterRoom(@RequestParam(name = "chatRoomId") Long chatRoomId, @RequestParam(name = "userId") Long userId) throws Exception
     {
@@ -59,7 +57,7 @@ public class ChatRoomController {
 
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")
-    // api/chat/rooms?userId={userId}&pageNumber={pageNumber}
+    // /api/chat/rooms?userId={userId}&pageNumber={pageNumber}
     public ResponseEntity<?> roomList(@RequestParam(name = "userId") Long userId,
                                       @RequestParam(name = "pageNumber") Integer pageNumber ) throws Exception {
 

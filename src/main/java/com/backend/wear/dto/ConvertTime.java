@@ -40,10 +40,7 @@ public class ConvertTime {
         return diffTime+"년 전";
     }
 
-    public static String convertChatLocaldatetimeToTime(LocalDateTime createdAt){
-        // 데이터베이스에서 조회한 createdAt 값
-        createdAt = LocalDateTime.parse("2024-04-20 12:42:32", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
+    public static String convertChatLocalDatetimeToTime(LocalDateTime createdAt){
         // 출력 형식 설정
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("a hh:mm");
 
