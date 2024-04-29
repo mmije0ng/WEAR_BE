@@ -1,9 +1,8 @@
 package com.backend.wear.service;
 
 import com.backend.wear.dto.ConvertTime;
-import com.backend.wear.dto.chat.ChatMessageResponseDto;
+import com.backend.wear.dto.chat.ChatMessageDto;
 import com.backend.wear.dto.chat.ChatRoomResponseDto;
-import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.entity.ChatMessage;
 import com.backend.wear.entity.ChatRoom;
 import com.backend.wear.entity.Product;
@@ -15,7 +14,6 @@ import com.backend.wear.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,20 +134,20 @@ public class ChatService {
         List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomId(chatRoomId);
 
         // 판매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageResponseDto.MessageDto> sellerMessageList = chatMessage.stream()
-                .filter(c -> c.getUserType().equals("customer"))
-                .map(c -> ChatMessageResponseDto.MessageDto.builder()
+        List<ChatMessageDto.MessageInfoDto> sellerMessageList = chatMessage.stream()
+                .filter(c -> c.getUserType().equals("seller"))
+                .map(c -> ChatMessageDto.MessageInfoDto.builder()
                         .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocaldatetimeToTime(c.getCreatedAt()))
+                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
                         .build())
                 .toList();
 
         // 구매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageResponseDto.MessageDto> customerMessageList = chatMessage.stream()
-                .filter(c -> !c.getUserType().equals("customer"))
-                .map(c -> ChatMessageResponseDto.MessageDto.builder()
+        List<ChatMessageDto.MessageInfoDto> customerMessageList = chatMessage.stream()
+                .filter(c -> c.getUserType().equals("customer"))
+                .map(c -> ChatMessageDto.MessageInfoDto.builder()
                         .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocaldatetimeToTime(c.getCreatedAt()))
+                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
                         .build())
                 .toList();
 
@@ -159,16 +157,19 @@ public class ChatService {
                 .productImage(productImageArray)
                 .productName(chatRoom.getProduct().getProductName())
                 .price(chatRoom.getProduct().getPrice())
+
                 .sellerId(chatRoom.getSeller().getId())
                 .sellerNickName(chatRoom.getSeller().getNickName())
                 .sellerProfileImage(sellerProfileImageArray)
                 .sellerLevel(chatRoom.getSeller().getLevel().getLabel())
                 .sellerMessageList(sellerMessageList)
+
                 .customerId(chatRoom.getCustomer().getId())
                 .customerNickName(chatRoom.getCustomer().getNickName())
                 .customerProfileImage(customerProfileImageArray)
                 .customerLevel(chatRoom.getCustomer().getLevel().getLabel())
                 .customerMessageList(customerMessageList)
+
                 .userType(userType)
                 .build();
     }
@@ -200,17 +201,17 @@ public class ChatService {
 
         // 가장 마지막에 보낸 메시지
         ChatMessage lastMessage;
-        ChatMessageResponseDto.MessageDto messageDto;
+        ChatMessageDto.MessageInfoDto messageInfoDto;
         if(!chatRoom.getMessageList().isEmpty()){
             lastMessage = chatRoom.getMessageList().get(chatRoom.getMessageList().size()-1);
-            messageDto = ChatMessageResponseDto.MessageDto.builder()
+            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
                     .content(lastMessage.getContent())
-                    .sendTime(ConvertTime.convertChatLocaldatetimeToTime(lastMessage.getCreatedAt()))
+                    .sendTime(ConvertTime.convertChatLocalDatetimeToTime(lastMessage.getCreatedAt()))
                     .build();
         }
 
         else{
-            messageDto = ChatMessageResponseDto.MessageDto.builder()
+            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
                     .content(null)
                     .sendTime(null)
                     .build();
@@ -226,7 +227,7 @@ public class ChatService {
                 .chatPartnerId(partner.getId())
                 .chatPartnerNickName(partner.getNickName())
                 .chatPartnerLevel(partner.getLevel().getLabel())
-                .messageInfo(messageDto)
+                .messageInfo(messageInfoDto)
                 .build();
     }
 

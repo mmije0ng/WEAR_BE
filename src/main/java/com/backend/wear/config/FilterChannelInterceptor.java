@@ -1,5 +1,8 @@
 package com.backend.wear.config;
 
+import com.backend.wear.dto.chat.ChatMessageDtoTemp;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
@@ -23,13 +26,25 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         System.out.println(this.getClass().getName()+" 호출 완료");
-        System.out.println("full message:" + message);  
-        System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
+        System.out.println("full message:" + message);
+
+        // 메시지의 본문(body) 추출
+        Object payload = message.getPayload();
+        System.out.println("Message Payload: " + payload.getClass());;
+   //     System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
 
-        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
-            System.out.println("msg: " + "conne");
-        }
+//        // 메시지의 페이로드를 ChatMessageDto 객체로 변환
+//        ChatMessageDtoTemp dto = null;
+//        try {
+//            dto = objectMapper.readValue(new String((byte[]) message.getPayload()), ChatMessageDtoTemp.class);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        System.out.println(dto);
+
+
 
         //throw new MessagingException("no permission! ");
         return message;
