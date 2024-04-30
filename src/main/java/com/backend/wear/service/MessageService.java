@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class MessageService {
     private static Logger log = LoggerFactory.getLogger(MessageService.class);
@@ -27,49 +29,52 @@ public class MessageService {
                           UserRepository userRepository) {
         this.chatMessageRepository = chatMessageRepository;
         this.chatRoomRepository = chatRoomRepository;
-        this.userRepository=userRepository;
+        this.userRepository = userRepository;
     }
 
-    public Long getPartnerId(Long chatRoomId, Long userId, String userType){
+    // 채팅 상대방 아이디 찾기
+    public Long getPartnerId(Long chatRoomId, Long userId, String userType) {
         // 채팅방 찾기
-        ChatRoom chatRoom=chatRoomRepository.findById(chatRoomId)
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾지 못하였습니다."));
 
         User partner;
         Long partnerId;
 
         // 내가 구매자일경우
-        if(userType.equals("customer")){
-            partner=chatRoomRepository.findByChatRoomIdAndUserIdSellerChatRoom(chatRoomId,userId)
+        if (userType.equals("customer")) {
+            partner = chatRoomRepository.findByChatRoomIdAndUserIdSellerChatRoom(chatRoomId, userId)
                     .orElseThrow(() -> new IllegalArgumentException("판매자를 찾지 못하였습니다."));
-            partnerId=partner.getId();
+            partnerId = partner.getId();
         }
 
         // 내가 판매자일경우
-        else{
-            partner=chatRoomRepository.findByChatRoomIdAndUserIdCustomerChatRoom(chatRoomId,userId)
+        else {
+            partner = chatRoomRepository.findByChatRoomIdAndUserIdCustomerChatRoom(chatRoomId, userId)
                     .orElseThrow(() -> new IllegalArgumentException("판매자를 찾지 못하였습니다."));
-            partnerId=partner.getId();
+            partnerId = partner.getId();
         }
 
         return partnerId;
     }
 
     @Transactional
-    public void saveMessage(Long chatRoomId, Long userId, ChatMessageDto.MessageDetailDto dto) {
+    public void saveMessage(Long chatRoomId, Long userId, ChatMessageDto.ChatRoomMessageDto dto) {
         // 채팅방 찾기
-        ChatRoom chatRoom=chatRoomRepository.findById(chatRoomId)
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾지 못하였습니다."));
 
         // 보낸사람 찾기
         User sender = userRepository.findById(dto.getSenderId())
                 .orElseThrow(() -> new IllegalArgumentException("메시지를 보낸 사용자를 찾지 못하였습니다."));
 
-        ChatMessage chatMessage=ChatMessage.builder()
+        ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
-                .content(dto.getContent())
+                .content(dto.getMessage())
                 .senderId(dto.getSenderId())
                 .userType(dto.getUserType())
+                .timestamp(dto.getTimestamp())
+                .sendTime(LocalDateTime.now())
                 .build();
 
         chatMessageRepository.save(chatMessage);

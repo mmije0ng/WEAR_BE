@@ -9,14 +9,15 @@ import lombok.*;
 public class ChatMessageDto {
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     // 메시지 보낼 때, 받을 때
-    public static class MessageDetailDto{
+    public static class ChatRoomMessageDto{
         //채팅방 아이디
-    //    private Long chatRoomId;
+        //    private Long chatRoomId;
 
         //보낸사람 pk
         private Long senderId;
@@ -28,10 +29,14 @@ public class ChatMessageDto {
         private String[] profileImage;
 
         //채팅 메시지
-        private String content;
+        private String message;
 
         //보낸시간
-        private String sendTime;
+        private String timestamp;
+
+        // 내가 보낸건지 여부
+        @JsonProperty("is_mine")
+        boolean mine;
 
         //보낸 사람 타입
         // customer, seller
@@ -42,12 +47,34 @@ public class ChatMessageDto {
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     // 메시지 리스트
-    public static class MessageInfoDto{
+    public static class MessageDetailInfoDto{
 
         //채팅 메시지
-        private String content;
+        private String message;
 
         //보낸시간
+        private String timestamp;
+
+        // 내가 보낸건지 여부
+        @JsonProperty("is_mine")
+        boolean mine;
+    }
+
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    // 메시지 리스트
+    public static class MessageScreenInfoDto{
+
+        //채팅 메시지
+        private String message;
+
+        // 내가 보낸건지 여부
+        @JsonProperty("is_mine")
+        boolean mine;
+
+        //보낸시간
+        //localdatetime
         private String sendTime;
     }
 }

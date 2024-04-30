@@ -216,7 +216,7 @@ public class ProductService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -265,7 +265,7 @@ public class ProductService {
                 .productImage(productImageArray)
                 .place(product.getPlace())
                 .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .isSelected(isSelected)
                 .isPrivate(product.isPrivate())
                 .build();

@@ -230,7 +230,7 @@ public class UserService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -264,7 +264,7 @@ public class UserService {
                 .productStatus(product.getProductStatus())
                 .postStatus(postStatus)
                 .productImage(productImageArray)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -304,7 +304,7 @@ public class UserService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isPrivate(product.isPrivate())
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 

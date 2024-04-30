@@ -26,14 +26,14 @@ public class ChatRoomResponseDto {
         private String sellerNickName;
         private String[] sellerProfileImage;
         private String sellerLevel;
-        private List<ChatMessageDto.MessageInfoDto> sellerMessageList;  // 메시지, 시간
+        private List<ChatMessageDto.MessageDetailInfoDto> sellerMessageList;  // 메시지, 시간
 
         //구매자 정보
         private Long customerId;
         private String customerNickName;
         private String[] customerProfileImage;
         private String customerLevel;
-        private List<ChatMessageDto.MessageInfoDto> customerMessageList;  // 메시지, 시간
+        private List<ChatMessageDto.MessageDetailInfoDto> customerMessageList;  // 메시지, 시간
 
         // 현재 채팅방에서 나의 타입 (구매자인지 판매자인지)
         // seller, customer
@@ -59,6 +59,6 @@ public class ChatRoomResponseDto {
         private Long chatPartnerId; //채팅 상대방 아이디
         private String chatPartnerNickName;
         private String chatPartnerLevel;
-        private ChatMessageDto.MessageInfoDto messageInfo;  // 마지막으로 보낸 메시지, 시간
+        private ChatMessageDto.MessageScreenInfoDto messageInfo;  // 마지막으로 보낸 메시지, 시간
     }
 }

@@ -42,4 +42,13 @@ public class ChatMessage extends BaseEntity {
     // 보낸사람 타입
     // seller, customer
     private String userType;
+
+    // 보낸 시간
+    private String timestamp;
+
+    // 보낸 시간
+    // LocalDateTime
+    @CreatedDate
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
+    LocalDateTime sendTime;
 }

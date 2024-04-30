@@ -73,7 +73,7 @@ public class ChatService {
         // 구매자 찾기
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException(
-                "구매자를 찾지 못하였습니다."));
+                        "구매자를 찾지 못하였습니다."));
 
         // 판매자 찾기
         Long sellerId=product.getUser().getId();
@@ -122,7 +122,7 @@ public class ChatService {
         String userType;
         // 구매자인 경우
         if(Objects.equals(chatRoom.getCustomer().getId(), userId))
-           userType="customer";
+            userType="customer";
         else
             userType="seller";
 
@@ -134,21 +134,29 @@ public class ChatService {
         List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomId(chatRoomId);
 
         // 판매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageInfoDto> sellerMessageList = chatMessage.stream()
+        List<ChatMessageDto.MessageDetailInfoDto> sellerMessageList = chatMessage.stream()
                 .filter(c -> c.getUserType().equals("seller"))
-                .map(c -> ChatMessageDto.MessageInfoDto.builder()
-                        .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
-                        .build())
+                .map(c -> {
+                    boolean isMine = Objects.equals(c.getSenderId(), userId); // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
+                    return ChatMessageDto.MessageDetailInfoDto.builder()
+                            .message(c.getContent())
+                            .timestamp(c.getTimestamp())
+                            .mine(isMine) // isMine 필드 설정
+                            .build();
+                })
                 .toList();
 
         // 구매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageInfoDto> customerMessageList = chatMessage.stream()
+        List<ChatMessageDto.MessageDetailInfoDto> customerMessageList = chatMessage.stream()
                 .filter(c -> c.getUserType().equals("customer"))
-                .map(c -> ChatMessageDto.MessageInfoDto.builder()
-                        .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
-                        .build())
+                .map(c -> {
+                    boolean isMine = Objects.equals(c.getSenderId(), userId); // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
+                    return ChatMessageDto.MessageDetailInfoDto.builder()
+                            .message(c.getContent())
+                            .timestamp(c.getTimestamp())
+                            .mine(isMine) // isMine 필드 설정
+                            .build();
+                })
                 .toList();
 
         return ChatRoomResponseDto.DetailDto.builder()
@@ -201,18 +209,18 @@ public class ChatService {
 
         // 가장 마지막에 보낸 메시지
         ChatMessage lastMessage;
-        ChatMessageDto.MessageInfoDto messageInfoDto;
+        ChatMessageDto.MessageScreenInfoDto messageInfoDto;
         if(!chatRoom.getMessageList().isEmpty()){
             lastMessage = chatRoom.getMessageList().get(chatRoom.getMessageList().size()-1);
-            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
-                    .content(lastMessage.getContent())
-                    .sendTime(ConvertTime.convertChatLocalDatetimeToTime(lastMessage.getCreatedAt()))
+            messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
+                    .message(lastMessage.getContent())
+                    .sendTime(ConvertTime.convertLocalDatetimeToTime(lastMessage.getSendTime()))
                     .build();
         }
 
         else{
-            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
-                    .content(null)
+            messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
+                    .message(null)
                     .sendTime(null)
                     .build();
         }
