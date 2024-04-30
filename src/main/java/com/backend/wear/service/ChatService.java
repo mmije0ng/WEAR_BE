@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -54,6 +55,7 @@ public class ChatService {
 
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
+        if(productImageJson==null) return null;
         try {
             return objectMapper.readValue(productImageJson, String[].class);
         } catch (JsonProcessingException e) {
@@ -131,30 +133,20 @@ public class ChatService {
         String[] sellerProfileImageArray = convertImageJsonToArray(chatRoom.getSeller().getProfileImage());
 
         // 채팅방 메시지 내역
-        List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomId(chatRoomId);
+        // 보낸 순서대로 정렬
+        List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomIdOrderBySendTimeAsc(chatRoomId);
 
-        // 판매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageDetailInfoDto> sellerMessageList = chatMessage.stream()
-                .filter(c -> c.getUserType().equals("seller"))
+        List<ChatMessageDto.MessageDetailInfoDto> messageInfoList = chatMessage.stream()
                 .map(c -> {
-                    boolean isMine = Objects.equals(c.getSenderId(), userId); // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
+                    String message = c.getContent();
+                    String[] messageImage = convertImageJsonToArray(c.getContentImage());
                     return ChatMessageDto.MessageDetailInfoDto.builder()
-                            .message(c.getContent())
+                            .messageUserType(c.getUserType())
+                            .message(message)
+                            .messageImage(messageImage)
                             .timestamp(c.getTimestamp())
-                            .mine(isMine) // isMine 필드 설정
-                            .build();
-                })
-                .toList();
-
-        // 구매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageDetailInfoDto> customerMessageList = chatMessage.stream()
-                .filter(c -> c.getUserType().equals("customer"))
-                .map(c -> {
-                    boolean isMine = Objects.equals(c.getSenderId(), userId); // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
-                    return ChatMessageDto.MessageDetailInfoDto.builder()
-                            .message(c.getContent())
-                            .timestamp(c.getTimestamp())
-                            .mine(isMine) // isMine 필드 설정
+                            .sendDateTime(c.getSendTime().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
+                            .mine(Objects.equals(c.getSenderId(), userId))  // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
                             .build();
                 })
                 .toList();
@@ -170,14 +162,13 @@ public class ChatService {
                 .sellerNickName(chatRoom.getSeller().getNickName())
                 .sellerProfileImage(sellerProfileImageArray)
                 .sellerLevel(chatRoom.getSeller().getLevel().getLabel())
-                .sellerMessageList(sellerMessageList)
 
                 .customerId(chatRoom.getCustomer().getId())
                 .customerNickName(chatRoom.getCustomer().getNickName())
                 .customerProfileImage(customerProfileImageArray)
                 .customerLevel(chatRoom.getCustomer().getLevel().getLabel())
-                .customerMessageList(customerMessageList)
 
+                .messageInfoList(messageInfoList)
                 .userType(userType)
                 .build();
     }
@@ -214,14 +205,16 @@ public class ChatService {
             lastMessage = chatRoom.getMessageList().get(chatRoom.getMessageList().size()-1);
             messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
                     .message(lastMessage.getContent())
-                    .sendTime(ConvertTime.convertLocalDatetimeToTime(lastMessage.getSendTime()))
+                    .messageImage(convertImageJsonToArray(lastMessage.getContentImage()))
+                    .time(ConvertTime.convertLocalDatetimeToTime(lastMessage.getSendTime()))
                     .build();
         }
 
         else{
             messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
                     .message(null)
-                    .sendTime(null)
+                    .messageImage(null)
+                    .time(null)
                     .build();
         }
 
@@ -232,9 +225,9 @@ public class ChatService {
         return ChatRoomResponseDto.ScreenDto.builder()
                 .chatRoomId(chatRoom.getId())
                 .productImage(productImageArray)
-                .chatPartnerId(partner.getId())
-                .chatPartnerNickName(partner.getNickName())
-                .chatPartnerLevel(partner.getLevel().getLabel())
+                .chatOtherId(partner.getId())
+                .chatOtherNickName(partner.getNickName())
+                .chatOtherLevel(partner.getLevel().getLabel())
                 .messageInfo(messageInfoDto)
                 .build();
     }

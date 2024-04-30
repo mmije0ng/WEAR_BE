@@ -31,6 +31,9 @@ public class ChatMessageDto {
         //채팅 메시지
         private String message;
 
+        //채팅 메시지 - 사진
+        private String[] messageImage;
+
         //보낸시간
         private String timestamp;
 
@@ -40,7 +43,7 @@ public class ChatMessageDto {
 
         //보낸 사람 타입
         // customer, seller
-        private String userType;
+        private String senderType;
     }
 
     @Getter
@@ -49,11 +52,20 @@ public class ChatMessageDto {
     // 메시지 리스트
     public static class MessageDetailInfoDto{
 
+        // 보낸 사람 타입
+        private String messageUserType;
+
         //채팅 메시지
         private String message;
 
+        //채팅 메시지 - 사진
+        private String[] messageImage;
+
         //보낸시간
         private String timestamp;
+
+        //보낸 시간 날짜 포함
+        private String sendDateTime;
 
         // 내가 보낸건지 여부
         @JsonProperty("is_mine")
@@ -69,12 +81,15 @@ public class ChatMessageDto {
         //채팅 메시지
         private String message;
 
+        //채팅 메시지 - 사진
+        private String[] messageImage;
+
         // 내가 보낸건지 여부
         @JsonProperty("is_mine")
         boolean mine;
 
         //보낸시간
-        //localdatetime
-        private String sendTime;
+        //몇분 전
+        private String time;
     }
 }

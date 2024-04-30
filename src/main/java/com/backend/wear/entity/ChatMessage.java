@@ -33,8 +33,12 @@ public class ChatMessage extends BaseEntity {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
-    // 내용(메시지)
+    // 메시지 내용
     private String content;
+
+    // 메시지 내용 (이미지)
+    @Column(name="content_image", columnDefinition = "json")
+    private String contentImage;
 
     // 보낸사람 pk
     private Long senderId;
@@ -46,9 +50,6 @@ public class ChatMessage extends BaseEntity {
     // 보낸 시간
     private String timestamp;
 
-    // 보낸 시간
-    // LocalDateTime
-    @CreatedDate
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
-    LocalDateTime sendTime;
+    // 보낸 시간을 LocalDateTime 으로 변경
+    private LocalDateTime sendTime;
 }

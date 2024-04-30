@@ -1,6 +1,7 @@
 package com.backend.wear.dto;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -40,11 +41,22 @@ public class ConvertTime {
         return diffTime+"년 전";
     }
 
-    public static String convertChatLocalDatetimeToTime(LocalDateTime createdAt){
-        // 출력 형식 설정
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("a hh:mm");
+    public static LocalDateTime convertChatTimeStampToLocalDateTime(String timestamp){
+        LocalDateTime now = LocalDateTime.now();
 
-        // 변환
-        return createdAt.format(formatter);
+        // "오후 3:26" timestamp 형식의 문자열을 LocalTime으로 파싱
+        LocalTime time = LocalTime.parse(timestamp, DateTimeFormatter.ofPattern("a h:mm"));
+
+        // 현재 날짜와 시간의 연도, 월, 일, 초, 밀리초를 가져오기
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        int day = now.getDayOfMonth();
+        int second = now.getSecond();
+        int ms = now.getNano();
+
+        // LocalDateTime으로 합치기
+        LocalDateTime dateTime = LocalDateTime.of(year, month, day, time.getHour(), time.getMinute(), second, ms);
+
+        return dateTime;
     }
 }
