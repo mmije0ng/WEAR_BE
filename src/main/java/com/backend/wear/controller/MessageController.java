@@ -44,7 +44,7 @@ public class MessageController {
         log.info("내가 보낸건지 여부: "+ dto.isMine());
 
         // 채팅 상대방 아이디 찾기
-        Long partnerId=messageService.getPartnerId(chatRoomId,dto.getSenderId(), dto.getSenderType());
+        Long partnerId=messageService.getChatOtherUserId(chatRoomId,dto.getSenderId(), dto.getSenderType());
         log.info("채팅 상대방 아이디: "+partnerId);
 
         // 메시지 저장 로직

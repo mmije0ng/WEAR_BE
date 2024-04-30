@@ -19,16 +19,22 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByProductIdAndCustomerIdAndSellerId(Long productId, Long customerId, Long sellerId);
 
     // 로그인한 사용자 아이디로 채팅방 조회
-    @Query("SELECT c FROM ChatRoom c WHERE c.customer.id=:userId OR c.seller.id=:userId")
-    Page<ChatRoom> findByUserId(@Param("userId") Long userId, Pageable pageable);
+    // 차단한 사용자, 내가 차단당한 경우 제외
+    @Query("SELECT c FROM ChatRoom c WHERE (c.customer.id = :userId OR c.seller.id = :userId) " +
+            "AND (:blockedUserIdList IS NULL OR (c.seller.id NOT IN (:blockedUserIdList) AND c.customer.id NOT IN (:blockedUserIdList) ) )" +
+            "AND (:userIdListBlocked IS NULL OR (c.seller.id NOT IN (:userIdListBlocked) AND c.customer.id NOT IN (:userIdListBlocked) ) )" )
+    Page<ChatRoom> findByUserId(@Param("userId") Long userId,
+                                @Param("blockedUserIdList") List<Long> blockedUserIdList,
+                                @Param("userIdListBlocked") List<Long> userIdListBlocked,
+                                Pageable pageable);
 
-    // 나와 채팅중인 판매자와의 채팅방 조회
+    // 나와 채팅중인 판매자 조회
     // 내가 구매자일경우
     @Query("SELECT c.seller FROM ChatRoom c WHERE c.id=:chatRoomId AND c.customer.id=:userId")
-    Optional <User> findByChatRoomIdAndUserIdSellerChatRoom(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
+    Optional <User> findByChatRoomIdAndCustomerIdBySeller(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
 
-    // 나와 채팅중인 구매자와의 채팅방 조회
+    // 나와 채팅중인 구매자 조회
     // 내가 판매자일경우
     @Query("SELECT c.customer FROM ChatRoom c WHERE c.id=:chatRoomId AND c.seller.id=:userId")
-    Optional <User> findByChatRoomIdAndUserIdCustomerChatRoom(@Param("chatRoomId") Long chatRoomId,@Param("userId") Long userId);
+    Optional <User> findByChatRoomIdAndSellerIdByCustomer(@Param("chatRoomId") Long chatRoomId,@Param("userId") Long userId);
 }

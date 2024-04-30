@@ -58,8 +58,8 @@ public class ChatRoomController {
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")
     // /api/chat/rooms?userId={userId}&pageNumber={pageNumber}
-    public ResponseEntity<?> roomList(@RequestParam(name = "userId") Long userId,
-                                      @RequestParam(name = "pageNumber") Integer pageNumber ) throws Exception {
+    public ResponseEntity<?> getChatRoomList(@RequestParam(name = "userId") Long userId,
+                                             @RequestParam(name = "pageNumber") Integer pageNumber ) throws Exception {
 
         try{
             // 채팅방 정보
@@ -67,6 +67,21 @@ public class ChatRoomController {
             log.info("모든 채팅방 조회 완료.");
 
             return ResponseEntity.ok().body(chatRoomsPage);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //채팅 상대 차단하기
+    //api/chat/room/block?chatRoomId={chatRoomId}&userId={userId}
+    @PostMapping("/room/block")
+    public ResponseEntity<?> blockedChatUser(@RequestParam(name = "chatRoomId") Long chatRoomId,
+                                             @RequestParam(name = "userId") Long userId) throws Exception {
+
+        try{
+            chatService.blockedChatUser(chatRoomId,userId);
+            return ResponseEntity.ok().body("채팅 상대방 차단 완료");
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());

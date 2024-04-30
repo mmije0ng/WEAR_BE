@@ -48,29 +48,19 @@ public class MessageService {
     }
 
     // 채팅 상대방 아이디 찾기
-    public Long getPartnerId(Long chatRoomId, Long userId, String userType) {
+    public Long getChatOtherUserId(Long chatRoomId, Long userId, String userType) {
         // 채팅방 찾기
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾지 못하였습니다."));
 
-        User partner;
-        Long partnerId;
+        // 채팅 상대방 찾기
+        User chatOtherUser = chatRoomRepository.findByChatRoomIdAndCustomerIdBySeller(chatRoomId, userId)
+                .orElseGet(() -> chatRoomRepository.findByChatRoomIdAndSellerIdByCustomer(chatRoomId, userId)
+                        .orElseThrow(() -> new IllegalArgumentException("판매자를 찾지 못하였습니다.")));
 
-        // 내가 구매자일경우
-        if (userType.equals("customer")) {
-            partner = chatRoomRepository.findByChatRoomIdAndUserIdSellerChatRoom(chatRoomId, userId)
-                    .orElseThrow(() -> new IllegalArgumentException("판매자를 찾지 못하였습니다."));
-            partnerId = partner.getId();
-        }
+        Long chatOtherUserId = chatOtherUser.getId();
 
-        // 내가 판매자일경우
-        else {
-            partner = chatRoomRepository.findByChatRoomIdAndUserIdCustomerChatRoom(chatRoomId, userId)
-                    .orElseThrow(() -> new IllegalArgumentException("판매자를 찾지 못하였습니다."));
-            partnerId = partner.getId();
-        }
-
-        return partnerId;
+        return chatOtherUserId;
     }
 
     // 메시지 저장

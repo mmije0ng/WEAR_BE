@@ -3,14 +3,8 @@ package com.backend.wear.service;
 import com.backend.wear.dto.ConvertTime;
 import com.backend.wear.dto.chat.ChatMessageDto;
 import com.backend.wear.dto.chat.ChatRoomResponseDto;
-import com.backend.wear.entity.ChatMessage;
-import com.backend.wear.entity.ChatRoom;
-import com.backend.wear.entity.Product;
-import com.backend.wear.entity.User;
-import com.backend.wear.repository.ChatMessageRepository;
-import com.backend.wear.repository.ChatRoomRepository;
-import com.backend.wear.repository.ProductRepository;
-import com.backend.wear.repository.UserRepository;
+import com.backend.wear.entity.*;
+import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -37,6 +31,8 @@ public class ChatService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
+    private final BlockedUserRepository blockedUserRepository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
@@ -45,12 +41,14 @@ public class ChatService {
     public ChatService(ChatRoomRepository chatRoomRepository,
                        ChatMessageRepository chatMessageRepository,
                        ProductRepository productRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       BlockedUserRepository blockedUserRepository) {
 
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository=chatMessageRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.blockedUserRepository=blockedUserRepository;
     }
 
     // JSON 문자열을 String[]으로 변환하는 메서드
@@ -179,7 +177,13 @@ public class ChatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
-        Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, pageRequest(pageNumber));
+        // 내간 차단한 유저 아이디 리스트
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        // 나를 차단한 유저 아이디 리스트
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
+
+        Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
+
         if(chatRoomsPage.isEmpty())
             throw new IllegalArgumentException("채팅 내역이 없습니다.");
 
@@ -230,6 +234,35 @@ public class ChatService {
                 .chatOtherLevel(partner.getLevel().getLabel())
                 .messageInfo(messageInfoDto)
                 .build();
+    }
+
+    // 사용자 차단하기
+    @Transactional
+    public void blockedChatUser(Long chatRoomId, Long userId) throws Exception{
+        // 사용자자 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "사용자를 찾지 못하였습니다."));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "채팅방을 찾지 못하였습니다."));
+
+        // 로그인한 사용자 타입에 따라 채팅 상대방 차단
+        String userType = Objects.equals(chatRoom.getCustomer().getId(), userId) ? "customer" : "seller";
+        User blockedUser = Objects.equals(userType, "customer") ?
+                chatRoomRepository.findByChatRoomIdAndCustomerIdBySeller(chatRoomId, userId).orElseThrow(() -> new IllegalArgumentException("차단하기 위한 판매자를 찾지 못하였습니다.")) :
+                chatRoomRepository.findByChatRoomIdAndSellerIdByCustomer(chatRoomId, userId).orElseThrow(() -> new IllegalArgumentException("차단하기 위한 구매자를 찾지 못하였습니다."));
+
+        BlockedUser block = BlockedUser.builder()
+                .user(user)
+                .blockedUserId(blockedUser.getId())
+                .build();
+
+        // 사용자 차단
+        blockedUserRepository.save(block);
+
+        log.info("채팅 차단한 사용자 아이디: "+blockedUser.getId());
     }
 
     private Pageable pageRequest(Integer pageNumber){
