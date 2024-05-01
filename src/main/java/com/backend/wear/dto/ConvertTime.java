@@ -44,7 +44,7 @@ public class ConvertTime {
     public static LocalDateTime convertChatTimeStampToLocalDateTime(String timestamp){
         LocalDateTime now = LocalDateTime.now();
 
-        // "오후 3:26" timestamp 형식의 문자열을 LocalTime으로 파싱
+        // "오후 3:26" 형식의 문자열을 LocalTime으로 파싱
         LocalTime time = LocalTime.parse(timestamp, DateTimeFormatter.ofPattern("a h:mm"));
 
         // 현재 날짜와 시간의 연도, 월, 일, 초, 밀리초를 가져오기
