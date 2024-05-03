@@ -18,12 +18,13 @@ public class UniversityService {
         // 인증된 유저 리스트
         UnivCert.list(API_KEY);
 
-        //UnivCert.clear(API_KEY);
+        UnivCert.clear(API_KEY);
 
         // 인증 여부
         Map<String, Object> statusMap = UnivCert.status(API_KEY, certifyDto.getEmail());
         // 이미 인증된 사용자일 경우
         if(statusMap.get("success").equals(true)){
+            statusMap.put("code", 400);
             statusMap.put("success", false);
             statusMap.put("already_certified",true); //이미 인증된 이메일 여부
             statusMap.put("message","이미 인증된 이메일입니다.");
@@ -35,6 +36,10 @@ public class UniversityService {
             certifyMap.put("message","인증 메일 발송 완료.");
         }
 
+        else if(certifyMap.get("message").equals("서버에 존재하지 않는 대학명입니다. univ_check 값을 false로 바꿔서 진행해주세요.")){
+            certifyMap.put("message","존재하지 않는 대학명입니다. 대학명을 정확히 입력해주세요.");
+        }
+
         certifyMap.put("already_certified",false);
 
         return certifyMap;
@@ -42,8 +47,11 @@ public class UniversityService {
 
     // 대학교 인증 코드 입력
     public Object certifyCode(UniversityRequestDto.CertifyCodeDto certifyCodeDto) throws IOException{
-
-        return UnivCert.certifyCode(API_KEY,
+        Map<String, Object> certifyCodeMap = UnivCert.certifyCode(API_KEY,
                 certifyCodeDto.getEmail(), certifyCodeDto.getUniversityName(),certifyCodeDto.getCode());
+
+        certifyCodeMap.put("university_name", certifyCodeMap.get("univName"));
+
+        return certifyCodeMap;
     }
 }
