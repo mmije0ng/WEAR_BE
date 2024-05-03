@@ -7,14 +7,24 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 public class UniversityRequestDto {
     @Getter
-    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class UnivCertDto{
+    public static class CertifyDto{
         private String universityName; //대학교명
         private String email; //대학 이메일
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class CertifyCodeDto{
+        private String universityName; //대학교명
+        private String email; //대학 이메일
+        private int code; //인증코드
     }
 }

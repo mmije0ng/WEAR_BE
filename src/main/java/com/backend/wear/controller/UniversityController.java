@@ -22,15 +22,23 @@ public class UniversityController {
 
     //대학 인증 메일 발송
     @PostMapping("/certify")
-    public ResponseEntity<?> certifyUniversity(@RequestBody UniversityRequestDto.UnivCertDto univCertDto) {
+    public ResponseEntity<?> certifyUniversity(@RequestBody UniversityRequestDto.CertifyDto certifyDto) {
         try {
-            // 인증
-            universityService.certifyUniversity(univCertDto);
+            return ResponseEntity.ok().body(universityService.certifyUniversity(certifyDto));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-        // 응답값
-        return ResponseEntity.ok().body("인증 메일 발송 완료");
+    }
+
+    //대학 인증 코드 입력
+    @PostMapping("/certify/code")
+    public ResponseEntity<?> certifyCode(@RequestBody UniversityRequestDto.CertifyCodeDto certifyCodeDto) {
+        try {
+            return ResponseEntity.ok().body(universityService.certifyCode(certifyCodeDto));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
     }
 }
