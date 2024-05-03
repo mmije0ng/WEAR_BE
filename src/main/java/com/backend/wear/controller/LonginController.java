@@ -1,16 +1,6 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.*;
-import com.backend.wear.service.LoginService;
-import com.univcert.api.UnivCert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -61,13 +51,9 @@ public class LonginController {
 //
 //    //대학 인증 메일 발송
 //    @PostMapping("/university/certify")
-//    public ResponseEntity<?> certifyUniversity
-//    (@RequestBody UnivCertRequestDto dto) throws IOException {
-//        myUniversityName=dto.getUniversityName();
-//        myUniversityEmail=dto.getUniversityEmail();
-//
+//    public ResponseEntity<?> certifyUniversity(@RequestBody UnivCertRequestDto dto) throws IOException {
 //        Map<String, Object> response =
-//                UnivCert.certify("8664efc6-ab71-47b9-8cb0-5aa20dccc59c", dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
+//                UnivCert.certify("7703b0e5-a8d1-4bb1-8463-76f0b422199a", dto.getUniversityEmail(), dto.getUniversityName(), dto.isCheck());
 //
 //        return ResponseEntity.ok(response);
 //    }
