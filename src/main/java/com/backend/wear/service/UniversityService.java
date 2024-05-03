@@ -22,7 +22,8 @@ public class UniversityService {
         Map<String, Object> statusMap = UnivCert.status(API_KEY, certifyDto.getEmail());
         // 이미 인증된 사용자일 경우
         if(statusMap.get("success").equals(true)){
-            statusMap.put("success", "이미 인증된 사용자입니다.");
+            statusMap.put("success", false);
+            statusMap.put("message","이미 인증된 이메일입니다.");
             return  statusMap;
         }
 
