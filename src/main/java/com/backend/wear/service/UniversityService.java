@@ -31,13 +31,9 @@ public class UniversityService {
         }
 
         Map<String, Object> certifyMap = UnivCert.certify(API_KEY, certifyDto.getEmail(), certifyDto.getUniversityName(), true);
-        if(certifyMap.get("success").equals(false)){
-            certifyMap.put("correct",false);
-            certifyMap.put("message","대학교명을 잘 못 입력하였습니다.");
+        if(certifyMap.get("success").equals(true)){
+            certifyMap.put("message","인증 메일 발송 완료.");
         }
-
-       else
-           certifyMap.put("correct",true);
 
         certifyMap.put("already_certified",false);
 
