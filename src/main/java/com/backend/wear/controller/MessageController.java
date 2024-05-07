@@ -29,27 +29,32 @@ public class MessageController {
 //    }
 
     // 메시지 보내기
-    // pub/api/chat/message
-    @MessageMapping(value="/api/chat/message/{chatRoomId}/{userId}")
+    // /pub/api/chat/message/{chatRoomId}
+    @MessageMapping(value="/api/chat/message/{chatRoomId}")
     public void sendMyMessage (@DestinationVariable("chatRoomId")Long chatRoomId,
-                               @DestinationVariable("userId") Long userId,
-                               ChatMessageDto.MessageDetailDto dto) {
+                               ChatMessageDto.ChatRoomMessageDto dto) throws Exception{
 
         log.info("채팅방 아이디: "+chatRoomId);
 
-        log.info("로그인 사용자 아이디: "+userId);
+        log.info("로그인 사용자 아이디: "+dto.getSenderId());
         log.info("보낸사람 아이디: "+dto.getSenderId());
-        log.info("메시지 내용: "+dto.getContent());
-        log.info("보낸사람 타입: "+dto.getUserType());
+        log.info("메시지 텍스트 내용: "+dto.getMessage());
+        log.info("보낸사람 타입: "+dto.getSenderType());
+        log.info("보낸 시간: "+dto.getTimestamp());
+        log.info("내가 보낸건지 여부: "+ dto.isMine());
 
         // 채팅 상대방 아이디 찾기
-        Long partnerId=messageService.getPartnerId(chatRoomId,userId, dto.getUserType());
+        Long partnerId=messageService.getChatOtherUserId(chatRoomId,dto.getSenderId(), dto.getSenderType());
         log.info("채팅 상대방 아이디: "+partnerId);
 
         // 메시지 저장 로직
-        messageService.saveMessage(chatRoomId, userId, dto);
+        messageService.saveMessage(chatRoomId, dto.getSenderId(), dto);
+
+        dto.setMine(false);
 
         // 구독자들에게 메시지 전달
-        simpMessagingTemplate.convertAndSend("/sub/api/chat/room/"+chatRoomId+"/"+partnerId, dto);
+        // /sub/api/chat/room/{chatRoomId}
+        simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);
+        log.info("상대편 입장 보낸건지 여부: "+ dto.isMine());
     }
 }

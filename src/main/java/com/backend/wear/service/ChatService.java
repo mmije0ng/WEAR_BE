@@ -3,14 +3,8 @@ package com.backend.wear.service;
 import com.backend.wear.dto.ConvertTime;
 import com.backend.wear.dto.chat.ChatMessageDto;
 import com.backend.wear.dto.chat.ChatRoomResponseDto;
-import com.backend.wear.entity.ChatMessage;
-import com.backend.wear.entity.ChatRoom;
-import com.backend.wear.entity.Product;
-import com.backend.wear.entity.User;
-import com.backend.wear.repository.ChatMessageRepository;
-import com.backend.wear.repository.ChatRoomRepository;
-import com.backend.wear.repository.ProductRepository;
-import com.backend.wear.repository.UserRepository;
+import com.backend.wear.entity.*;
+import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -23,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -36,6 +31,8 @@ public class ChatService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
+    private final BlockedUserRepository blockedUserRepository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
@@ -44,16 +41,19 @@ public class ChatService {
     public ChatService(ChatRoomRepository chatRoomRepository,
                        ChatMessageRepository chatMessageRepository,
                        ProductRepository productRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       BlockedUserRepository blockedUserRepository) {
 
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository=chatMessageRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.blockedUserRepository=blockedUserRepository;
     }
 
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
+        if(productImageJson==null) return null;
         try {
             return objectMapper.readValue(productImageJson, String[].class);
         } catch (JsonProcessingException e) {
@@ -73,7 +73,7 @@ public class ChatService {
         // 구매자 찾기
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException(
-                "구매자를 찾지 못하였습니다."));
+                        "구매자를 찾지 못하였습니다."));
 
         // 판매자 찾기
         Long sellerId=product.getUser().getId();
@@ -122,7 +122,7 @@ public class ChatService {
         String userType;
         // 구매자인 경우
         if(Objects.equals(chatRoom.getCustomer().getId(), userId))
-           userType="customer";
+            userType="customer";
         else
             userType="seller";
 
@@ -131,24 +131,22 @@ public class ChatService {
         String[] sellerProfileImageArray = convertImageJsonToArray(chatRoom.getSeller().getProfileImage());
 
         // 채팅방 메시지 내역
-        List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomId(chatRoomId);
+        // 보낸 순서대로 정렬
+        List<ChatMessage> chatMessage = chatMessageRepository.findByChatRoomIdOrderBySendTimeAsc(chatRoomId);
 
-        // 판매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageInfoDto> sellerMessageList = chatMessage.stream()
-                .filter(c -> c.getUserType().equals("seller"))
-                .map(c -> ChatMessageDto.MessageInfoDto.builder()
-                        .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
-                        .build())
-                .toList();
-
-        // 구매자가 보낸 채팅 메시지, 시간
-        List<ChatMessageDto.MessageInfoDto> customerMessageList = chatMessage.stream()
-                .filter(c -> c.getUserType().equals("customer"))
-                .map(c -> ChatMessageDto.MessageInfoDto.builder()
-                        .content( c.getContent())
-                        .sendTime(ConvertTime.convertChatLocalDatetimeToTime(c.getCreatedAt()))
-                        .build())
+        List<ChatMessageDto.MessageDetailInfoDto> messageInfoList = chatMessage.stream()
+                .map(c -> {
+                    String message = c.getContent();
+                    String[] messageImage = convertImageJsonToArray(c.getContentImage());
+                    return ChatMessageDto.MessageDetailInfoDto.builder()
+                            .messageUserType(c.getUserType())
+                            .message(message)
+                            .messageImage(messageImage)
+                            .timestamp(c.getTimestamp())
+                            .sendDateTime(c.getSendTime().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
+                            .mine(Objects.equals(c.getSenderId(), userId))  // 메시지를 보낸 사용자가 현재 사용자와 일치하지 않는 경우 false
+                            .build();
+                })
                 .toList();
 
         return ChatRoomResponseDto.DetailDto.builder()
@@ -162,14 +160,13 @@ public class ChatService {
                 .sellerNickName(chatRoom.getSeller().getNickName())
                 .sellerProfileImage(sellerProfileImageArray)
                 .sellerLevel(chatRoom.getSeller().getLevel().getLabel())
-                .sellerMessageList(sellerMessageList)
 
                 .customerId(chatRoom.getCustomer().getId())
                 .customerNickName(chatRoom.getCustomer().getNickName())
                 .customerProfileImage(customerProfileImageArray)
                 .customerLevel(chatRoom.getCustomer().getLevel().getLabel())
-                .customerMessageList(customerMessageList)
 
+                .messageInfoList(messageInfoList)
                 .userType(userType)
                 .build();
     }
@@ -180,7 +177,13 @@ public class ChatService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
 
-        Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, pageRequest(pageNumber));
+        // 내간 차단한 유저 아이디 리스트
+        List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        // 나를 차단한 유저 아이디 리스트
+        List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
+
+        Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
+
         if(chatRoomsPage.isEmpty())
             throw new IllegalArgumentException("채팅 내역이 없습니다.");
 
@@ -201,19 +204,21 @@ public class ChatService {
 
         // 가장 마지막에 보낸 메시지
         ChatMessage lastMessage;
-        ChatMessageDto.MessageInfoDto messageInfoDto;
+        ChatMessageDto.MessageScreenInfoDto messageInfoDto;
         if(!chatRoom.getMessageList().isEmpty()){
             lastMessage = chatRoom.getMessageList().get(chatRoom.getMessageList().size()-1);
-            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
-                    .content(lastMessage.getContent())
-                    .sendTime(ConvertTime.convertChatLocalDatetimeToTime(lastMessage.getCreatedAt()))
+            messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
+                    .message(lastMessage.getContent())
+                    .messageImage(convertImageJsonToArray(lastMessage.getContentImage()))
+                    .time(ConvertTime.convertLocalDatetimeToTime(lastMessage.getSendTime()))
                     .build();
         }
 
         else{
-            messageInfoDto = ChatMessageDto.MessageInfoDto.builder()
-                    .content(null)
-                    .sendTime(null)
+            messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
+                    .message(null)
+                    .messageImage(null)
+                    .time(null)
                     .build();
         }
 
@@ -224,11 +229,40 @@ public class ChatService {
         return ChatRoomResponseDto.ScreenDto.builder()
                 .chatRoomId(chatRoom.getId())
                 .productImage(productImageArray)
-                .chatPartnerId(partner.getId())
-                .chatPartnerNickName(partner.getNickName())
-                .chatPartnerLevel(partner.getLevel().getLabel())
+                .chatOtherId(partner.getId())
+                .chatOtherNickName(partner.getNickName())
+                .chatOtherLevel(partner.getLevel().getLabel())
                 .messageInfo(messageInfoDto)
                 .build();
+    }
+
+    // 사용자 차단하기
+    @Transactional
+    public void blockedChatUser(Long chatRoomId, Long userId) throws Exception{
+        // 사용자자 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "사용자를 찾지 못하였습니다."));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "채팅방을 찾지 못하였습니다."));
+
+        // 로그인한 사용자 타입에 따라 채팅 상대방 차단
+        String userType = Objects.equals(chatRoom.getCustomer().getId(), userId) ? "customer" : "seller";
+        User blockedUser = Objects.equals(userType, "customer") ?
+                chatRoomRepository.findByChatRoomIdAndCustomerIdBySeller(chatRoomId, userId).orElseThrow(() -> new IllegalArgumentException("차단하기 위한 판매자를 찾지 못하였습니다.")) :
+                chatRoomRepository.findByChatRoomIdAndSellerIdByCustomer(chatRoomId, userId).orElseThrow(() -> new IllegalArgumentException("차단하기 위한 구매자를 찾지 못하였습니다."));
+
+        BlockedUser block = BlockedUser.builder()
+                .user(user)
+                .blockedUserId(blockedUser.getId())
+                .build();
+
+        // 사용자 차단
+        blockedUserRepository.save(block);
+
+        log.info("채팅 차단한 사용자 아이디: "+blockedUser.getId());
     }
 
     private Pageable pageRequest(Integer pageNumber){
