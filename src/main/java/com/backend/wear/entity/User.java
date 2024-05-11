@@ -62,14 +62,9 @@ public class User extends BaseEntity {
     private Integer point;
 
     //환경 레벨
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name="level", columnDefinition = "varchar(10) default 'SEED'")
     private EnvironmentLevel level;
-
-    //스타일
-    @OneToMany(mappedBy = "user")
-    private List<UserStyle> userStyles = new ArrayList<>();
 
     //프로필 이미지
     @Column(name="profile_image")
@@ -80,13 +75,13 @@ public class User extends BaseEntity {
     @JoinColumn(name="university_id")
     University university;
 
+    //스타일
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserStyle> userStyles = new ArrayList<>();
+
     //판매 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<Product> productList = new ArrayList<>();
-
-    //기부 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
-    private List<Donation> donationList=new ArrayList<>();
 
     //기부 신청 내역
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)

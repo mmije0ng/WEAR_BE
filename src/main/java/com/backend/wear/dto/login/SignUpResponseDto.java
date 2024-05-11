@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SigunUpResponseDto {
+public class SignUpResponseDto {
     private boolean signUpSuccess;
     private Long userId;
 }

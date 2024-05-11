@@ -29,6 +29,6 @@ public class Style extends BaseEntity {
     @Column(name="style_name", unique = true)
     private String styleName;
 
-    @OneToMany(mappedBy = "style")
+    @OneToMany(mappedBy = "style", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<UserStyle> userStyles = new ArrayList<>();
 }
