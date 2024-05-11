@@ -6,6 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -23,16 +26,10 @@ public class Style extends BaseEntity {
     private Long id;
 
     //스타일 태그 이름
-    @Column(name="style_name")
+    @Column(name="style_name", unique = true)
     private String styleName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
-    User user;
+    @OneToMany(mappedBy = "style")
+    private List<UserStyle> userStyles = new ArrayList<>();
 
-//    @Builder
-//    public Style(String styleName, User user){
-//        this.styleName=styleName;
-//        this.user=user;
-//    }
 }

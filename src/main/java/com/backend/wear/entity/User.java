@@ -1,13 +1,12 @@
 package com.backend.wear.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +16,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -68,8 +68,8 @@ public class User extends BaseEntity {
     private EnvironmentLevel level;
 
     //스타일
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
-    private List<Style> style = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<UserStyle> userStyles = new ArrayList<>();
 
     //프로필 이미지
     @Column(name="profile_image")
@@ -95,4 +95,8 @@ public class User extends BaseEntity {
     //찜목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<Wish> wishList=new ArrayList<>();
+
+    public String getMyUserName(){
+        return userName;
+    }
 }

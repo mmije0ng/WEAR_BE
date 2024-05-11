@@ -7,19 +7,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class LoginDto {
+public class LoginRequestDto {
 
     private String userCreatedId;
     private String userPassword;
     private String userCheckPassword;
-//    private String universityName;
-//    private String universityEmail;
-//    private List<String> list;
 }
