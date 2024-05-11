@@ -57,4 +57,12 @@ public class MessageController {
         simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);
         log.info("상대편 입장 보낸건지 여부: "+ dto.isMine());
     }
+
+    // 상품 등록 5일후 보내는 메시지
+    @MessageMapping(value="/api/chat/message/wear/{chatRoomId}")
+    public void sendWearMessage (@DestinationVariable("chatRoomId")Long chatRoomId,
+                               ChatMessageDto.ChatRoomMessageDto dto) throws Exception{
+
+        simpMessagingTemplate.convertAndSend("/sub/api/chat/message/wear"+chatRoomId, dto);
+    }
 }

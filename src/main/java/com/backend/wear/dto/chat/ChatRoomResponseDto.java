@@ -46,8 +46,8 @@ public class ChatRoomResponseDto {
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreatedDto{
-        Long chatRoomId;
-        Boolean isCreated;
+        private Long chatRoomId;
+        private Boolean isCreated;
     }
 
     // 나의 채팅 내역 dto

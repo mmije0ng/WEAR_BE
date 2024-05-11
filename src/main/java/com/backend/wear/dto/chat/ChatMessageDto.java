@@ -86,10 +86,33 @@ public class ChatMessageDto {
 
         // 내가 보낸건지 여부
         @JsonProperty("is_mine")
-        boolean mine;
+        private boolean mine;
 
         //보낸시간
         //몇분 전
         private String time;
+    }
+
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    // wear 메시지
+    public static class WearMessageDto{
+        // 상품 이름
+        private String productName;
+
+        //채팅 메시지
+        private String message;
+
+        //보낸 사람 타입
+        // admin
+        private String senderType;
+
+        //보낸시간
+        private String timestamp;
+
+        // 내가 보낸건지 여부
+        @JsonProperty("is_mine")
+        boolean mine;
     }
 }

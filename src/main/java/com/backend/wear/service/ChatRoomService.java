@@ -21,16 +21,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class ChatService {
+public class ChatRoomService {
     private static final int pageSize=12;
 
     private final ChatRoomRepository chatRoomRepository;
-
     private final ChatMessageRepository chatMessageRepository;
-
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-
     private final BlockedUserRepository blockedUserRepository;
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -38,11 +35,11 @@ public class ChatService {
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
-    public ChatService(ChatRoomRepository chatRoomRepository,
-                       ChatMessageRepository chatMessageRepository,
-                       ProductRepository productRepository,
-                       UserRepository userRepository,
-                       BlockedUserRepository blockedUserRepository) {
+    public ChatRoomService(ChatRoomRepository chatRoomRepository,
+                           ChatMessageRepository chatMessageRepository,
+                           ProductRepository productRepository,
+                           UserRepository userRepository,
+                           BlockedUserRepository blockedUserRepository) {
 
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository=chatMessageRepository;
@@ -182,6 +179,7 @@ public class ChatService {
         // 나를 차단한 유저 아이디 리스트
         List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
 
+        // 사용자와의 채팅방
         Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));
 
         if(chatRoomsPage.isEmpty())
@@ -207,9 +205,16 @@ public class ChatService {
         ChatMessageDto.MessageScreenInfoDto messageInfoDto;
         if(!chatRoom.getMessageList().isEmpty()){
             lastMessage = chatRoom.getMessageList().get(chatRoom.getMessageList().size()-1);
+
+            Long senderId = lastMessage.getSenderId();
+            boolean isMine=false;
+            if(senderId.equals(userId))
+                isMine=true;
+
             messageInfoDto = ChatMessageDto.MessageScreenInfoDto.builder()
                     .message(lastMessage.getContent())
                     .messageImage(convertImageJsonToArray(lastMessage.getContentImage()))
+                    .mine(isMine)
                     .time(ConvertTime.convertLocalDatetimeToTime(lastMessage.getSendTime()))
                     .build();
         }
@@ -239,7 +244,7 @@ public class ChatService {
     // 사용자 차단하기
     @Transactional
     public void blockedChatUser(Long chatRoomId, Long userId) throws Exception{
-        // 사용자자 찾기
+        // 사용자 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "사용자를 찾지 못하였습니다."));
@@ -263,6 +268,17 @@ public class ChatService {
         blockedUserRepository.save(block);
 
         log.info("채팅 차단한 사용자 아이디: "+blockedUser.getId());
+    }
+
+    @Transactional
+    public void deleteChatRoom(Long chatRoomId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾지 못하였습니다."));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾지 못하였습니다."));
+
+        chatRoomRepository.delete(chatRoom);
     }
 
     private Pageable pageRequest(Integer pageNumber){

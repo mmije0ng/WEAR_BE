@@ -56,6 +56,7 @@ public class DonationApplyService {
         applyUser.setPoint(applyUser.getPoint()+5);
         log.info("업데이트된 포인트: "+applyUser.getPoint());
 
+    //    CheckUserPoint.checkUserPointLevel(applyUser, applyUser.getPoint());
         checkUserPointLevel(applyUser, applyUser.getPoint());
         log.info("기부 완료후 레벨: "+applyUser.getLevel().getLabel());
     }
@@ -77,7 +78,6 @@ public class DonationApplyService {
                 user.setLevel(EnvironmentLevel.CLOTHES);
                 break;
         }
-
     }
 
 }
