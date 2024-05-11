@@ -404,12 +404,12 @@ public class UserService {
         // Set으로 저장된 styleNameList 생성
         Set<String> styleNamesInList = new HashSet<>(styleNameList);
 
-        // styleNameList에 포함되지 않은 UserStyle 삭제 및 새로운 스타일 추가
+        // 사용자가 변경할 스타일 태그 리스트 중 포함되지 않는 스타일 태그 삭제
         allUserStyles.stream()
                 .filter(userStyle -> !styleNamesInList.contains(userStyle.getStyle().getStyleName()))
                 .forEach(userStyleRepository::delete);
 
-        // styleNameList에 포함되지 않은 UserStyle 삭제 후, 새로운 스타일 추가
+        // 새로운 스타일 추가
         styleNameList.stream()
                 .filter(styleName -> allUserStyles.stream()
                         .noneMatch(userStyle -> userStyle.getStyle().getStyleName().equals(styleName)))
@@ -448,7 +448,7 @@ public class UserService {
     //스타일 태그 이름으로 조회
     private List<String> getUserStyleList(Long userId){
 
-        List<UserStyle> userStyleList = userStyleRepository.findByUserId(userId);
+        List<UserStyle> userStyleList = userStyleRepository.findByUserIdOrderByIdStyleId(userId);
         // Style 태그에서 styleName만 추출하여 리스트로 반환
         return userStyleList.stream()
                 .map(userStyle -> userStyle.getStyle().getStyleName()) // Style 객체의 name 필드를 추출하여 매핑
