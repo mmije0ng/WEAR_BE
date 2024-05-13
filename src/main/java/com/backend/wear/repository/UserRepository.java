@@ -1,5 +1,6 @@
 package com.backend.wear.repository;
 
+import com.backend.wear.entity.University;
 import com.backend.wear.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 유저 아이디와 일치아는 유저 리스트 반환
     @Query("SELECT u FROM User u WHERE u.id IN (:blockedUsersIdList)")
     Page <User> findByUserId(@Param("blockedUsersIdList")List<Long> blockedUsersIdList, Pageable pageable);
+
+    // 대학과 일치하는 모든 유저 리스트
+    List<User> findByUniversity(University university);
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2024_BEOTKKOTTHON_TEAM_12_BE.wear.main.iml" filepath="$PROJECT_DIR$/.idea/modules/2024_BEOTKKOTTHON_TEAM_12_BE.wear.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.backend.wear.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.backend.wear.main.iml" />
+    </modules>
+  </component>
+</project>

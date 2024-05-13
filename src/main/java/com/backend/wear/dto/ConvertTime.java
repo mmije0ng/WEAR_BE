@@ -55,8 +55,19 @@ public class ConvertTime {
         int ms = now.getNano();
 
         // LocalDateTime으로 합치기
-        LocalDateTime dateTime = LocalDateTime.of(year, month, day, time.getHour(), time.getMinute(), second, ms);
 
-        return dateTime;
+        return LocalDateTime.of(year, month, day, time.getHour(), time.getMinute(), second, ms);
+    }
+
+    // LocalDateTime을 날짜 "03.11" 형식의 문자열로 파싱
+    public static String convertLocalDateTimeToDate(LocalDateTime now){
+        // LocalDateTime 객체를 "MM.dd" 형식의 문자열로 변환
+        return now.format(DateTimeFormatter.ofPattern("MM.dd"));
+    }
+
+    // LocalDateTime을 "12:00" 형식의 문자열로 파싱
+    public static String convertLocalDateTimeToTime(LocalDateTime now){
+        // LocalDateTime 객체를 "HH:mm" 형식으로 변환
+        return now.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

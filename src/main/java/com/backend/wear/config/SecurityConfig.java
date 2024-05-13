@@ -1,12 +1,13 @@
 package com.backend.wear.config;
 
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//
 //@Configuration
 //@EnableWebSecurity
 //@RequiredArgsConstructor
 //public class SecurityConfig {
+//    // 암호화
+//    @Bean
+//    public BCryptPasswordEncoder encodePassword(){
+//        return new BCryptPasswordEncoder();
+//    }
 //
 //}

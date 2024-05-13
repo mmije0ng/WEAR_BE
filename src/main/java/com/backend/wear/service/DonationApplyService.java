@@ -3,8 +3,10 @@ package com.backend.wear.service;
 import com.backend.wear.dto.donation.DonationApplyRequestDto;
 import com.backend.wear.entity.DonationApply;
 import com.backend.wear.entity.EnvironmentLevel;
+import com.backend.wear.entity.University;
 import com.backend.wear.entity.User;
 import com.backend.wear.repository.DonationApplyRepository;
+import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +19,19 @@ import java.util.Date;
 
 @Service
 public class DonationApplyService {
-
-    private final UserRepository userRepository;
     private final DonationApplyRepository donationApplyRepository;
+    private final UserRepository userRepository;
+    private final UniversityRepository universityRepository;
 
     private final Logger log = LoggerFactory.getLogger(DonationApplyService.class);
 
     @Autowired
     public DonationApplyService(DonationApplyRepository donationApplyRepository,
-                                UserRepository userRepository){
+                                UserRepository userRepository,
+                                UniversityRepository universityRepository){
         this.donationApplyRepository=donationApplyRepository;
         this.userRepository=userRepository;
+        this.universityRepository=universityRepository;
     }
 
     // 기부 신청
@@ -55,6 +59,11 @@ public class DonationApplyService {
         // 환경 점수 추가
         applyUser.setPoint(applyUser.getPoint()+5);
         log.info("업데이트된 포인트: "+applyUser.getPoint());
+
+        // 대학교 환경 점수 추가
+        University university = universityRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자의 대학교를 찾지 못하였습니다."));
+        university.setUniversityPoint(university.getUniversityPoint()+5);
 
     //    CheckUserPoint.checkUserPointLevel(applyUser, applyUser.getPoint());
         checkUserPointLevel(applyUser, applyUser.getPoint());

@@ -1,57 +1,112 @@
 package com.backend.wear.service;
 
-import com.backend.wear.dto.university.UniversityRequestDto;
-import com.univcert.api.UnivCert;
-import org.springframework.beans.factory.annotation.Value;
+import com.backend.wear.dto.ConvertTime;
+import com.backend.wear.dto.university.UniversityResponseDto;
+import com.backend.wear.entity.University;
+import com.backend.wear.entity.User;
+import com.backend.wear.repository.DonationApplyRepository;
+import com.backend.wear.repository.ProductRepository;
+import com.backend.wear.repository.UniversityRepository;
+import com.backend.wear.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UniversityService {
-    @Value("${api.key}")
-    private String API_KEY;
 
-    // 대학교 인증 메일 발송
-    public Object certifyUniversity(UniversityRequestDto.CertifyDto certifyDto) throws IOException{
-        // 인증된 유저 리스트
-        UnivCert.list(API_KEY);
+    private final UniversityRepository universityRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final DonationApplyRepository donationApplyRepository;
 
-        UnivCert.clear(API_KEY);
 
-        // 인증 여부
-        Map<String, Object> statusMap = UnivCert.status(API_KEY, certifyDto.getEmail());
-        // 이미 인증된 사용자일 경우
-        if(statusMap.get("success").equals(true)){
-            statusMap.put("code", 400);
-            statusMap.put("success", false);
-            statusMap.put("already_certified",true); //이미 인증된 이메일 여부
-            statusMap.put("message","이미 인증된 이메일입니다.");
-            return  statusMap;
+    // ObjectMapper 생성
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    // JSON 문자열을 String[]으로 변환하는 메서드
+    private  String[] convertImageJsonToArray(String productImageJson) {
+        if (productImageJson == null) {
+            return null;
         }
 
-        Map<String, Object> certifyMap = UnivCert.certify(API_KEY, certifyDto.getEmail(), certifyDto.getUniversityName(), true);
-        if(certifyMap.get("success").equals(true)){
-            certifyMap.put("message","인증 메일 발송 완료.");
+        try {
+            return objectMapper.readValue(productImageJson, String[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse JSON", e);
         }
-
-        else if(certifyMap.get("message").equals("서버에 존재하지 않는 대학명입니다. univ_check 값을 false로 바꿔서 진행해주세요.")){
-            certifyMap.put("message","존재하지 않는 대학명입니다. 대학명을 정확히 입력해주세요.");
-        }
-
-        certifyMap.put("already_certified",false);
-
-        return certifyMap;
     }
 
-    // 대학교 인증 코드 입력
-    public Object certifyCode(UniversityRequestDto.CertifyCodeDto certifyCodeDto) throws IOException{
-        Map<String, Object> certifyCodeMap = UnivCert.certifyCode(API_KEY,
-                certifyCodeDto.getEmail(), certifyCodeDto.getUniversityName(),certifyCodeDto.getCode());
+    @Autowired
+    public UniversityService(UniversityRepository universityRepository,
+                             UserRepository userRepository,
+                             ProductRepository productRepository,
+                             DonationApplyRepository donationApplyRepository){
+        this.universityRepository=universityRepository;
+        this.userRepository=userRepository;
+        this.productRepository=productRepository;
+        this.donationApplyRepository=donationApplyRepository;
+    }
 
-        certifyCodeMap.put("university_name", certifyCodeMap.get("univName"));
+    // 상위 5개 대학 순위 스케줄링
 
-        return certifyCodeMap;
+    public UniversityResponseDto universityRankingSchedule() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
+        String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
+
+        List<University> topUniversityList = universityRepository.findTopUniversity();
+        List<University> top5UniversityList = topUniversityList.subList(0, Math.min(5, topUniversityList.size()));
+
+        List<UniversityResponseDto.UniversityInfoDto> universityList = top5UniversityList.stream()
+                .map(this::mapToUniversityInfoDto)
+                .toList();
+
+        String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
+        String firstTotalPoint=universityList.get(0).getUniversityPoint(); //1위 대학 총 포인트
+        Integer firstProductCount=0; //1위 대학 거래횟수
+        Integer firstDonationCount=0; //1위 대학 기부횟수
+
+        University firstUniversity = top5UniversityList.get(0);
+        // 상위 대학 매핑
+        setFirstUniversityPoint(top5UniversityList.get(0), firstProductCount,firstDonationCount);
+
+        return UniversityResponseDto.builder()
+                .date(date)
+                .time(time)
+                .universityList(universityList)
+                .firstUniversityName(firstUniversityName)
+                .firstTotalPoint(firstTotalPoint)
+                .firstProductCount(firstProductCount)
+                .firstDonationCount(firstDonationCount)
+                .build();
+    }
+
+    public UniversityResponseDto.UniversityInfoDto mapToUniversityInfoDto(University university){
+        String stringUniversityPoint = formatIntegerWithCommas(university.getUniversityPoint());
+        String[] universityImageArray = convertImageJsonToArray(university.getUniversityImage());
+
+        return UniversityResponseDto.UniversityInfoDto.builder()
+                .universityName(university.getUniversityName())
+                .universityPoint(stringUniversityPoint)
+                .universityImage(universityImageArray)
+                .build();
+
+    }
+
+    public void setFirstUniversityPoint(University firstUniversity, Integer firstProductCount, Integer firstDonationCount){
+        // 1위 대학의 모든 유저리스트
+        List<User> firstUniversityUserList =userRepository.findByUniversity(firstUniversity);
+        firstProductCount = productRepository.findUsersProductCount(firstUniversityUserList);
+        firstDonationCount = donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList);
+    }
+
+    public static String formatIntegerWithCommas(int number) {
+        return String.format("%,d", number);
     }
 }

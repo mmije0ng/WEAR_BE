@@ -1,14 +1,13 @@
-package com.backend.wear.dto.university;
+package com.backend.wear.dto.login;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-public class UniversityRequestDto {
+public class UniversityCertifyRequestDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor

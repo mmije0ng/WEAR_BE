@@ -31,10 +31,12 @@ public class University extends BaseEntity {
     @Column(name="university_name", unique = true)
     private String universityName;
 
-//
-//    // 대학 이미지
-//    @Column(name="university_image", columnDefinition = "json")
-//    private String universityImage;
+    // 대학 이미지
+    @Column(name="university_image", columnDefinition = "json")
+    private String universityImage;
+
+    @Column(name="university_point",columnDefinition = "integer default 0")
+    private Integer universityPoint;
 
     @OneToMany(mappedBy = "university")
     private List<User> userList = new ArrayList<>();

@@ -2,6 +2,7 @@ package com.backend.wear.repository;
 
 import com.backend.wear.entity.Product;
 
+import com.backend.wear.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -81,6 +82,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 판매자 아이디와 상품 아이디로 조회
     Optional<Product> findByIdAndUserId(Long productId, Long userId);
+
+    // 사용자들의 총 구매횟수 조회
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.user IN :userList")
+    Integer findUsersProductCount(@Param("userList")List<User> userList);
 
     // 구매내역
   //  @Query("SELECT p FROM Product p WHERE p.user.id != :userId AND p.productStatus = 'soldOut'")
