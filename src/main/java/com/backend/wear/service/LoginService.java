@@ -93,7 +93,7 @@ public class LoginService {
         // 인증된 유저 리스트
         UnivCert.list(API_KEY);
 
-  //      UnivCert.clear(API_KEY);
+        UnivCert.clear(API_KEY);
 
         // 인증 여부
         Map<String, Object> statusMap = UnivCert.status(API_KEY, certifyDto.getEmail());
@@ -125,7 +125,7 @@ public class LoginService {
         Map<String, Object> certifyCodeMap = UnivCert.certifyCode(API_KEY,
                 certifyCodeDto.getEmail(), certifyCodeDto.getUniversityName(),certifyCodeDto.getCode());
 
-        certifyCodeMap.put("university_name", certifyCodeMap.get("univName"));
+        certifyCodeMap.put("certify_success", certifyCodeMap.get("success"));
 
         return certifyCodeMap;
     }

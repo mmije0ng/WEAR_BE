@@ -10,6 +10,7 @@ import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class UniversityService {
 
@@ -67,14 +69,15 @@ public class UniversityService {
                 .map(this::mapToUniversityInfoDto)
                 .toList();
 
+        // 1위 대학 매핑
         String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
         String firstTotalPoint=universityList.get(0).getUniversityPoint(); //1위 대학 총 포인트
-        Integer firstProductCount=0; //1위 대학 거래횟수
-        Integer firstDonationCount=0; //1위 대학 기부횟수
 
-        University firstUniversity = top5UniversityList.get(0);
-        // 상위 대학 매핑
-        setFirstUniversityPoint(top5UniversityList.get(0), firstProductCount,firstDonationCount);
+        List<User> firstUniversityUserList =userRepository.findByUniversity(top5UniversityList.get(0));  // 1위 대학의 모든 유저리스트
+        Integer firstProductCount = productRepository.findUsersProductCount(firstUniversityUserList); //1위 대학 거래횟수
+        Integer firstDonationCount = donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList); //1위 대학 기부횟수
+
+        log.info("거래횟수: "+firstProductCount+", 기부횟수: "+firstDonationCount);
 
         return UniversityResponseDto.builder()
                 .date(date)
@@ -100,10 +103,7 @@ public class UniversityService {
     }
 
     public void setFirstUniversityPoint(University firstUniversity, Integer firstProductCount, Integer firstDonationCount){
-        // 1위 대학의 모든 유저리스트
-        List<User> firstUniversityUserList =userRepository.findByUniversity(firstUniversity);
-        firstProductCount = productRepository.findUsersProductCount(firstUniversityUserList);
-        firstDonationCount = donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList);
+
     }
 
     public static String formatIntegerWithCommas(int number) {

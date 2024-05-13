@@ -19,6 +19,7 @@ public class UniversityController {
     }
 
 //    @Scheduled(cron = "* * * * * *", zone = "Asia/Seoul")
+    // 매월 1일 오전 12시에 스케줄링
     @Scheduled(cron = "0 0 12 1 * *", zone = "Asia/Seoul")
     @GetMapping("/rank")
     public ResponseEntity<?> getUniversityRanking() {
