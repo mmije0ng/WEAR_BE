@@ -71,7 +71,7 @@ public class UniversityService {
 
         // 1위 대학 매핑
         String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
-        String firstTotalPoint= String.format("%,d",  top5UniversityList.get(0).getUniversityPoint()); //1위 대학 총 포인트
+        String firstTotalPoint= String.format("%,d",  top5UniversityList.get(0).getUniversityPoint())+"포인트"; //1위 대학 총 포인트
 
         List<User> firstUniversityUserList =userRepository.findByUniversity(top5UniversityList.get(0));  // 1위 대학의 모든 유저리스트
         String firstProductCount = Integer.toString(productRepository.findUsersProductCount(firstUniversityUserList))+"번"; //1위 대학 거래횟수
