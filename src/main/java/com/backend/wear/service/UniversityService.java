@@ -71,11 +71,12 @@ public class UniversityService {
 
         // 1위 대학 매핑
         String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
-        String firstTotalPoint=universityList.get(0).getUniversityPoint(); //1위 대학 총 포인트
+        String firstTotalPoint= String.format("%,d",  top5UniversityList.get(0).getUniversityPoint()); //1위 대학 총 포인트
 
         List<User> firstUniversityUserList =userRepository.findByUniversity(top5UniversityList.get(0));  // 1위 대학의 모든 유저리스트
-        Integer firstProductCount = productRepository.findUsersProductCount(firstUniversityUserList); //1위 대학 거래횟수
-        Integer firstDonationCount = donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList); //1위 대학 기부횟수
+        String firstProductCount = Integer.toString(productRepository.findUsersProductCount(firstUniversityUserList))+"번"; //1위 대학 거래횟수
+        String firstDonationCount = Integer.toString(
+                donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList))+"번"; //1위 대학 기부횟수
 
         log.info("거래횟수: "+firstProductCount+", 기부횟수: "+firstDonationCount);
 
@@ -91,7 +92,8 @@ public class UniversityService {
     }
 
     public UniversityResponseDto.UniversityInfoDto mapToUniversityInfoDto(University university){
-        String stringUniversityPoint = formatIntegerWithCommas(university.getUniversityPoint());
+        String stringUniversityPoint = String.format("%,d", university.getUniversityPoint())+"p";
+        log.info("대학 포인트:"+stringUniversityPoint);
         String[] universityImageArray = convertImageJsonToArray(university.getUniversityImage());
 
         return UniversityResponseDto.UniversityInfoDto.builder()
@@ -99,10 +101,6 @@ public class UniversityService {
                 .universityPoint(stringUniversityPoint)
                 .universityImage(universityImageArray)
                 .build();
-
-    }
-
-    public void setFirstUniversityPoint(University firstUniversity, Integer firstProductCount, Integer firstDonationCount){
 
     }
 

@@ -18,8 +18,8 @@ public class UniversityResponseDto { // 대학 순위 응답 dto
     private List<UniversityInfoDto> universityList; //상위 5개 대학 정보
     private String firstUniversityName; //1위 대학 이름
     private String firstTotalPoint; //1위 대학 총 포인트
-    private Integer firstProductCount; //1위 대학 거래횟수
-    private Integer firstDonationCount; //1위 대학 기부횟수
+    private String firstProductCount; //1위 대학 거래횟수
+    private String firstDonationCount; //1위 대학 기부횟수
 
     @Getter
     @Setter
