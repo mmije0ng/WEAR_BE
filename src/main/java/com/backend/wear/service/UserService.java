@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 @Service
 public class UserService {
+    private static final int PAGE_SIZE=12;
 
     private final UserRepository userRepository;
 
@@ -43,8 +44,6 @@ public class UserService {
     private final BlockedUserRepository blockedUserRepository;
 
     private final ObjectMapper objectMapper;
-
-    private static final int pageSize=12;
 
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
@@ -442,7 +441,7 @@ public class UserService {
     // 상품 12개씩 최신순으로 정렬
     private Pageable pageRequest(Integer pageNumber){
         return
-                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
+                PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
     //스타일 태그 이름으로 조회

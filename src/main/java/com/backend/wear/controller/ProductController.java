@@ -256,4 +256,58 @@ public class ProductController {
         }
         return ResponseEntity.ok().body("사용자 차단 완료");
     }
+
+    // 사용자 최근 검색어 저장
+    // /api/products/search/save?userId={userId}&searchName={searchName}
+    @PostMapping("/search/save")
+    public ResponseEntity<?> saveRecentSearchLog(@RequestParam(name="userId") Long userId,
+            @RequestParam(name="searchName") String searchName )
+            throws Exception{
+        try {
+            productService.saveRecentSearchLog(userId,searchName);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("최근 검색어 저장 완료");
+    }
+
+    // 최근 검색어 조회
+    // /api/products/search/list?{userId}={userId}
+    @GetMapping("/search/list")
+    public ResponseEntity<?> findRecentSearchLogs(@RequestParam(name="userId") Long userId)
+            throws Exception{
+        try {
+            return ResponseEntity.ok(productService.findRecentSearchLogs(userId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 최근 검색어 삭제
+    // /api/products/search/delete?userId={userId}&searchName={searchName}
+    @DeleteMapping("/search/delete")
+    public ResponseEntity<?> deleteSearchName(@RequestParam(name="userId") Long userId,
+                                                  @RequestParam(name="searchName") String searchName) throws Exception{
+        try {
+            return ResponseEntity.ok(productService.deleteRecentSearchLog(userId,searchName));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 최근 검색어 전체 삭제
+    // /api/products/search/delete/all?userId={userId}
+    @DeleteMapping("/search/delete/all")
+    public ResponseEntity<?> deleteAllSearchNameByUser(@RequestParam(name="userId") Long userId) throws Exception{
+        try {
+            productService.deleteAllSearchNameByUser(userId);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("최근 검색어 전체 삭제 완료");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
 }

@@ -53,7 +53,7 @@ public class MessageController {
         dto.setMine(false);
 
         // 구독자들에게 메시지 전달
-        // /sub/api/chat/room/{chatRoomId}
+        // /sub/api/chat/message/{chatRoomId}
         simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);
         log.info("상대편 입장 보낸건지 여부: "+ dto.isMine());
     }

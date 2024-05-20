@@ -22,7 +22,7 @@ import java.util.*;
 
 @Service
 public class ChatRoomService {
-    private static final int pageSize=12;
+    private static final int PAGE_SIZE=12;
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -283,6 +283,6 @@ public class ChatRoomService {
 
     private Pageable pageRequest(Integer pageNumber){
         return
-                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
+                PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 }
