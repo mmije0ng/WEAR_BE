@@ -4,7 +4,7 @@ import com.backend.wear.dto.*;
 import com.backend.wear.dto.product.ProductPostRequestDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
-import com.backend.wear.dto.product.SearchLog;
+import com.backend.wear.dto.product.SearchResponseDto;
 import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
@@ -25,8 +25,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,7 +44,7 @@ public class ProductService {
 
     private final BlockedUserRepository blockedUserRepository;
 
-    private final RedisTemplate<String, String> seachLogRedisTemplate;
+    private final RedisTemplate<String, String> searchLogRedisTemplate;
     private ZSetOperations<String, String> zSetOperations;
 
     // ObjectMapper 생성
@@ -77,13 +79,13 @@ public class ProductService {
     @Autowired
     public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
                           CategoryRepository categoryRepository, BlockedUserRepository blockedUserRepository,
-                          RedisTemplate<String, String> seachLogRedisTemplate){
+                          RedisTemplate<String, String> searchLogRedisTemplate){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.blockedUserRepository=blockedUserRepository;
-        this.seachLogRedisTemplate=seachLogRedisTemplate;
+        this.searchLogRedisTemplate=searchLogRedisTemplate;
     }
 
     // 카테고리별, 최신순 페이지네이션
@@ -497,34 +499,30 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
 
         String key = "SearchLog" + userId;
-
-        log.info("입력한 검색어 key, value: "+key+", "+searchName);
+        log.info("입력한 검색어 key, value: " + key + ", " + searchName);
 
         // 이미 존재하는지 확인
-        Boolean exists = Objects.requireNonNull(seachLogRedisTemplate.opsForList().range(key, 0, -1)).contains(searchName);
-        log.info("exists: "+exists);
-        if (exists) {
+        List<String> searchList = searchLogRedisTemplate.opsForList().range(key, 0, -1);
+        if (searchList != null && searchList.contains(searchName)) {
+            log.info("exists: true");
             // 이미 존재하는 경우, 해당 검색어를 리스트의 맨 앞으로 이동시켜야 하기 때문에 제거
-            seachLogRedisTemplate.opsForList().remove(key, 0, searchName);
+            searchLogRedisTemplate.opsForList().remove(key, 0, searchName);
         }
 
-        Long size = seachLogRedisTemplate.opsForList().size(key);
+        Long size = searchLogRedisTemplate.opsForList().size(key);
 
         // redis의 현재 크기가 10인 경우
-        if (size == (long) SEARCH_SIZE) {
+        if (size != null && size == SEARCH_SIZE) {
             // rightPop을 통해 가장 오래된 데이터 삭제
-            seachLogRedisTemplate.opsForList().rightPop(key);
+            searchLogRedisTemplate.opsForList().rightPop(key);
         }
 
         // 새로운 검색어를 추가
-        seachLogRedisTemplate.opsForList().leftPush(key, searchName);
+        searchLogRedisTemplate.opsForList().leftPush(key, searchName);
 
         // 전체 사용자 대상 검색어 추가
-        Boolean existsByAll = Objects.requireNonNull(seachLogRedisTemplate.opsForZSet().range("SearchLog", 0, -1)).contains(searchName);
-        if( existsByAll) // 이미 검색어가 존재한다면 가중치를 올림
-            seachLogRedisTemplate.opsForZSet().incrementScore("SearchLog",searchName,1);
-        else // 존재하지 않다면 가중치를 1로 시작
-            seachLogRedisTemplate.opsForZSet().add("SearchLog", searchName,1);
+        Double score = searchLogRedisTemplate.opsForZSet().score("SearchLog", searchName);
+        searchLogRedisTemplate.opsForZSet().add("SearchLog", searchName, (score != null) ? score + 1 : 1);
     }
 
     // 최근 검색 기록 조회
@@ -532,16 +530,17 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
 
-        return seachLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10);
+        return searchLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10);
     }
-
+    
+    // 검색어와 일치하는 사용자 최근 검색어 삭제
     public Long deleteRecentSearchLog(Long userId, String searchName) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
 
         String key = "SearchLog" + userId;
 
-        Long count = seachLogRedisTemplate.opsForList().remove(key, 1, searchName);
+        Long count = searchLogRedisTemplate.opsForList().remove(key, 1, searchName);
 
         if (count == 0) {
             throw new Exception("삭제하기 위한 검색어와 일치하는 값이 없음.");
@@ -550,9 +549,42 @@ public class ProductService {
         return count;
     }
 
+    // 사용자 최근 검색어 전체 삭제
     public void deleteAllSearchNameByUser(Long userId){
-        seachLogRedisTemplate.keys("SearchLog"+userId).stream().forEach(k-> {
-            seachLogRedisTemplate.delete(k);
+        searchLogRedisTemplate.keys("SearchLog"+userId).stream().forEach(k-> {
+            searchLogRedisTemplate.delete(k);
         });
+    }
+
+    // 인기 검색어 스케줄링
+    public SearchResponseDto getSearchNameRank(){
+        LocalDateTime now = LocalDateTime.now();
+        String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
+        String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
+
+        log.info("인기 검색어 스케줄링 실행");
+
+        return SearchResponseDto.builder()
+                .searchNameRankList(searchNameRankList())
+                .date(date)
+                .time(time)
+                .build();
+    }
+    
+    // 인기 검색어 조회
+    private List<String> searchNameRankList(){
+        String key= "SearchLog";
+        ZSetOperations<String, String> zSetOperations = searchLogRedisTemplate.opsForZSet();
+        // score 순으로 10개 보여줌 (value, score) 형태
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = zSetOperations.reverseRangeWithScores(key, 0, 9);
+
+        // 검색어만 추출하여 리스트로 변환
+        if (typedTuples != null) {
+            return typedTuples.stream()
+                    .map(ZSetOperations.TypedTuple::getValue)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 }

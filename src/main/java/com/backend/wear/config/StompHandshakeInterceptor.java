@@ -22,6 +22,6 @@ public class StompHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        log.info("stomp hadnshake success!");
+        log.info("stomp handhake success!");
     }
 }

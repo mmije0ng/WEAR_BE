@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/products")
@@ -261,8 +265,7 @@ public class ProductController {
     // /api/products/search/save?userId={userId}&searchName={searchName}
     @PostMapping("/search/save")
     public ResponseEntity<?> saveRecentSearchLog(@RequestParam(name="userId") Long userId,
-            @RequestParam(name="searchName") String searchName )
-            throws Exception{
+            @RequestParam(name="searchName") String searchName ) throws Exception{
         try {
             productService.saveRecentSearchLog(userId,searchName);
         } catch (IllegalArgumentException e) {
@@ -304,10 +307,27 @@ public class ProductController {
     public ResponseEntity<?> deleteAllSearchNameByUser(@RequestParam(name="userId") Long userId) throws Exception{
         try {
             productService.deleteAllSearchNameByUser(userId);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("최근 검색어 전체 삭제 완료");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("최근 검색어 전체 삭제 완료");
     }
+
+
+    // 인기 검색어 조회
+    // 매일 정각에 스케줄링
+    // /api/products/search/rank
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+    @GetMapping("/search/rank")
+    public ResponseEntity<?> searchNameRankListSchedule() {
+        try{
+            return ResponseEntity.ok().body(productService.getSearchNameRank());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
 }

@@ -70,7 +70,7 @@ public class DonationApplyService {
         log.info("기부 완료후 레벨: "+applyUser.getLevel().getLabel());
     }
 
-    void checkUserPointLevel(User user, Integer point){
+    private void checkUserPointLevel(User user, Integer point){
         if(point%100!=0) return;
 
         switch(point){

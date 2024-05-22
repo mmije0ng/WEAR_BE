@@ -10,9 +10,9 @@ import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,8 +56,8 @@ public class UniversityService {
     }
 
     // 상위 5개 대학 순위 스케줄링
-
-    public UniversityResponseDto universityRankingSchedule() throws Exception {
+    @Transactional
+    public UniversityResponseDto getUniversityRank() throws Exception {
         LocalDateTime now = LocalDateTime.now();
         String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
         String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
@@ -68,6 +68,8 @@ public class UniversityService {
         List<UniversityResponseDto.UniversityInfoDto> universityList = top5UniversityList.stream()
                 .map(this::mapToUniversityInfoDto)
                 .toList();
+
+        log.info("대학 순위 스케줄링 실행");
 
         // 1위 대학 매핑
         String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
@@ -91,7 +93,7 @@ public class UniversityService {
                 .build();
     }
 
-    public UniversityResponseDto.UniversityInfoDto mapToUniversityInfoDto(University university){
+    private UniversityResponseDto.UniversityInfoDto mapToUniversityInfoDto(University university){
         String stringUniversityPoint = String.format("%,d", university.getUniversityPoint())+"p";
         log.info("대학 포인트:"+stringUniversityPoint);
         String[] universityImageArray = convertImageJsonToArray(university.getUniversityImage());
@@ -101,7 +103,6 @@ public class UniversityService {
                 .universityPoint(stringUniversityPoint)
                 .universityImage(universityImageArray)
                 .build();
-
     }
 
     public static String formatIntegerWithCommas(int number) {
