@@ -20,12 +20,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 @Service
 public class UserService {
+    private static final int PAGE_SIZE=12;
 
     private final UserRepository userRepository;
+
+    private final UserStyleRepository userStyleRepository;
+
     private final StyleRepository styleRepository;
     private final UniversityRepository universityRepository;
 
@@ -39,8 +45,6 @@ public class UserService {
 
     private final ObjectMapper objectMapper;
 
-    private static final int pageSize=12;
-
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
         try {
@@ -51,11 +55,14 @@ public class UserService {
     }
 
     @Autowired
-    public UserService(UserRepository userRepository, StyleRepository styleRepository,
+    public UserService(UserRepository userRepository,
+                       UserStyleRepository userStyleRepository,
+                       StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
                        WishRepository wishRepository, ProductRepository productRepository, BlockedUserRepository blockedUserRepository,
                        ObjectMapper objectMapper){
         this.userRepository=userRepository;
+        this.userStyleRepository=userStyleRepository;
         this.styleRepository=styleRepository;
         this.universityRepository=universityRepository;
         this.donationApplyRepository=donationApplyRepository;
@@ -67,16 +74,16 @@ public class UserService {
 
     // 마이페이지 사용자 정보
     @Transactional
-    public UserResponseDto.MyPageDto getMyPageUserService(Long userId) throws Exception{
+    public UserResponseDto.MyPageDto getMyPageUserService(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        System.out.println("유저"+user.getUserName());
+        System.out.println("유저"+user.getMyUserName());
 
         return mapToMyPageDto(user, userId);
     }
 
     // 마이페이지 응답 dto 매핑
-    private UserResponseDto.MyPageDto mapToMyPageDto(User user, Long userId) throws Exception{
+    private UserResponseDto.MyPageDto mapToMyPageDto(User user, Long userId){
         String universityName = getUniversityNameByUser(userId); //대학 이름
         List<String> style = getUserStyleList(userId); //스타일 리스트
         String level=getCurrentLevel(userId); //현재 레벨
@@ -84,13 +91,13 @@ public class UserService {
         Integer point=getPoint(userId);
         Integer remainLevelPoint= getRemainLevelPoint(point);
 
-        System.out.println("이름: "+user.getUserName());
+        System.out.println("이름: "+user.getMyUserName());
 
         // JSON 배열 파싱
         String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());
 
         return UserResponseDto.MyPageDto.builder()
-                .userName(user.getUserName())
+                .userName(user.getMyUserName())
                 .nickName(user.getNickName())
                 .universityName(universityName)
                 .style(style)
@@ -104,7 +111,7 @@ public class UserService {
 
     // 마이페이지 프로필
     @Transactional
-    public UserResponseDto.ProfileDto getUserProfileService(Long userId) throws Exception{
+    public UserResponseDto.ProfileDto getUserProfileService(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -112,7 +119,7 @@ public class UserService {
     }
 
     // 마이페이지 프로필 응답 dto 매핑
-    private UserResponseDto.ProfileDto mapToProfileDto(User user, Long userId) throws Exception {
+    private UserResponseDto.ProfileDto mapToProfileDto(User user, Long userId) {
         List<String> styleList = getUserStyleList(userId); //스타일 리스트
 
         // JSON 배열 파싱
@@ -127,7 +134,7 @@ public class UserService {
 
     // 마이페이지 프로필 수정
     @Transactional
-    public void updateUserProfile(Long userId, UserRequestDto.ProfileDto profileDto) throws Exception {
+    public void updateUserProfile(Long userId, UserRequestDto.ProfileDto profileDto)  {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -165,7 +172,7 @@ public class UserService {
         String universityName=getUniversityNameByUser(userId);
 
         return UserResponseDto.InfoDto.builder()
-                .userName(user.getUserName())
+                .userName(user.getMyUserName())
                 .universityName(universityName)
                 .universityEmail(user.getUniversityEmail())
                 .build();
@@ -196,7 +203,7 @@ public class UserService {
 
     // 찜한 상품 불러오기
     @Transactional
-    public Page<ProductResponseDto.ScreenDto> getMyWishPage(Long userId, Integer pageNumber) throws Exception{
+    public Page<ProductResponseDto.ScreenDto> getMyWishPage(Long userId, Integer pageNumber) {
 
         // 찜 리스트
         Page <Wish> myWishPage = wishRepository.findByUserId(userId, pageRequest(pageNumber));
@@ -230,7 +237,7 @@ public class UserService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -264,7 +271,7 @@ public class UserService {
                 .productStatus(product.getProductStatus())
                 .postStatus(postStatus)
                 .productImage(productImageArray)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -281,7 +288,7 @@ public class UserService {
 
     // 숨김 처리 상품 보기
     @Transactional
-    public Page<ProductResponseDto.PrivateDto> getMyPrivateProductsPage(Long userId, Integer pageNumber) throws Exception {
+    public Page<ProductResponseDto.PrivateDto> getMyPrivateProductsPage(Long userId, Integer pageNumber) {
         Page <Product> myPrivateProductsPage
                 = productRepository.findByUserIdAndIsPrivateTrue(userId, pageRequest(pageNumber));
 
@@ -304,7 +311,7 @@ public class UserService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isPrivate(product.isPrivate())
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
@@ -378,7 +385,6 @@ public class UserService {
                 .build();
     }
 
-
     // 차단 해제
     @Transactional
     public void deleteBlockedUser(Long userId, Long blockedUserId){
@@ -391,22 +397,31 @@ public class UserService {
     // 스타일 태그 이름으로 Style 저장
     @Transactional
     public void setProfileStyle (Long userId, User user, List<String> styleNameList) {
+        // userId에 해당하는 모든 UserStyle 조회
+        List<UserStyle> allUserStyles = userStyleRepository.findByUserId(userId);
 
-        // styleNameList에 포함되어 있지 않은 스타일 삭제
-        styleRepository.deleteByUserIdAndStyleNameNotIn(userId, styleNameList);
+        // Set으로 저장된 styleNameList 생성
+        Set<String> styleNamesInList = new HashSet<>(styleNameList);
 
-        // styleNameList에 포함되어 있지만 style 테이블에 없는 스타일 삽입
-        for (String styleName : styleNameList) {
-            Style existingStyle = styleRepository.findStyleByStyleNameAndUserId(styleName, userId);
+        // 사용자가 변경할 스타일 태그 리스트 중 포함되지 않는 스타일 태그 삭제
+        allUserStyles.stream()
+                .filter(userStyle -> !styleNamesInList.contains(userStyle.getStyle().getStyleName()))
+                .forEach(userStyleRepository::delete);
 
-            if (existingStyle == null) {
-                Style newStyle = Style.builder()
-                        .styleName(styleName)
-                        .user(user)
-                        .build();
-                styleRepository.save(newStyle);
-            }
-        }
+        // 새로운 스타일 추가
+        styleNameList.stream()
+                .filter(styleName -> allUserStyles.stream()
+                        .noneMatch(userStyle -> userStyle.getStyle().getStyleName().equals(styleName)))
+                .forEach(styleName -> {
+                    Style style = styleRepository.findByStyleName(styleName)
+                            .orElseThrow(() -> new IllegalArgumentException("없는 스타일 태그 이름입니다."));
+
+                    UserStyle newUserStyle = UserStyle.builder()
+                            .user(user)
+                            .style(style)
+                            .build();
+                    userStyleRepository.save(newUserStyle);
+                });
     }
 
     //대학교 이름 조회
@@ -426,16 +441,16 @@ public class UserService {
     // 상품 12개씩 최신순으로 정렬
     private Pageable pageRequest(Integer pageNumber){
         return
-                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
+                PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
-    //스타일 태그 이름만 조회
+    //스타일 태그 이름으로 조회
     private List<String> getUserStyleList(Long userId){
-        List<Style> styleList = styleRepository.findByUserId(userId);
 
+        List<UserStyle> userStyleList = userStyleRepository.findByUserIdOrderByIdStyleId(userId);
         // Style 태그에서 styleName만 추출하여 리스트로 반환
-        return styleList.stream()
-                .map(Style::getStyleName) // Style 객체를 styleName으로 매핑
+        return userStyleList.stream()
+                .map(userStyle -> userStyle.getStyle().getStyleName()) // Style 객체의 name 필드를 추출하여 매핑
                 .collect(Collectors.toList()); // 리스트로 변환하여 반환
     }
 

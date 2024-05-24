@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class FilterChannelInterceptor implements ChannelInterceptor {
 
-    // stomp 연결 시도 시 호출
     // 메시지가 채널로 전송되기 전 호출되는 메서드
     // 프런트 -> 서버로 메시지가 전송될 때
     @Override

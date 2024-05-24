@@ -41,17 +41,11 @@ public class ChatRoom extends BaseEntity {
     private Product product;
 
     //채팅 메시지
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval  = true)
+    @Builder.Default
     private List<ChatMessage> messageList = new ArrayList<>();
 
     // 구매여부
     @Column(name="is_purchased", columnDefinition = "boolean default false")
     private Boolean isPurchased;
-
-    @Builder
-    public ChatRoom(Product product, User customer, User seller) {
-        this.product=product;
-        this.customer=customer;
-        this.seller=seller;
-    }
 }

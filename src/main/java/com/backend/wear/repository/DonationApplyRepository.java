@@ -1,14 +1,13 @@
 package com.backend.wear.repository;
 
 import com.backend.wear.entity.DonationApply;
+import com.backend.wear.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,4 +20,8 @@ public interface DonationApplyRepository extends JpaRepository<DonationApply, Lo
     // 기부 완료 내역
     @Query("SELECT d FROM DonationApply d WHERE d.user.id = :userId AND d.isDonationComplete = true")
     Page <DonationApply> findByUserIdAndDonationComplete(@Param("userId") Long userId, Pageable pageable);
+
+    // 사용자들의 총 기부횟수 조회
+    @Query("SELECT COUNT(d) FROM DonationApply d WHERE d.user IN :userList")
+    Integer findUsersDonationApplyCount(@Param("userList")List<User> userList);
 }

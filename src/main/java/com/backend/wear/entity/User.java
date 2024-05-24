@@ -1,13 +1,12 @@
 package com.backend.wear.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +16,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +41,7 @@ public class User extends BaseEntity {
     @Column(name="user_password", unique = true)
     private String userPassword;
 
-    //이름 (실명)
+    //이름
     @NotNull
     @Column(name="user_name")
     private String userName;
@@ -62,14 +62,9 @@ public class User extends BaseEntity {
     private Integer point;
 
     //환경 레벨
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name="level", columnDefinition = "varchar(10) default 'SEED'")
     private EnvironmentLevel level;
-
-    //스타일
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Style> style = new ArrayList<>();
 
     //프로필 이미지
     @Column(name="profile_image")
@@ -80,33 +75,23 @@ public class User extends BaseEntity {
     @JoinColumn(name="university_id")
     University university;
 
+    //스타일
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserStyle> userStyles = new ArrayList<>();
+
     //판매 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<Product> productList = new ArrayList<>();
 
-    //기부 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Donation> donationList=new ArrayList<>();
-
     //기부 신청 내역
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<DonationApply> donationApplyList=new ArrayList<>();
 
     //찜목록
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<Wish> wishList=new ArrayList<>();
 
-//    //채팅방
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<ChatRoom> chatRoomList=new ArrayList<>();
-
-    // 스타일 필드를 갱신하는 메서드
-    public void updateStyle(List<Style> newStyleList) {
-        this.style.clear(); // 현재 스타일 목록 비우기
-        this.style.addAll(newStyleList); // 새로운 스타일 목록 추가
+    public String getMyUserName(){
+        return userName;
     }
-
-    //차단한 사용자 이름
-//    @Column(name="blocked_user_name")
-//    private List <String> blockedUserNameList=new ArrayList<>();
 }

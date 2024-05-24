@@ -26,14 +26,15 @@ public class ChatRoomResponseDto {
         private String sellerNickName;
         private String[] sellerProfileImage;
         private String sellerLevel;
-        private List<ChatMessageDto.MessageInfoDto> sellerMessageList;  // 메시지, 시간
 
         //구매자 정보
         private Long customerId;
         private String customerNickName;
         private String[] customerProfileImage;
         private String customerLevel;
-        private List<ChatMessageDto.MessageInfoDto> customerMessageList;  // 메시지, 시간
+
+        private List<ChatMessageDto.MessageDetailInfoDto> messageInfoList;  // 메시지 정보 리스트
+
 
         // 현재 채팅방에서 나의 타입 (구매자인지 판매자인지)
         // seller, customer
@@ -45,8 +46,8 @@ public class ChatRoomResponseDto {
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreatedDto{
-        Long chatRoomId;
-        Boolean isCreated;
+        private Long chatRoomId;
+        private Boolean isCreated;
     }
 
     // 나의 채팅 내역 dto
@@ -56,9 +57,9 @@ public class ChatRoomResponseDto {
     public static class ScreenDto{
         private Long chatRoomId; //채팅방 아이디
         private String[] productImage; //상품 이미지
-        private Long chatPartnerId; //채팅 상대방 아이디
-        private String chatPartnerNickName;
-        private String chatPartnerLevel;
-        private ChatMessageDto.MessageInfoDto messageInfo;  // 마지막으로 보낸 메시지, 시간
+        private Long chatOtherId; //채팅 상대방 아이디
+        private String chatOtherNickName;
+        private String chatOtherLevel;
+        private ChatMessageDto.MessageScreenInfoDto messageInfo;  // 마지막으로 보낸 메시지, 시간
     }
 }

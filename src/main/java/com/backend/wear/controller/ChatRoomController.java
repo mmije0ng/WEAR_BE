@@ -7,19 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.backend.wear.service.ChatService;
+import com.backend.wear.service.ChatRoomService;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatRoomController {
-    private final ChatService chatService;
+    private final ChatRoomService chatRoomService;
     private static Logger log = LoggerFactory.getLogger(ChatRoomController.class);
 
     @Autowired
-    public ChatRoomController(ChatService chatService){
-        this.chatService=chatService;
+    public ChatRoomController(ChatRoomService chatRoomService){
+        this.chatRoomService = chatRoomService;
     }
 
     // 채팅방 생성
@@ -28,7 +28,7 @@ public class ChatRoomController {
     public ResponseEntity<?> createRoom(@RequestParam(name="productId") Long productId, @RequestParam(name="userId") Long userId) throws Exception{
 
         try {
-            ChatRoomResponseDto.CreatedDto createdDto =  chatService.createdChatRoom(productId, userId);
+            ChatRoomResponseDto.CreatedDto createdDto =  chatRoomService.createdChatRoom(productId, userId);
             log.info("채팅방 생성 완료");
             return ResponseEntity.ok(createdDto);
         } catch (IllegalArgumentException e) {
@@ -44,7 +44,7 @@ public class ChatRoomController {
     {
         try{
             // 채팅방 정보
-            ChatRoomResponseDto.DetailDto detailDto=chatService.enterChatRoom(chatRoomId, userId);
+            ChatRoomResponseDto.DetailDto detailDto= chatRoomService.enterChatRoom(chatRoomId, userId);
 
             log.info("채팅방 입장 완료");
 
@@ -58,15 +58,42 @@ public class ChatRoomController {
     //사용자 모든 채팅방 조회
     @GetMapping("/rooms")
     // /api/chat/rooms?userId={userId}&pageNumber={pageNumber}
-    public ResponseEntity<?> roomList(@RequestParam(name = "userId") Long userId,
-                                      @RequestParam(name = "pageNumber") Integer pageNumber ) throws Exception {
-
+    public ResponseEntity<?> getChatRoomList(@RequestParam(name = "userId") Long userId,
+                                             @RequestParam(name = "pageNumber") Integer pageNumber ) throws Exception {
         try{
             // 채팅방 정보
-            Page<ChatRoomResponseDto.ScreenDto> chatRoomsPage=chatService.findAllChatRooms(userId, pageNumber);
+            Page<ChatRoomResponseDto.ScreenDto> chatRoomsPage= chatRoomService.findAllChatRooms(userId, pageNumber);
             log.info("모든 채팅방 조회 완료.");
 
             return ResponseEntity.ok().body(chatRoomsPage);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    //채팅 상대 차단하기
+    //api/chat/room/block?chatRoomId={chatRoomId}&userId={userId}
+    @PostMapping("/room/block")
+    public ResponseEntity<?> blockedChatUser(@RequestParam(name = "chatRoomId") Long chatRoomId,
+                                             @RequestParam(name = "userId") Long userId) throws Exception {
+        try{
+            chatRoomService.blockedChatUser(chatRoomId,userId);
+            return ResponseEntity.ok().body("채팅 상대방 차단 완료");
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 채팅 삭제하기
+    // api/chat/room/delete?chatRoomId={chatRoomId}&userId={userId}
+    @DeleteMapping("/room/delete")
+    public ResponseEntity<?> deleteChatRoom(@RequestParam(name = "chatRoomId") Long chatRoomId,
+                                            @RequestParam(name = "userId") Long userId) throws Exception{
+        try{
+            chatRoomService.deleteChatRoom(chatRoomId, userId);
+            return ResponseEntity.ok().body("채팅방 삭제 완료");
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());

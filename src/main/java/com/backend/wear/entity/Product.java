@@ -77,7 +77,7 @@ public class Product extends BaseEntity {
     private Category category;
 
     //채팅방
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<ChatRoom> chatRoomList=new ArrayList<>();
 
     public void setUpdatedAt(LocalDateTime updatedAt) {

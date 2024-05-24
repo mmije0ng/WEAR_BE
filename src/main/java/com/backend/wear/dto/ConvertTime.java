@@ -1,6 +1,7 @@
 package com.backend.wear.dto;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -12,7 +13,7 @@ public class ConvertTime {
     public static final int DAY = 30;
     public static final int MONTH = 12;
 
-    public static String convertLocaldatetimeToTime(LocalDateTime localDateTime) {
+    public static String convertLocalDatetimeToTime(LocalDateTime localDateTime) {
         LocalDateTime now = LocalDateTime.now();
 
         long diffTime = localDateTime.until(now, ChronoUnit.SECONDS); // now보다 이후면 +, 전이면 -
@@ -40,11 +41,33 @@ public class ConvertTime {
         return diffTime+"년 전";
     }
 
-    public static String convertChatLocalDatetimeToTime(LocalDateTime createdAt){
-        // 출력 형식 설정
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("a hh:mm");
+    public static LocalDateTime convertChatTimeStampToLocalDateTime(String timestamp){
+        LocalDateTime now = LocalDateTime.now();
 
-        // 변환
-        return createdAt.format(formatter);
+        // "오후 3:26" 형식의 문자열을 LocalTime으로 파싱
+        LocalTime time = LocalTime.parse(timestamp, DateTimeFormatter.ofPattern("a h:mm"));
+
+        // 현재 날짜와 시간의 연도, 월, 일, 초, 밀리초를 가져오기
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        int day = now.getDayOfMonth();
+        int second = now.getSecond();
+        int ms = now.getNano();
+
+        // LocalDateTime으로 합치기
+
+        return LocalDateTime.of(year, month, day, time.getHour(), time.getMinute(), second, ms);
+    }
+
+    // LocalDateTime을 날짜 "03.11" 형식의 문자열로 파싱
+    public static String convertLocalDateTimeToDate(LocalDateTime now){
+        // LocalDateTime 객체를 "MM.dd" 형식의 문자열로 변환
+        return now.format(DateTimeFormatter.ofPattern("MM.dd"));
+    }
+
+    // LocalDateTime을 "12:00" 형식의 문자열로 파싱
+    public static String convertLocalDateTimeToTime(LocalDateTime now){
+        // LocalDateTime 객체를 "HH:mm" 형식으로 변환
+        return now.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

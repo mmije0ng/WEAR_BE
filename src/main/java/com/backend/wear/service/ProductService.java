@@ -4,6 +4,7 @@ import com.backend.wear.dto.*;
 import com.backend.wear.dto.product.ProductPostRequestDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.product.SearchResponseDto;
 import com.backend.wear.dto.user.UserResponseDto;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
@@ -12,22 +13,29 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ProductService {
 
-    private static final int pageSize=12;
+    private static final int PAGE_SIZE=12;
+    private static final int SEARCH_SIZE=10;
 
     private final ProductRepository productRepository;
     private final WishRepository wishRepository;
@@ -36,10 +44,11 @@ public class ProductService {
 
     private final BlockedUserRepository blockedUserRepository;
 
+    private final RedisTemplate<String, String> searchLogRedisTemplate;
+    private ZSetOperations<String, String> zSetOperations;
+
     // ObjectMapper 생성
     ObjectMapper objectMapper = new ObjectMapper();
-
-    private final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     /* // JSON 배열 파싱
      String[] array = objectMapper.readValue(jsonString, String[].class);
@@ -56,6 +65,8 @@ public class ProductService {
         return mapper.readValue(json, new TypeReference<List<String>>() {});
     }
 
+
+
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
         try {
@@ -67,12 +78,14 @@ public class ProductService {
 
     @Autowired
     public ProductService(ProductRepository productRepository, WishRepository wishRepository, UserRepository userRepository,
-                          CategoryRepository categoryRepository, BlockedUserRepository blockedUserRepository){
+                          CategoryRepository categoryRepository, BlockedUserRepository blockedUserRepository,
+                          RedisTemplate<String, String> searchLogRedisTemplate){
         this.productRepository=productRepository;
         this.wishRepository=wishRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.blockedUserRepository=blockedUserRepository;
+        this.searchLogRedisTemplate=searchLogRedisTemplate;
     }
 
     // 카테고리별, 최신순 페이지네이션
@@ -216,14 +229,14 @@ public class ProductService {
                 .postStatus(product.getPostStatus())
                 .productImage(productImageArray)
                 .isSelected(isSelected)
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .build();
     }
 
     // 상품 12개씩 최신순으로 정렬
     private Pageable pageRequest(Integer pageNumber){
         return
-                PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
+                PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
     // 상품 상세 조회
@@ -265,7 +278,7 @@ public class ProductService {
                 .productImage(productImageArray)
                 .place(product.getPlace())
                 .createdTime(product.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")))
-                .time(ConvertTime.convertLocaldatetimeToTime(product.getCreatedAt()))
+                .time(ConvertTime.convertLocalDatetimeToTime(product.getCreatedAt()))
                 .isSelected(isSelected)
                 .isPrivate(product.isPrivate())
                 .build();
@@ -478,5 +491,102 @@ public class ProductService {
 
         // 사용자 차단
         blockedUserRepository.save(block);
+    }
+
+    // 최근 검색어 저장
+    public void saveRecentSearchLog(Long userId, String searchName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
+
+        String key = "SearchLog" + userId;
+        log.info("입력한 검색어 key, value: " + key + ", " + searchName);
+
+        // 이미 존재하는지 확인
+        List<String> searchList = searchLogRedisTemplate.opsForList().range(key, 0, -1);
+        if (searchList != null && searchList.contains(searchName)) {
+            log.info("exists: true");
+            // 이미 존재하는 경우, 해당 검색어를 리스트의 맨 앞으로 이동시켜야 하기 때문에 제거
+            searchLogRedisTemplate.opsForList().remove(key, 0, searchName);
+        }
+
+        Long size = searchLogRedisTemplate.opsForList().size(key);
+
+        // redis의 현재 크기가 10인 경우
+        if (size != null && size == SEARCH_SIZE) {
+            // rightPop을 통해 가장 오래된 데이터 삭제
+            searchLogRedisTemplate.opsForList().rightPop(key);
+        }
+
+        // 새로운 검색어를 추가
+        searchLogRedisTemplate.opsForList().leftPush(key, searchName);
+
+        // 전체 사용자 대상 검색어 추가
+        Double score = searchLogRedisTemplate.opsForZSet().score("SearchLog", searchName);
+        searchLogRedisTemplate.opsForZSet().add("SearchLog", searchName, (score != null) ? score + 1 : 1);
+    }
+
+    // 최근 검색 기록 조회
+    public SearchResponseDto.UserDto findRecentSearchLogs(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
+
+        return SearchResponseDto.UserDto.builder()
+                .searchNameList( searchLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10))
+                .build();
+    }
+    
+    // 검색어와 일치하는 사용자 최근 검색어 삭제
+    public Long deleteRecentSearchLog(Long userId, String searchName) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
+
+        String key = "SearchLog" + userId;
+
+        Long count = searchLogRedisTemplate.opsForList().remove(key, 1, searchName);
+
+        if (count == 0) {
+            throw new Exception("삭제하기 위한 검색어와 일치하는 값이 없음.");
+        }
+
+        return count;
+    }
+
+    // 사용자 최근 검색어 전체 삭제
+    public void deleteAllSearchNameByUser(Long userId){
+        searchLogRedisTemplate.keys("SearchLog"+userId).stream().forEach(k-> {
+            searchLogRedisTemplate.delete(k);
+        });
+    }
+
+    // 인기 검색어 스케줄링
+    public SearchResponseDto.RankDto getSearchNameRank(){
+        LocalDateTime now = LocalDateTime.now();
+        String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
+        String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
+
+        log.info("인기 검색어 스케줄링 실행");
+
+        return SearchResponseDto.RankDto.builder()
+                .searchNameRankList(searchNameRankList())
+                .date(date)
+                .time(time)
+                .build();
+    }
+    
+    // 인기 검색어 조회
+    private List<String> searchNameRankList(){
+        String key= "SearchLog";
+        ZSetOperations<String, String> zSetOperations = searchLogRedisTemplate.opsForZSet();
+        // score 순으로 10개 보여줌 (value, score) 형태
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = zSetOperations.reverseRangeWithScores(key, 0, 9);
+
+        // 검색어만 추출하여 리스트로 변환
+        if (typedTuples != null) {
+            return typedTuples.stream()
+                    .map(ZSetOperations.TypedTuple::getValue)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 }

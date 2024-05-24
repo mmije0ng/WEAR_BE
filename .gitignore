@@ -1,9 +1,7 @@
 HELP.md
 .gradle
 build/
-
 !gradle/wrapper/gradle-wrapper.jar
-
 
 
 !**/src/main/**/build/
@@ -41,13 +39,12 @@ out/
 ### VS Code ###
 .vscode/
 
-
-
 ### application ###
-/src/main/resources/application-local.yml
+/src/main/resources/application.yml
 /src/main/resources/application-prod.yml
 
-
+# Ignore GitHub Actions workflow files
+.github/workflows/github-actions.yml
 
 
 
