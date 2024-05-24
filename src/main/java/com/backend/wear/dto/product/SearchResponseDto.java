@@ -9,13 +9,25 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SearchResponseDto {
-    private List<String> searchNameRankList; //인기 검색어 이름 리스트
-    private String date; //스케줄링 날짜
-    private String time; //스케줄링 시간
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class RankDto{ //인기 검색 Dto
+        List<String> searchNameRankList; //인기 검색어 이름 리스트
+        String date; //스케줄링 날짜
+        String time; //스케줄링 시간
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class UserDto{ //사용자 검색 Dto
+        List<String> searchNameList;
+    }
 }

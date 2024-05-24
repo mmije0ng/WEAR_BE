@@ -526,11 +526,13 @@ public class ProductService {
     }
 
     // 최근 검색 기록 조회
-    public List<String> findRecentSearchLogs(Long userId){
+    public SearchResponseDto.UserDto findRecentSearchLogs(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
 
-        return searchLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10);
+        return SearchResponseDto.UserDto.builder()
+                .searchNameList( searchLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10))
+                .build();
     }
     
     // 검색어와 일치하는 사용자 최근 검색어 삭제
@@ -557,14 +559,14 @@ public class ProductService {
     }
 
     // 인기 검색어 스케줄링
-    public SearchResponseDto getSearchNameRank(){
+    public SearchResponseDto.RankDto getSearchNameRank(){
         LocalDateTime now = LocalDateTime.now();
         String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
         String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
 
         log.info("인기 검색어 스케줄링 실행");
 
-        return SearchResponseDto.builder()
+        return SearchResponseDto.RankDto.builder()
                 .searchNameRankList(searchNameRankList())
                 .date(date)
                 .time(time)

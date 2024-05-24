@@ -276,7 +276,7 @@ public class ProductController {
     }
 
     // 최근 검색어 조회
-    // /api/products/search/list?{userId}={userId}
+    // /api/products/search/list?userId={userId}
     @GetMapping("/search/list")
     public ResponseEntity<?> findRecentSearchLogs(@RequestParam(name="userId") Long userId)
             throws Exception{
