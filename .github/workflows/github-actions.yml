@@ -33,16 +33,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      # 환경별 yml 파일 생성(1) - application.yml
-      #- name: make application.yml
-       # if: |
-         # contains(github.ref, 'master')
-        #run: |
-         # mkdir ./src/main/resources # resources 폴더 생성
-         # cd ./src/main/resources # resources 폴더로 이동
-         # touch ./application.yml # application.yml 생성
-         # echo "${{ secrets.YML }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기
-        #shell: bash
+          # 환경별 yml 파일 생성(1) - application.yml
+          #- name: make application.yml
+          # if: |
+          # contains(github.ref, 'master')
+          #run: |
+          # mkdir ./src/main/resources # resources 폴더 생성
+          # cd ./src/main/resources # resources 폴더로 이동
+          # touch ./application.yml # application.yml 생성
+          # echo "${{ secrets.YML }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기
+          #shell: bash
 
           # 환경별 yml 파일 생성(2) - dev
           #- name: make application-dev.yml
@@ -91,4 +91,3 @@ jobs:
           --deployment-config-name CodeDeployDefault.OneAtATime
           --deployment-group-name ${{ secrets.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
           --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=deploy/$GITHUB_SHA.zip
-
