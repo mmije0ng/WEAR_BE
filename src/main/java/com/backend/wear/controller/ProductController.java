@@ -45,7 +45,7 @@ public class ProductController {
     // api/products/category/sale?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category/sale")
     public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam(name="categoryName") String categoryName,
-                                                        @RequestParam(name="userId") Long userId,
+                                                          @RequestParam(name="userId") Long userId,
                                                           @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
         try {
@@ -97,8 +97,8 @@ public class ProductController {
     //   /products/search/category/sale?searchName={}&categoryName={}&userId=1{}&pageNumber={}
     @GetMapping("/search/category/sale")
     public ResponseEntity<?> searchProductsByCategoryOnSale(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
-                                                      @RequestParam(name="userId") Long userId,
-                                                      @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
+                                                            @RequestParam(name="userId") Long userId,
+                                                            @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
         try {
             Page <ProductResponseDto.ScreenDto> productsPage
@@ -159,7 +159,7 @@ public class ProductController {
     @PutMapping("/edit/{userId}/{productId}")
     public ResponseEntity<?> updateProductPost(@PathVariable(name="userId") Long userId , @PathVariable(name="productId") Long productId ,
                                                @RequestBody @Valid ProductPostRequestDto requestDTO, Errors errors) throws Exception{
-            productService.updateProductPost(requestDTO,userId,productId);
+        productService.updateProductPost(requestDTO,userId,productId);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
@@ -265,7 +265,7 @@ public class ProductController {
     // /api/products/search/save?userId={userId}&searchName={searchName}
     @PostMapping("/search/save")
     public ResponseEntity<?> saveRecentSearchLog(@RequestParam(name="userId") Long userId,
-            @RequestParam(name="searchName") String searchName ) throws Exception{
+                                                 @RequestParam(name="searchName") String searchName ) throws Exception{
         try {
             productService.saveRecentSearchLog(userId,searchName);
         } catch (IllegalArgumentException e) {
@@ -292,9 +292,15 @@ public class ProductController {
     // /api/products/search/delete?userId={userId}&searchName={searchName}
     @DeleteMapping("/search/delete")
     public ResponseEntity<?> deleteSearchName(@RequestParam(name="userId") Long userId,
-                                                  @RequestParam(name="searchName") String searchName) throws Exception{
+                                              @RequestParam(name="searchName") String searchName) throws Exception{
         try {
-            return ResponseEntity.ok(productService.deleteRecentSearchLog(userId,searchName));
+            Long count = productService.deleteRecentSearchLog(userId,searchName);
+            if (count==1)
+                return ResponseEntity.ok().body("최근 검색어 삭제 완료");
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("최근 검색어 삭제 실패");
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
@@ -314,7 +320,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("최근 검색어 전체 삭제 완료");
     }
 
-
     // 인기 검색어 조회
     // 매일 정각에 스케줄링
     // /api/products/search/rank
@@ -329,5 +334,4 @@ public class ProductController {
                     .body(e.getMessage());
         }
     }
-
 }
