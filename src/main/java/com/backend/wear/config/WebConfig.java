@@ -9,12 +9,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @Configuration
 @EnableWebSocket
 public class WebConfig implements WebMvcConfigurer {
- //   private final StompHandshakeInterceptor interceptor;
-
-//    @Autowired
-//    public WebConfig(StompHandshakeInterceptor interceptor) {
-//        this.interceptor = interceptor;
-//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

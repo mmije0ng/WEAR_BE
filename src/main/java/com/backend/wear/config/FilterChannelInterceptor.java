@@ -5,6 +5,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
 
     // 메시지가 채널로 전송되기 전 호출되는 메서드
     // 프런트 -> 서버로 메시지가 전송될 때
+    // 메시지 전송 전에 인증 토큰을 검증하거나, 메시지 내용을 필터링 가능
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -29,7 +31,29 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         System.out.println("Message Payload: " + payload.getClass());;
         System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
         System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
+
+
+        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
+            System.out.println("msg: " + "conne");
+        }
+
         return message;
+
+
+//        // Authorization 헤더에서 토큰 추출
+//        List<String> authHeaders = headerAccessor.getNativeHeader("Authorization");
+//        if (authHeaders != null && !authHeaders.isEmpty()) {
+//            String authHeader = authHeaders.get(0);
+//            if (authHeader.startsWith("Bearer ")) {
+//                String token = authHeader.substring(7);
+//                System.out.println("Extracted Token: " + token);
+//                // 여기서 추출한 토큰을 사용하여 추가 검증 또는 처리 수행
+//            } else {
+//                System.out.println("Authorization header is not in expected 'Bearer <token>' format");
+//            }
+//        } else {
+//            System.out.println("Authorization header is missing");
+//        }
     }
 
 //    // 발생한 예외에 관계없이 전송이 완료된 후 호출

@@ -45,7 +45,6 @@ public class ChatRoomController {
         try{
             // 채팅방 정보
             ChatRoomResponseDto.DetailDto detailDto= chatRoomService.enterChatRoom(chatRoomId, userId);
-
             log.info("채팅방 입장 완료");
 
             return ResponseEntity.ok().body(detailDto);

@@ -59,13 +59,11 @@ public class ProductService {
         return mapper.writeValueAsString(imageList);
     }
 
-    // JSON 문자열을 List<String>으로 변환하는 메서드
-    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, new TypeReference<List<String>>() {});
-    }
-
-
+//    // JSON 문자열을 List<String>으로 변환하는 메서드
+//    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        return mapper.readValue(json, new TypeReference<List<String>>() {});
+//    }
 
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
