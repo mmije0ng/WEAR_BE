@@ -10,7 +10,6 @@ import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -245,7 +244,7 @@ public class ProductService {
                         "상품을 찾지 못하였습니다."));
 
         // 판매자
-        User user=product.getUser();
+        User user =product.getUser();
 
         // JSON 배열 파싱
         // 판매자 프로필 이미지 배열로 변환

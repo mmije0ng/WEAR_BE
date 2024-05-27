@@ -267,7 +267,7 @@ public class ChatRoomService {
         // 사용자 차단
         blockedUserRepository.save(block);
 
-        log.info("채팅 차단한 사용자 아이디: "+blockedUser.getId());
+        log.info("채팅 차단한 사용자 아이디: "+ blockedUser.getId());
     }
 
     @Transactional

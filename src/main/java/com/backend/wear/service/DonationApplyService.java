@@ -14,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-
 @Service
 public class DonationApplyService {
     private final DonationApplyRepository donationApplyRepository;
@@ -58,7 +55,7 @@ public class DonationApplyService {
 
         // 환경 점수 추가
         applyUser.setPoint(applyUser.getPoint()+5);
-        log.info("업데이트된 포인트: "+applyUser.getPoint());
+        log.info("업데이트된 포인트: "+ applyUser.getPoint());
 
         // 대학교 환경 점수 추가
         University university = universityRepository.findByUserId(userId)
@@ -67,7 +64,7 @@ public class DonationApplyService {
 
     //    CheckUserPoint.checkUserPointLevel(applyUser, applyUser.getPoint());
         checkUserPointLevel(applyUser, applyUser.getPoint());
-        log.info("기부 완료후 레벨: "+applyUser.getLevel().getLabel());
+        log.info("기부 완료후 레벨: "+ applyUser.getLevel().getLabel());
     }
 
     private void checkUserPointLevel(User user, Integer point){

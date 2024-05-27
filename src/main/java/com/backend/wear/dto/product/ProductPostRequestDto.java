@@ -1,20 +1,11 @@
 package com.backend.wear.dto.product;
 
 
-import com.backend.wear.entity.Category;
 import com.backend.wear.entity.User;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

@@ -1,12 +1,11 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.dto.login.SignUpRequestDto;
-import com.backend.wear.dto.login.SignUpResponseDto;
-import com.backend.wear.dto.login.UniversityCertifyRequestDto;
+import com.backend.wear.dto.login.*;
 import com.backend.wear.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ public class LonginController {
         this.loginService=loginService;
     }
 
+    // 회원가입
     // api/auth/signup
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto) throws Exception{
@@ -29,6 +29,19 @@ public class LonginController {
             SignUpResponseDto signUpResponseDto = loginService.userSignUp(signUpRequestDto);
             return ResponseEntity.ok(signUpResponseDto);
         } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 로그인
+    // api/auth/login
+    @GetMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception{
+        try {
+            LoginResponseDto loginResponseDto = loginService.login(loginRequestDto);
+            return ResponseEntity.ok(loginResponseDto);
+        } catch (IllegalArgumentException | BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }

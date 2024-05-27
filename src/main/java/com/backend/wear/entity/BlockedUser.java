@@ -1,8 +1,6 @@
 package com.backend.wear.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -35,7 +33,7 @@ public class BlockedUser extends BaseEntity { //차단된 사용자
 
     @Builder
     public BlockedUser(User user, Long blockedUserId){
-        this.user=user;
+        this.user = user;
         this.blockedUserId=blockedUserId;
     }
 }
