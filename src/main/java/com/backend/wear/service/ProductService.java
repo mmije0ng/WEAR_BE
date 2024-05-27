@@ -59,13 +59,11 @@ public class ProductService {
         return mapper.writeValueAsString(imageList);
     }
 
-    // JSON 문자열을 List<String>으로 변환하는 메서드
-    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, new TypeReference<List<String>>() {});
-    }
-
-
+//    // JSON 문자열을 List<String>으로 변환하는 메서드
+//    private List<String> convertJsonToImageList(String json) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        return mapper.readValue(json, new TypeReference<List<String>>() {});
+//    }
 
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
@@ -371,7 +369,7 @@ public class ProductService {
         // updatedAt 업데이트
         product.setUpdatedAt(product.getUpdatedAt());
 
-       // productRepository.save(product);
+        // productRepository.save(product);
     }
 
     // 상품 판매 상태 변경 (판매 완료 또는 판매 중)
@@ -397,7 +395,7 @@ public class ProductService {
             product.setUpdatedAt(product.getUpdatedAt());
 
             // 변경된 상품 정보를 저장합니다.
-        //    productRepository.save(product);
+            //    productRepository.save(product);
         }
     }
 
@@ -498,6 +496,9 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
 
+        if(searchName == null || searchName.isEmpty())
+            throw new IllegalArgumentException("빈 검색어 입력 불가");
+
         String key = "SearchLog" + userId;
         log.info("입력한 검색어 key, value: " + key + ", " + searchName);
 
@@ -534,8 +535,8 @@ public class ProductService {
                 .searchNameList( searchLogRedisTemplate.opsForList().range("SearchLog"+userId, 0, 10))
                 .build();
     }
-    
-    // 검색어와 일치하는 사용자 최근 검색어 삭제
+
+    // 검색어와 일치하는 사용자의 최근 검색어 삭제
     public Long deleteRecentSearchLog(Long userId, String searchName) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자를 찾지 못하였습니다."));
@@ -544,13 +545,10 @@ public class ProductService {
 
         Long count = searchLogRedisTemplate.opsForList().remove(key, 1, searchName);
 
-        if (count == 0) {
-            throw new Exception("삭제하기 위한 검색어와 일치하는 값이 없음.");
-        }
-
         return count;
     }
 
+    @Transactional
     // 사용자 최근 검색어 전체 삭제
     public void deleteAllSearchNameByUser(Long userId){
         searchLogRedisTemplate.keys("SearchLog"+userId).stream().forEach(k-> {
@@ -559,6 +557,7 @@ public class ProductService {
     }
 
     // 인기 검색어 스케줄링
+    @Transactional
     public SearchResponseDto.RankDto getSearchNameRank(){
         LocalDateTime now = LocalDateTime.now();
         String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
@@ -572,7 +571,7 @@ public class ProductService {
                 .time(time)
                 .build();
     }
-    
+
     // 인기 검색어 조회
     private List<String> searchNameRankList(){
         String key= "SearchLog";

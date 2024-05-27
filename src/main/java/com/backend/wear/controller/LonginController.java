@@ -22,9 +22,9 @@ public class LonginController {
         this.loginService=loginService;
     }
 
-    // api/signup
+    // api/auth/signup
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto){
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto) throws Exception{
         try {
             SignUpResponseDto signUpResponseDto = loginService.userSignUp(signUpRequestDto);
             return ResponseEntity.ok(signUpResponseDto);
