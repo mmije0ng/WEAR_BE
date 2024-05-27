@@ -2,19 +2,20 @@ package com.backend.wear.dto.login;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class LoginRequestDto {
+    @NotNull(message = "아이디 입력은 필수입니다.")
+    private String loginId;
 
-    private String userCreatedId;
-    private String userPassword;
-    private String userCheckPassword;
+    @NotNull(message = "패스워드 입력은 필수입니다.")
+    private String password;
 }

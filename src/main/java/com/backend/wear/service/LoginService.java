@@ -1,9 +1,8 @@
 package com.backend.wear.service;
 
 
-import com.backend.wear.dto.login.SignUpRequestDto;
-import com.backend.wear.dto.login.SignUpResponseDto;
-import com.backend.wear.dto.login.UniversityCertifyRequestDto;
+import com.backend.wear.config.JwtUtil;
+import com.backend.wear.dto.login.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.StyleRepository;
 import com.backend.wear.repository.UniversityRepository;
@@ -12,9 +11,11 @@ import com.backend.wear.repository.UserStyleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.univcert.api.UnivCert;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LoginService {
+    private final JwtUtil jwtUtil;
 
     private final PasswordEncoder passwordEncoder; //비밀번호 암호회
 
@@ -54,11 +56,13 @@ public class LoginService {
     }
 
     @Autowired
-    public LoginService(PasswordEncoder passwordEncoder,
+    public LoginService(JwtUtil jwtUtil,
+                        PasswordEncoder passwordEncoder,
                         UserRepository userRepository,
                         UserStyleRepository userStyleRepository,
                         StyleRepository styleRepository,
                         UniversityRepository universityRepository){
+        this.jwtUtil=jwtUtil;
         this.passwordEncoder=passwordEncoder;
         this.userRepository=userRepository;
         this.userStyleRepository=userStyleRepository;
@@ -66,12 +70,14 @@ public class LoginService {
         this.universityRepository=universityRepository;
     }
 
+    @Transactional
     public SignUpResponseDto userSignUp(SignUpRequestDto signUpRequestDto) throws Exception {
+        String userCreatedId = signUpRequestDto.getUserCreatedId();
         // 유저 회원가입 아이디 목록
         List<String> userCreatedIdList = userRepository.findUserCreatedIdList();
         // 아이디 존재 여부 확인
         Optional<String> existingUserId = userCreatedIdList.stream()
-                .filter(id -> id.equals(signUpRequestDto.getUserCreatedId()))
+                .filter(id -> id.equals(userCreatedId))
                 .findFirst();
 
         if (existingUserId.isPresent()) {
@@ -88,6 +94,10 @@ public class LoginService {
         Optional<String> existUniversityEmail = userUniversityEmailList.stream()
                 .filter(id -> id.equals(signUpRequestDto.getUniversityEmail()))
                 .findFirst();
+
+
+
+
 
         if (existUniversityEmail.isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -133,12 +143,41 @@ public class LoginService {
                 .build();
     }
 
+    // 로그인
+    @Transactional
+    public LoginResponseDto login(LoginRequestDto loginRequestDto){
+        String loginId=loginRequestDto.getLoginId();
+        String password = loginRequestDto.getPassword();
+
+        User user = userRepository.findByUserCreatedId(loginId)
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 암호화된 password를 디코딩한 값과 입력한 패스워드 값이 다르면 null 반환
+        if(!passwordEncoder.matches(password, user.getUserPassword())) {
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        }
+
+        CustomUserInfoDto info = CustomUserInfoDto.builder()
+                .userId(user.getId())
+                .email(user.getUniversityEmail())
+                .password(user.getUserPassword())
+                .nickName(user.getNickName())
+                .build();
+
+        String accessToken = jwtUtil.createAccessToken(info);
+        return LoginResponseDto.builder()
+                .userId(user.getId())
+                .accessToken(accessToken)
+                .loginSuccess(true)
+                .build();
+    }
+
     // 대학교 인증 메일 발송
     public Object certifyUniversity(UniversityCertifyRequestDto.CertifyDto certifyDto) throws IOException {
         // 인증된 유저 리스트
         UnivCert.list(API_KEY);
 
-        UnivCert.clear(API_KEY);
+   //     UnivCert.clear(API_KEY);
 
         // 인증 여부
         Map<String, Object> statusMap = UnivCert.status(API_KEY, certifyDto.getEmail());

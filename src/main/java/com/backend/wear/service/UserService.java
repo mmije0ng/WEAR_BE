@@ -77,7 +77,7 @@ public class UserService {
     public UserResponseDto.MyPageDto getMyPageUserService(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        System.out.println("유저"+user.getMyUserName());
+        System.out.println("유저"+ user.getMyUserName());
 
         return mapToMyPageDto(user, userId);
     }
@@ -91,7 +91,7 @@ public class UserService {
         Integer point=getPoint(userId);
         Integer remainLevelPoint= getRemainLevelPoint(point);
 
-        System.out.println("이름: "+user.getMyUserName());
+        System.out.println("이름: "+ user.getMyUserName());
 
         // JSON 배열 파싱
         String[] profileImageArray = convertImageJsonToArray(user.getProfileImage());

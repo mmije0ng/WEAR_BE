@@ -36,5 +36,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // 나와 채팅중인 구매자 조회
     // 내가 판매자일경우
     @Query("SELECT c.customer FROM ChatRoom c WHERE c.id=:chatRoomId AND c.seller.id=:userId")
-    Optional <User> findByChatRoomIdAndSellerIdByCustomer(@Param("chatRoomId") Long chatRoomId,@Param("userId") Long userId);
+    Optional <User> findByChatRoomIdAndSellerIdByCustomer(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
 }
