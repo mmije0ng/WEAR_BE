@@ -1,8 +1,5 @@
 package com.backend.wear.entity;
 
-import com.backend.wear.entity.Product;
-import com.backend.wear.entity.User;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;

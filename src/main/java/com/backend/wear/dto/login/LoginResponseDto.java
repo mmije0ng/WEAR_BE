@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class LoginResponseDto {
-
-    private Long id; //pk
-    private String message;
+    private Long userId; //pk
+    private String accessToken;
+    private Boolean loginSuccess;
 }

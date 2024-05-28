@@ -33,4 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 대학과 일치하는 모든 유저 리스트
     List<User> findByUniversity(University university);
+
+    @Query("SELECT u FROM User u where u.id<=20")
+    List<User> findUserPasswordList();
 }

@@ -1,7 +1,6 @@
 package com.backend.wear.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -90,6 +89,10 @@ public class User extends BaseEntity {
     //찜목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval  = true)
     private List<Wish> wishList=new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, columnDefinition = "varchar(10) default 'MEMBER'")
+    private RoleType role;
 
     public String getMyUserName(){
         return userName;
