@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.univcert.api.UnivCert;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class LoginService {
     private final JwtUtil jwtUtil;
@@ -72,7 +74,7 @@ public class LoginService {
 
     @Transactional
     public SignUpResponseDto userSignUp(SignUpRequestDto signUpRequestDto) throws Exception {
-        String userCreatedId = signUpRequestDto.getUserCreatedId();
+        String userCreatedId = signUpRequestDto.getLoginId();
         // 유저 회원가입 아이디 목록
         List<String> userCreatedIdList = userRepository.findUserCreatedIdList();
         // 아이디 존재 여부 확인
@@ -84,7 +86,7 @@ public class LoginService {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
 
-        if (!signUpRequestDto.getUserPassword().equals(signUpRequestDto.getUserCheckPassword())) {
+        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getCheckPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -94,9 +96,6 @@ public class LoginService {
         Optional<String> existUniversityEmail = userUniversityEmailList.stream()
                 .filter(id -> id.equals(signUpRequestDto.getUniversityEmail()))
                 .findFirst();
-
-
-
 
 
         if (existUniversityEmail.isPresent()) {
@@ -115,8 +114,8 @@ public class LoginService {
         // 유저 생성
         String[] profileImage = {"https://image1.marpple.co/files/u_1602321/2023/8/original/06c1fe9eefa54842de748c3a343b1207291ffa651.png?w=654"};
         User newUser = User.builder()
-                .userCreatedId(signUpRequestDto.getUserCreatedId())
-                .userPassword(passwordEncoder.encode(signUpRequestDto.getUserPassword())) //
+                .userCreatedId(signUpRequestDto.getLoginId())
+                .userPassword(passwordEncoder.encode(signUpRequestDto.getPassword())) //
                 .userName(signUpRequestDto.getUserName())
                 .nickName(signUpRequestDto.getNickName())
                 .university(university)
@@ -162,6 +161,7 @@ public class LoginService {
                 .email(user.getUniversityEmail())
                 .password(user.getUserPassword())
                 .nickName(user.getNickName())
+                .role(user.getRole().getRole())
                 .build();
 
         String accessToken = jwtUtil.createAccessToken(info);

@@ -50,9 +50,9 @@ public class JwtUtil {
 //     */
     private String createToken(CustomUserInfoDto user, long expireTime) {
         Claims claims = Jwts.claims();
-        claims.put("userId", user.getUserId());
+        claims.put("userId", user.getUserId()); //pk
      //   claims.put("email", user.getEmail());
-    //    claims.put("role", user.getRole());
+        claims.put("role", user.getRole());
 
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);

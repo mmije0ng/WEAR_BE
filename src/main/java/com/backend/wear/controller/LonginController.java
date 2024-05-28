@@ -2,6 +2,7 @@ package com.backend.wear.controller;
 
 import com.backend.wear.dto.login.*;
 import com.backend.wear.service.LoginService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,11 @@ public class LonginController {
     // 회원가입
     // api/auth/signup
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto) throws Exception{
+    public ResponseEntity<?> signUp(@RequestBody @Valid  SignUpRequestDto signUpRequestDto) throws Exception{
         try {
             SignUpResponseDto signUpResponseDto = loginService.userSignUp(signUpRequestDto);
             return ResponseEntity.ok(signUpResponseDto);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
