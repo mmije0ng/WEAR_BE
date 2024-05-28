@@ -1,6 +1,5 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
-import com.backend.wear.dto.login.CustomUserInfoDto;
 import com.backend.wear.entity.User;
 import com.backend.wear.repository.UserRepository;
 

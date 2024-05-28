@@ -1,7 +1,8 @@
 package com.backend.wear.service;
 
 
-import com.backend.wear.config.JwtUtil;
+import com.backend.wear.config.JWT.CustomUserInfoDto;
+import com.backend.wear.config.JWT.JwtUtil;
 import com.backend.wear.dto.login.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.StyleRepository;

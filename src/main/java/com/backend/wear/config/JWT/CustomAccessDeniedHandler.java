@@ -1,6 +1,5 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
-import com.backend.wear.dto.login.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

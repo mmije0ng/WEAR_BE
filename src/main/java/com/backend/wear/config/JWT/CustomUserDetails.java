@@ -1,6 +1,5 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
-import com.backend.wear.dto.login.CustomUserInfoDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

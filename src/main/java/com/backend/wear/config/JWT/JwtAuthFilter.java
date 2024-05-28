@@ -1,5 +1,7 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
+import com.backend.wear.config.JWT.CustomUserDetailsService;
+import com.backend.wear.config.JWT.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,13 +1,10 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
-import com.backend.wear.dto.login.CustomUserInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;

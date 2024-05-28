@@ -1,5 +1,6 @@
-package com.backend.wear.config;
+package com.backend.wear.config.JWT;
 
+import com.backend.wear.config.JWT.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
