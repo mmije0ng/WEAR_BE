@@ -57,7 +57,6 @@ public class JwtUtil {
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);
 
-
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(Date.from(now.toInstant()))
@@ -66,16 +65,14 @@ public class JwtUtil {
                 .compact();
     }
 
-
     /**
      * Token에서 User ID 추출
      * @param token
      * @return User ID
      */
-    public Long getUserLoginId(String token) {
+    public Long getUserId(String token) {
         return parseClaims(token).get("userId", Long.class);
     }
-
 
     /**
      * JWT 검증
@@ -98,7 +95,6 @@ public class JwtUtil {
         return false;
     }
 
-
     /**
      * JWT Claims 추출
      * @param accessToken
@@ -111,6 +107,4 @@ public class JwtUtil {
             return e.getClaims();
         }
     }
-
-
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,7 +33,7 @@ public class UserController {
     // 마이페이지 사용자 정보
     // /api/users/{userId}
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId) throws Exception {
+    public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId, Authentication authentication) throws Exception {
         UserResponseDto.MyPageDto myPageDto;
 
         try{

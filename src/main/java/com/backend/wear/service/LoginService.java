@@ -145,7 +145,7 @@ public class LoginService {
     // 로그인
     @Transactional
     public LoginResponseDto login(LoginRequestDto loginRequestDto){
-        String loginId=loginRequestDto.getLoginId();
+        String loginId=loginRequestDto.getId();
         String password = loginRequestDto.getPassword();
 
         User user = userRepository.findByUserCreatedId(loginId)
