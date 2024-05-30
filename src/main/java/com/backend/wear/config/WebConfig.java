@@ -14,10 +14,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/**") // 모든 경로에 대해 CORS 허용
-                .allowedOrigins("http://localhost:5173",
-                        "http://localhost:8080",
-                        "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com",
-                        "http://43.201.189.171:8080"
+                .allowedOrigins("http://localhost:8080", "http://localhost:5173",
+                        "http://43.201.189.171:8080",
+                        "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
                         ) // 허용할 Origin 설정
               //  .allowedOrigins("**")
                 .allowedHeaders("*")
