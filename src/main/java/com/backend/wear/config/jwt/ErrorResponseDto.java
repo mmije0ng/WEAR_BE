@@ -1,4 +1,4 @@
-package com.backend.wear.config.JWT;
+package com.backend.wear.config.jwt;
 
 import lombok.*;
 

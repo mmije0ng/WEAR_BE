@@ -1,4 +1,4 @@
-package com.backend.wear.config.JWT;
+package com.backend.wear.config.jwt;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
     private final CustomUserInfoDto customUser;
 
+    // 사용자가 가지는 권한
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List <String> roles = new ArrayList<>();
         roles.add("ROLE_"+customUser.getRole().toString());
-
 
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)

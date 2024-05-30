@@ -33,7 +33,7 @@ public class UserController {
     // 마이페이지 사용자 정보
     // /api/users/{userId}
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId, Authentication authentication) throws Exception {
+    public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId ,Authentication authentication) throws Exception {
         UserResponseDto.MyPageDto myPageDto;
 
         try{

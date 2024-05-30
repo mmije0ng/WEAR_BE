@@ -1,10 +1,8 @@
-package com.backend.wear.config.JWT;
+package com.backend.wear.config.jwt;
 
-import com.backend.wear.config.JWT.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,6 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -32,12 +35,16 @@ public class SecurityConfig {
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
+    // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
             "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
-            "/api/university/**",
-            "/swagger-ui/**", "/api-docs",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**", "/api/auth/**"
+            "/api/university/**","/api/auth/**","/api/token/**",
+            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
     };
+//    private static final String[] AUTH_WHITELIST = {
+//            "/**",
+//            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
+//    };
 
     // 비밀번호 암호화
     @Bean
@@ -47,9 +54,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
-        //CSRF, CORS
+        // CSRF
         http.csrf((csrf) -> csrf.disable());
-        http.cors(Customizer.withDefaults());
+
+        // CORS
+        http.cors(httpSecurityCorsConfigurer ->
+                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
+        );
 
         //세션 관리 상태 없음으로 구성, Spring Security가 세션 생성 or 사용 X
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
@@ -70,12 +81,28 @@ public class SecurityConfig {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-    //                    //@PreAuthrization을 사용할 것이기 때문에 모든 경로에 대한 인증처리는 Pass
-    //                    .anyRequest().permitAll()
+       //                 .anyRequest().permitAll()
                         .anyRequest().authenticated()
         );
 
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
+                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
+        ));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration); // 모든 경로에 대해서 CORS 설정을 적용
+
+        return source;
     }
 }

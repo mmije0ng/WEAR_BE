@@ -1,8 +1,10 @@
 package com.backend.wear.service;
 
 
-import com.backend.wear.config.JWT.CustomUserInfoDto;
-import com.backend.wear.config.JWT.JwtUtil;
+import com.backend.wear.config.jwt.CustomUserInfoDto;
+import com.backend.wear.config.jwt.JwtUtil;
+import com.backend.wear.config.jwt.Token;
+import com.backend.wear.config.jwt.TokenRepository;
 import com.backend.wear.dto.login.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.StyleRepository;
@@ -15,13 +17,13 @@ import com.univcert.api.UnivCert;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,8 +33,8 @@ import java.util.stream.Collectors;
 @Service
 public class LoginService {
     private final JwtUtil jwtUtil;
-
     private final PasswordEncoder passwordEncoder; //비밀번호 암호회
+    private final TokenRepository tokenRepository;
 
     private final UserRepository userRepository;
     private final UserStyleRepository userStyleRepository;
@@ -61,12 +63,14 @@ public class LoginService {
     @Autowired
     public LoginService(JwtUtil jwtUtil,
                         PasswordEncoder passwordEncoder,
+                        TokenRepository tokenRepository,
                         UserRepository userRepository,
                         UserStyleRepository userStyleRepository,
                         StyleRepository styleRepository,
                         UniversityRepository universityRepository){
         this.jwtUtil=jwtUtil;
         this.passwordEncoder=passwordEncoder;
+        this.tokenRepository=tokenRepository;
         this.userRepository=userRepository;
         this.userStyleRepository=userStyleRepository;
         this.styleRepository=styleRepository;
@@ -165,11 +169,23 @@ public class LoginService {
                 .role(user.getRole().getRole())
                 .build();
 
+        // 로그인시 토큰 생성
         String accessToken = jwtUtil.createAccessToken(info);
+        String refreshToken = jwtUtil.createRefreshToken(info);
+
+//        // refresh token 저장
+//        Token token = Token.builder()
+//                        .id(user.getId())
+//                        .refreshToken(refreshToken)
+//                        .expiration(Duration.ofMillis(1209600000)) // 14일을 밀리초로 변환하여 설정
+//                        .build();
+//
+//        tokenRepository.save(token);
+
         return LoginResponseDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
-                .loginSuccess(true)
+                .refreshToken(refreshToken)
                 .build();
     }
 

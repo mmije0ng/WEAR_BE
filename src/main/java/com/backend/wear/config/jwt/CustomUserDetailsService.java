@@ -1,4 +1,4 @@
-package com.backend.wear.config.JWT;
+package com.backend.wear.config.jwt;
 
 import com.backend.wear.entity.User;
 import com.backend.wear.repository.UserRepository;
