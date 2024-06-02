@@ -38,9 +38,10 @@ public class SecurityConfig {
     // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
             "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
+            "/api/test",
             "/api/university/**","/api/auth/**","/api/token/**",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
-    };
+        };
 //    private static final String[] AUTH_WHITELIST = {
 //            "/**",
 //            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
@@ -84,7 +85,6 @@ public class SecurityConfig {
        //                 .anyRequest().permitAll()
                         .anyRequest().authenticated()
         );
-
 
         return http.build();
     }

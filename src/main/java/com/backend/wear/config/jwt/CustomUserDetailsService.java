@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository; // 사용자 레포지토리
-    private final ModelMapper mapper;
 
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
