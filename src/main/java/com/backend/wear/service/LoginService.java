@@ -79,7 +79,7 @@ public class LoginService {
 
     @Transactional
     public SignUpResponseDto userSignUp(SignUpRequestDto signUpRequestDto) throws Exception {
-        String userCreatedId = signUpRequestDto.getLoginId();
+        String userCreatedId = signUpRequestDto.getId();
         // 유저 회원가입 아이디 목록
         List<String> userCreatedIdList = userRepository.findUserCreatedIdList();
         // 아이디 존재 여부 확인
@@ -87,13 +87,14 @@ public class LoginService {
                 .filter(id -> id.equals(userCreatedId))
                 .findFirst();
 
-        if (existingUserId.isPresent()) {
+        if (existingUserId.isPresent())
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-        }
 
-        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getCheckPassword())) {
+        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getCheckPassword()))
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+
+        if(userRepository.findByNickName(signUpRequestDto.getNickName()).isPresent())
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다");
 
         // 유저 대학 이메일 목록
         List<String> userUniversityEmailList = userRepository.findUserUniversityEmailList();
@@ -119,7 +120,7 @@ public class LoginService {
         // 유저 생성
         String[] profileImage = {"https://image1.marpple.co/files/u_1602321/2023/8/original/06c1fe9eefa54842de748c3a343b1207291ffa651.png?w=654"};
         User newUser = User.builder()
-                .userCreatedId(signUpRequestDto.getLoginId())
+                .userCreatedId(signUpRequestDto.getId())
                 .userPassword(passwordEncoder.encode(signUpRequestDto.getPassword())) //
                 .userName(signUpRequestDto.getUserName())
                 .nickName(signUpRequestDto.getNickName())

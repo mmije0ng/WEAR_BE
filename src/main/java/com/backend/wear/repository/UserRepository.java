@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserCreatedId(String userCreatedId);
 
+    Optional<User> findByNickName(String nickName);
+
     // 사용자들의 모든 로그인 아이디 반환
     @Query("SELECT u.userCreatedId FROM User u")
     List<String> findUserCreatedIdList();
