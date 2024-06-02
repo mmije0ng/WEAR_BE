@@ -5,6 +5,7 @@ import com.backend.wear.service.DonationApplyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,10 +22,7 @@ public class DonationApplyController {
     // api/donations/{userId}?charity={charity}
     @PostMapping("/{userId}")
     public ResponseEntity<?> postDonationApply(@PathVariable(name="userId")Long userId,@RequestParam(name="charity") Integer charity,
-                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto){
-            System.out.println(donationApplyRequestDto.getUserName());
-        System.out.println(donationApplyRequestDto.getEmail());
-
+                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto, Authentication authentication){
         try{
             donationApplyService.donationApplyService(userId, charity, donationApplyRequestDto);
             return ResponseEntity.ok().body("기부가 완료되었습니다.");

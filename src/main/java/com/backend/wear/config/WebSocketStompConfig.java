@@ -1,5 +1,6 @@
 package com.backend.wear.config;
 
+import com.backend.wear.config.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Slf4j
 @EnableWebSocketMessageBroker
 @Configuration
-@RequiredArgsConstructor
 public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final JwtUtil jwtUtil;
+    private final FilterChannelInterceptor filterChannelInterceptor;
+
+    @Autowired
+    WebSocketStompConfig(JwtUtil jwtUtil, FilterChannelInterceptor filterChannelInterceptor){
+        this.jwtUtil=jwtUtil;
+        this.filterChannelInterceptor=filterChannelInterceptor;
+    }
 
     // sockJS Fallback을 이용해 노출할 endpoint 설정
     @Override
@@ -39,6 +48,6 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new FilterChannelInterceptor()); // FilterChannelInterceptor 추가
+        registration.interceptors(filterChannelInterceptor); // FilterChannelInterceptor 추가
     }
 }
