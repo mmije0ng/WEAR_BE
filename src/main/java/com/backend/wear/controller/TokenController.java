@@ -28,7 +28,12 @@ public class TokenController {
         try{
             TokenResponseDto tokenResponseDto = tokenService.getNewAccessToken(userId, tokenRequestDto);
             return ResponseEntity.ok(tokenResponseDto);
-        } catch (ExpiredJwtException | IllegalArgumentException e){
+        }  catch (ExpiredJwtException e){
+            // refreshToken 만료시
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("refreshToken 만료. 재로그인 필요.");
+        } catch (IllegalArgumentException e){
+            // userId 불일치시
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }

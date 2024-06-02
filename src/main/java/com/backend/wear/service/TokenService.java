@@ -53,7 +53,8 @@ public class TokenService {
         String requestAccessToken= dto.getAccessToken();
         String requestRefreshToken= dto.getRefreshToken();
 
-        // refresh token 만료기간 검증
+        // token 만료기간 검증
+ //       jwtUtil.validateToken(requestAccessToken);
         jwtUtil.validateToken(requestRefreshToken);
 
         // userId로 유효한 토큰인지 검증
