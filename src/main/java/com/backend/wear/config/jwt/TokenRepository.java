@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TokenRepository extends CrudRepository<Token, Long> {
-    Optional <Token> findByIdAndRefreshToken(Long id, String refreshToken);
+public interface TokenRepository extends CrudRepository<Token, String> {
+//    Optional<Token> findById(String id);
 }

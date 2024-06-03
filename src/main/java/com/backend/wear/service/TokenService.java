@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -46,33 +47,39 @@ public class TokenService {
 
     // accessToken 재발급
     @Transactional
-    public TokenResponseDto getNewAccessToken(Long userId, TokenRequestDto dto) throws ExpiredJwtException{
+    public TokenResponseDto getNewAccessToken(TokenRequestDto dto) throws ExpiredJwtException{
+        Long userId = dto.getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        log.info("재발급");
 
         String requestAccessToken= dto.getAccessToken();
         String requestRefreshToken= dto.getRefreshToken();
 
         // token 만료기간 검증
- //       jwtUtil.validateToken(requestAccessToken);
         jwtUtil.validateToken(requestRefreshToken);
 
+        log.info("refresh");
+
         // userId로 유효한 토큰인지 검증
-        Long requestAccessUserId= jwtUtil.getTokenUserId(requestAccessToken);
-        Long requestRefreshUserId= jwtUtil.getTokenUserId(requestAccessToken);
-        if( (requestAccessUserId==requestRefreshUserId) && (requestAccessUserId==userId)
-            && (userId==requestRefreshUserId)
-        ){
+        Long requestRefreshUserId= jwtUtil.getTokenUserId(requestRefreshToken);
+        if(userId==requestRefreshUserId){
+
+            log.info("repo");
+            tokenRepository.findById(requestRefreshToken)
+                    .orElseThrow(() -> new IllegalArgumentException("refreshToken 만료. 재로그인 필요."));
+
             // 새로운 accessToken 발급
-            String accessToken = jwtUtil.createAccessToken(mapToCustomUser(user));
+            String newAccessToken = jwtUtil.createAccessToken(mapToCustomUser(user));
 
             return TokenResponseDto.builder()
-                    .accessToken(accessToken)
+                    .newAccessToken(newAccessToken)
                     .build();
         }
 
         else
-            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+            throw new IllegalArgumentException("refreshToken의 userId 불일치");
     }
 
     private CustomUserInfoDto mapToCustomUser(User user){

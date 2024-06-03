@@ -1,24 +1,24 @@
 package com.backend.wear.config.jwt;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @RedisHash("token")
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
 public class Token {
     @Id
-    private Long id;
+    private String id; //refreshToken
 
-    private String refreshToken;
+    private Long userId;
 
-    @TimeToLive // Duration 타입으로 지정
-    private Duration expiration;
+    @TimeToLive(unit = TimeUnit.SECONDS)
+    private Long expiration;
 }

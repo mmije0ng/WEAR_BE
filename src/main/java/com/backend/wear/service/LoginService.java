@@ -5,6 +5,7 @@ import com.backend.wear.config.jwt.CustomUserInfoDto;
 import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.config.jwt.Token;
 import com.backend.wear.config.jwt.TokenRepository;
+import com.backend.wear.dto.jwt.TokenRequestDto;
 import com.backend.wear.dto.login.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.StyleRepository;
@@ -43,6 +44,9 @@ public class LoginService {
 
     @Value("${api.key}")
     private String API_KEY;
+
+    @Value("${jwt.refresh_token.expiration_time}")
+    private long refreshTokenExpTime;
 
     ObjectMapper objectMapper;
 
@@ -174,20 +178,28 @@ public class LoginService {
         String accessToken = jwtUtil.createAccessToken(info);
         String refreshToken = jwtUtil.createRefreshToken(info);
 
-//        // refresh token 저장
-//        Token token = Token.builder()
-//                        .id(user.getId())
-//                        .refreshToken(refreshToken)
-//                        .expiration(Duration.ofMillis(1209600000)) // 14일을 밀리초로 변환하여 설정
-//                        .build();
-//
-//        tokenRepository.save(token);
+        // refresh token 저장
+        Token token = Token.builder()
+                        .id(refreshToken)
+                        .userId(user.getId())
+                        .expiration(refreshTokenExpTime)
+                        .build();
+
+        tokenRepository.save(token);
 
         return LoginResponseDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void logout(TokenRequestDto logoutDto){
+        User user = userRepository.findById(logoutDto.getUserId())
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        tokenRepository.deleteById(logoutDto.getRefreshToken());
     }
 
     // 대학교 인증 메일 발송

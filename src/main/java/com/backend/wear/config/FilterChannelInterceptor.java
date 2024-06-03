@@ -100,6 +100,8 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
                 .build();
     }
 
+
+
 //    // 발생한 예외에 관계없이 전송이 완료된 후 호출
 //    // 클라이언트 -> 서버 메시지 전송 완료 후
 //    @Override
