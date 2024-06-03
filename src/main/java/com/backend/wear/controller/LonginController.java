@@ -25,22 +25,9 @@ public class LonginController {
         this.loginService=loginService;
     }
 
-    // 회원가입
-    // api/auth/signup
-    @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody @Valid  SignUpRequestDto signUpRequestDto) throws Exception{
-        try {
-            SignUpResponseDto signUpResponseDto = loginService.userSignUp(signUpRequestDto);
-            return ResponseEntity.ok(signUpResponseDto);
-        } catch (IllegalArgumentException | BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
-
     // 로그인
     // api/auth/login
-    @PostMapping("/login")
+    @GetMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception{
         try {
             LoginResponseDto loginResponseDto = loginService.login(loginRequestDto);
@@ -60,6 +47,19 @@ public class LonginController {
             loginService.logout(logoutRequestDto);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // 회원가입
+    // api/auth/signup
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@RequestBody @Valid  SignUpRequestDto signUpRequestDto) throws Exception{
+        try {
+            SignUpResponseDto signUpResponseDto = loginService.userSignUp(signUpRequestDto);
+            return ResponseEntity.ok(signUpResponseDto);
+        } catch (IllegalArgumentException | BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
