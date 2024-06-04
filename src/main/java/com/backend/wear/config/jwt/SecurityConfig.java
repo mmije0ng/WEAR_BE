@@ -39,7 +39,7 @@ public class SecurityConfig  {
     // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
             "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
-            "/api/test","/ws-stomp/**",
+            "/test","/ws-stomp/**",
             "/api/university/**","/api/auth/**","/api/token/**",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
         };
@@ -60,17 +60,17 @@ public class SecurityConfig  {
         http.csrf((csrf) -> csrf.disable());
 
         // CORS
-        http.cors(httpSecurityCorsConfigurer ->
-                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
-        );
+//        http.cors(httpSecurityCorsConfigurer ->
+//                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
+//        );
 
         //세션 관리 상태 없음으로 구성, Spring Security가 세션 생성 or 사용 X
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS));
 
         //FormLogin, BasicHttp 비활성화
-        http.formLogin((form) -> form.disable());
-        http.httpBasic(AbstractHttpConfigurer::disable);
+     //   http.formLogin((form) -> form.disable());
+     //   http.httpBasic(AbstractHttpConfigurer::disable);
 
         //JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
         http.addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
