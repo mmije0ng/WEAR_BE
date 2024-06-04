@@ -23,18 +23,19 @@ public class TokenController {
     }
 
     // accessToken 재발급
-    @GetMapping("/refresh/{userId}")
-    public ResponseEntity<?> getRefresh(@PathVariable(name="userId") Long userId, @RequestBody TokenRequestDto tokenRequestDto) {
+    @GetMapping("/refresh")
+    public ResponseEntity<?> getRefresh(@RequestBody TokenRequestDto tokenRequestDto) {
         try{
-            TokenResponseDto tokenResponseDto = tokenService.getNewAccessToken(userId, tokenRequestDto);
+            TokenResponseDto tokenResponseDto = tokenService.getNewAccessToken(tokenRequestDto);
             return ResponseEntity.ok(tokenResponseDto);
         }  catch (ExpiredJwtException e){
             // refreshToken 만료시
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("refreshToken 만료. 재로그인 필요.");
         } catch (IllegalArgumentException e){
-            // userId 불일치시
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+
+            // 유저의 토큰이 아닐 시
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(e.getMessage());
         }
     }

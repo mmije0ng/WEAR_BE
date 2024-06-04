@@ -5,6 +5,7 @@ import com.backend.wear.config.jwt.CustomUserInfoDto;
 import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.config.jwt.Token;
 import com.backend.wear.config.jwt.TokenRepository;
+import com.backend.wear.dto.jwt.TokenRequestDto;
 import com.backend.wear.dto.login.*;
 import com.backend.wear.entity.*;
 import com.backend.wear.repository.StyleRepository;
@@ -44,6 +45,9 @@ public class LoginService {
     @Value("${api.key}")
     private String API_KEY;
 
+    @Value("${jwt.refresh_token.expiration_time}")
+    private long refreshTokenExpTime;
+
     ObjectMapper objectMapper;
 
     private String convertImageListToJson(String[] imageList) throws JsonProcessingException {
@@ -79,7 +83,7 @@ public class LoginService {
 
     @Transactional
     public SignUpResponseDto userSignUp(SignUpRequestDto signUpRequestDto) throws Exception {
-        String userCreatedId = signUpRequestDto.getLoginId();
+        String userCreatedId = signUpRequestDto.getId();
         // 유저 회원가입 아이디 목록
         List<String> userCreatedIdList = userRepository.findUserCreatedIdList();
         // 아이디 존재 여부 확인
@@ -87,13 +91,14 @@ public class LoginService {
                 .filter(id -> id.equals(userCreatedId))
                 .findFirst();
 
-        if (existingUserId.isPresent()) {
+        if (existingUserId.isPresent())
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-        }
 
-        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getCheckPassword())) {
+        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getCheckPassword()))
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+
+        if(userRepository.findByNickName(signUpRequestDto.getNickName()).isPresent())
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다");
 
         // 유저 대학 이메일 목록
         List<String> userUniversityEmailList = userRepository.findUserUniversityEmailList();
@@ -119,7 +124,7 @@ public class LoginService {
         // 유저 생성
         String[] profileImage = {"https://image1.marpple.co/files/u_1602321/2023/8/original/06c1fe9eefa54842de748c3a343b1207291ffa651.png?w=654"};
         User newUser = User.builder()
-                .userCreatedId(signUpRequestDto.getLoginId())
+                .userCreatedId(signUpRequestDto.getId())
                 .userPassword(passwordEncoder.encode(signUpRequestDto.getPassword())) //
                 .userName(signUpRequestDto.getUserName())
                 .nickName(signUpRequestDto.getNickName())
@@ -173,20 +178,28 @@ public class LoginService {
         String accessToken = jwtUtil.createAccessToken(info);
         String refreshToken = jwtUtil.createRefreshToken(info);
 
-//        // refresh token 저장
-//        Token token = Token.builder()
-//                        .id(user.getId())
-//                        .refreshToken(refreshToken)
-//                        .expiration(Duration.ofMillis(1209600000)) // 14일을 밀리초로 변환하여 설정
-//                        .build();
-//
-//        tokenRepository.save(token);
+        // refresh token 저장
+        Token token = Token.builder()
+                        .id(refreshToken)
+                        .userId(user.getId())
+                        .expiration(refreshTokenExpTime)
+                        .build();
+
+        tokenRepository.save(token);
 
         return LoginResponseDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void logout(TokenRequestDto logoutDto){
+        User user = userRepository.findById(logoutDto.getUserId())
+                .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        tokenRepository.deleteById(logoutDto.getRefreshToken());
     }
 
     // 대학교 인증 메일 발송

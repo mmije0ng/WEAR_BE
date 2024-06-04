@@ -43,6 +43,13 @@ public class JwtUtil {
         this.tokenRepository=tokenRepository;
     }
 
+    public String resolveToken(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);  // "Bearer " 이후의 실제 토큰 부분만 반환
+        }
+        return null;
+    }
+
     // Access Token 생성
     public String createAccessToken(CustomUserInfoDto user) {
         return doCreateToken(user, accessTokenExpTime);
@@ -90,8 +97,8 @@ public class JwtUtil {
                 .compact();
 
         Token token = Token.builder()
-                .id(userId)
-                .refreshToken(refreshToken)
+                .id(refreshToken)
+                .userId(user.getId())
                 .build();
 
         tokenRepository.save(token);
@@ -126,20 +133,11 @@ public class JwtUtil {
     }
 
     // JWT Claims 추출
-    public Claims extractAllClaims(String token) throws ExpiredJwtException {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-    public Boolean isTokenExpired(String token) {
-        final Date expiration = extractAllClaims(token).getExpiration();
-        return expiration.before(new Date());
-    }
-
-    public Long getRefreshTokenExpTime() {return refreshTokenExpTime;}
-
-    public Long getUserId(Long userId){return userId;}
 }

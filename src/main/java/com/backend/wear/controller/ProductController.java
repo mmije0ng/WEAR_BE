@@ -5,6 +5,7 @@ import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.service.ProductService;
 import com.backend.wear.service.TokenService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,11 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.Authentication;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/products")
@@ -24,6 +24,8 @@ public class ProductController {
 
     private final ProductService productService;
     private final TokenService tokenService;
+    private CompletableFuture<Object> searchNameRankFuture;
+
 
     @Autowired
     public ProductController(ProductService productService, TokenService tokenService){
@@ -375,18 +377,32 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("최근 검색어 전체 삭제 완료");
     }
 
-    // 인기 검색어 조회
-    // 매일 정각에 스케줄링
-    // /api/products/search/rank
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
-    @GetMapping("/search/rank")
-    public ResponseEntity<?> searchNameRankListSchedule() {
-        try{
-            return ResponseEntity.ok().body(productService.getSearchNameRank());
+    // 매일 정각에 스케줄링된 작업 실행
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") // 매일 정각에 실행
+ //   @Scheduled(cron = "* * * * * *", zone = "Asia/Seoul") // 매일 정각에 실행
+    @Async
+    public void searchNameRankListSchedule() {
+        try {
+            searchNameRankFuture = CompletableFuture.completedFuture(productService.getSearchNameRank());
+        } catch (Exception e) {
+            System.err.println("Error during scheduled task: " + e.getMessage());
+            searchNameRankFuture = CompletableFuture.completedFuture(e.getMessage());
         }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+    }
+
+    // REST API 메서드
+    // 인기 검색어 조회
+    // /api/products/search/rank
+    @GetMapping("/search/rank")
+    public ResponseEntity<?> getSearchNameRank() {
+        if (searchNameRankFuture != null && searchNameRankFuture.isDone()) {
+            try {
+                return ResponseEntity.ok().body(searchNameRankFuture.get());
+            } catch (InterruptedException | ExecutionException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching search name rank");
+            }
+        } else {
+            return ResponseEntity.ok().body(productService.getSearchNameRank());
         }
     }
 }
