@@ -43,6 +43,13 @@ public class JwtUtil {
         this.tokenRepository=tokenRepository;
     }
 
+    public String resolveToken(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);  // "Bearer " 이후의 실제 토큰 부분만 반환
+        }
+        return null;
+    }
+
     // Access Token 생성
     public String createAccessToken(CustomUserInfoDto user) {
         return doCreateToken(user, accessTokenExpTime);

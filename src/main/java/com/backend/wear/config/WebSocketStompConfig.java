@@ -1,6 +1,5 @@
 package com.backend.wear.config;
 
-import com.backend.wear.config.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +12,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 // stomp 연결 config
 
+@RequiredArgsConstructor
 @Slf4j
 @EnableWebSocketMessageBroker
 @Configuration
 public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtUtil jwtUtil;
     private final FilterChannelInterceptor filterChannelInterceptor;
-
-    @Autowired
-    WebSocketStompConfig(JwtUtil jwtUtil, FilterChannelInterceptor filterChannelInterceptor){
-        this.jwtUtil=jwtUtil;
-        this.filterChannelInterceptor=filterChannelInterceptor;
-    }
 
     // sockJS Fallback을 이용해 노출할 endpoint 설정
     @Override
@@ -35,6 +28,11 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new StompHandshakeInterceptor()) // StompHandshakeInterceptor 추가
                 .withSockJS();
+
+        // SockJS 지원 안 할시
+        registry.addEndpoint("/ws-stomp")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(new StompHandshakeInterceptor());
     }
 
     //메세지 브로커에 관한 설정

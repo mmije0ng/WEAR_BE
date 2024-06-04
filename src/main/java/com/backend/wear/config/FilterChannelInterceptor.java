@@ -9,6 +9,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -22,13 +23,18 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.AccountException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.amazonaws.util.AWSRequestMetrics.Field.StatusCode;
+
 
 // 메시지를 주고 받으면서 메시지 전송과 관련한 추가 로직을 처리할 때 사용
+@RequiredArgsConstructor
+
 @Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
@@ -37,41 +43,45 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private static final String BEARER_PREFIX = "Bearer ";
 
-    @Autowired
-    public FilterChannelInterceptor(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
-
     // 메시지가 채널로 전송되기 전 호출되는 메서드
     // 프런트 -> 서버로 메시지가 전송될 때
     // 메시지 전송 전에 인증 토큰을 검증하거나, 메시지 내용을 필터링 가능
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        log.info("full message:" + message);
+
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
-        // 헤더에서 토큰 얻기
-        List<String> authorizationHeaders = headerAccessor.getNativeHeader("Authorization");
-        String authorizationHeader = (authorizationHeaders != null && !authorizationHeaders.isEmpty()) ? authorizationHeaders.get(0) : null;
+        if (StompCommand.CONNECT.equals(headerAccessor.getCommand()) || StompCommand.SEND.equals(headerAccessor.getCommand())){
 
-        if (authorizationHeader == null || authorizationHeader.equals("null")) {
-            return buildErrorMessage(headerAccessor.getSessionId(), "토큰이 없습니다");
-        }
+            log.info("preSend 토큰 검사");
 
-        String token = authorizationHeader.substring(BEARER_PREFIX.length());
+            // 헤더에서 토큰 얻기
+            List<String> authorizationHeaders = headerAccessor.getNativeHeader("Authorization");
 
-        // 토큰 인증
-        try {
-            jwtUtil.validateToken(token);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-            return buildErrorMessage(headerAccessor.getSessionId(), "AccessToken 만료");
-        } catch (MalformedJwtException e) {
-            log.info("Malformed JWT Token", e);
-            return buildErrorMessage(headerAccessor.getSessionId(), "MalformedJwtException 예외");
-        } catch (Exception e) {
-            log.info("Token validation error", e);
-            return buildErrorMessage(headerAccessor.getSessionId(), "Token validation error");
+            String authorizationHeader = (authorizationHeaders != null && !authorizationHeaders.isEmpty()) ? authorizationHeaders.get(0) : null;
+
+            if (authorizationHeader == null || authorizationHeader.equals("null")) {
+                log.info("토큰 없음");
+                return buildErrorMessage(headerAccessor.getSessionId(), "토큰이 없습니다");
+            }
+
+            String token = authorizationHeader.substring(BEARER_PREFIX.length());
+
+            // 토큰 인증
+            try {
+                jwtUtil.validateToken(token);
+            } catch (ExpiredJwtException e) {
+                log.info("Expired JWT Token", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "AccessToken 만료");
+            } catch (MalformedJwtException e) {
+                log.info("Malformed JWT Token", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "MalformedJwtException 예외");
+            } catch (Exception e) {
+                log.info("Token validation error", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "Token validation error");
+            }
         }
 
         return message;
@@ -99,7 +109,6 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
                 .setHeaders(headerAccessor)
                 .build();
     }
-
 
 
 //    // 발생한 예외에 관계없이 전송이 완료된 후 호출

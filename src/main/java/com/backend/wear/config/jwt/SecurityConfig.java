@@ -3,6 +3,7 @@ package com.backend.wear.config.jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,7 +21,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 //@RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final CustomAccessDeniedHandler accessDeniedHandler;
@@ -38,7 +39,7 @@ public class SecurityConfig {
     // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
             "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
-            "/api/test",
+            "/api/test","/ws-stomp/**",
             "/api/university/**","/api/auth/**","/api/token/**",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
         };
@@ -82,7 +83,7 @@ public class SecurityConfig {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-        //               .anyRequest().permitAll()
+             //           .anyRequest().permitAll()
                         .anyRequest().authenticated()
         );
 
@@ -93,10 +94,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
-                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
-        ));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+//        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
+//                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
+//        ));
+
+        corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+
+        corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
 
