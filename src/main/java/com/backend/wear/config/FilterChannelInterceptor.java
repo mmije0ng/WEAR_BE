@@ -1,20 +1,47 @@
 package com.backend.wear.config;
 
 
+import com.backend.wear.config.jwt.JwtUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.AccountException;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.amazonaws.util.AWSRequestMetrics.Field.StatusCode;
+
+
 // 메시지를 주고 받으면서 메시지 전송과 관련한 추가 로직을 처리할 때 사용
+@RequiredArgsConstructor
+
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class FilterChannelInterceptor implements ChannelInterceptor {
+
+    private final JwtUtil jwtUtil;
+    private static final String BEARER_PREFIX = "Bearer ";
 
     // 메시지가 채널로 전송되기 전 호출되는 메서드
     // 프런트 -> 서버로 메시지가 전송될 때
@@ -22,39 +49,69 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        log.info("full message:" + message);
+
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        System.out.println(this.getClass().getName()+" 호출 완료");
-        System.out.println("full message:" + message);
-
-        // 메시지의 본문(body) 추출
-        Object payload = message.getPayload();
-        System.out.println("Message Payload: " + payload.getClass());;
         System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
-        System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
 
+        // stomp 연결시 jwt 검사 수행
+        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())){
 
-        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
-            System.out.println("msg: " + "conne");
+            log.info("preSend 메서드 stomp connect 연결 시 토큰 검사");
+
+            // 헤더에서 토큰 얻기
+            List<String> authorizationHeaders = headerAccessor.getNativeHeader("Authorization");
+
+            String authorizationHeader = (authorizationHeaders != null && !authorizationHeaders.isEmpty()) ? authorizationHeaders.get(0) : null;
+
+            if (authorizationHeader == null || authorizationHeader.equals("null")) {
+                log.info("토큰 없음");
+                return buildErrorMessage(headerAccessor.getSessionId(), "토큰이 없습니다");
+            }
+
+            String token = authorizationHeader.substring(BEARER_PREFIX.length());
+
+            // 토큰 인증
+            try {
+                jwtUtil.validateToken(token);
+            } catch (ExpiredJwtException e) {
+                log.info("Expired JWT Token", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "AccessToken 만료");
+            } catch (MalformedJwtException e) {
+                log.info("Malformed JWT Token", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "MalformedJwtException 예외");
+            } catch (Exception e) {
+                log.info("Token validation error", e);
+                return buildErrorMessage(headerAccessor.getSessionId(), "Token validation error");
+            }
         }
 
         return message;
-
-
-//        // Authorization 헤더에서 토큰 추출
-//        List<String> authHeaders = headerAccessor.getNativeHeader("Authorization");
-//        if (authHeaders != null && !authHeaders.isEmpty()) {
-//            String authHeader = authHeaders.get(0);
-//            if (authHeader.startsWith("Bearer ")) {
-//                String token = authHeader.substring(7);
-//                System.out.println("Extracted Token: " + token);
-//                // 여기서 추출한 토큰을 사용하여 추가 검증 또는 처리 수행
-//            } else {
-//                System.out.println("Authorization header is not in expected 'Bearer <token>' format");
-//            }
-//        } else {
-//            System.out.println("Authorization header is missing");
-//        }
     }
+
+    private Message<?> buildErrorMessage(String sessionId, String errorMessage) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
+        headerAccessor.setSessionId(sessionId);
+        headerAccessor.setMessage(errorMessage);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("access", false);
+        responseBody.put("message", errorMessage);
+        responseBody.put("timestamp", Instant.now().toString());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse;
+        try {
+            jsonResponse = objectMapper.writeValueAsString(responseBody);
+        } catch (JsonProcessingException e) {
+            jsonResponse = "{\"access\":false,\"message\":\"JSON processing error\",\"timestamp\":\"" + Instant.now().toString() + "\"}";
+        }
+
+        return MessageBuilder.withPayload(jsonResponse)
+                .setHeaders(headerAccessor)
+                .build();
+    }
+
 
 //    // 발생한 예외에 관계없이 전송이 완료된 후 호출
 //    // 클라이언트 -> 서버 메시지 전송 완료 후

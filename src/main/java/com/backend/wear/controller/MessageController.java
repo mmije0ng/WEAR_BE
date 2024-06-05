@@ -2,7 +2,9 @@ package com.backend.wear.controller;
 
 import com.backend.wear.dto.chat.ChatMessageDto;
 import com.backend.wear.service.MessageService;
+import com.backend.wear.service.TokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -10,7 +12,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestHeader;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @CrossOrigin(origins={"http://43.201.189.171:8080", "http://localhost:5173",
@@ -19,7 +23,6 @@ public class MessageController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final MessageService messageService;
-    private static final Logger log = LoggerFactory.getLogger(MessageController.class);
 
     // 새로운 사용자가 웹 소켓을 연결할 때 실행됨
     // @EventListener은 한개의 매개변수만 가질 수 있다.

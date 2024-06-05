@@ -10,10 +10,10 @@ import com.backend.wear.repository.UniversityRepository;
 import com.backend.wear.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,14 +55,22 @@ public class UniversityService {
         this.donationApplyRepository=donationApplyRepository;
     }
 
-    // 상위 5개 대학 순위 스케줄링
-    @Transactional
+    @Transactional(readOnly = true)
+    public List<University> getTopUniversities() {
+        return universityRepository.findTopUniversity();
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getUsersByUniversity(University university) {
+        return userRepository.findByUniversity(university);
+    }
+
     public UniversityResponseDto getUniversityRank() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        String date = ConvertTime.convertLocalDateTimeToDate(now); //날짜
-        String time = ConvertTime.convertLocalDateTimeToTime(now); //시간
+        String date = ConvertTime.convertLocalDateTimeToDate(now); // 날짜
+        String time = ConvertTime.convertLocalDateTimeToTime(now); // 시간
 
-        List<University> topUniversityList = universityRepository.findTopUniversity();
+        List<University> topUniversityList = getTopUniversities();
         List<University> top5UniversityList = topUniversityList.subList(0, Math.min(5, topUniversityList.size()));
 
         List<UniversityResponseDto.UniversityInfoDto> universityList = top5UniversityList.stream()
@@ -72,15 +80,15 @@ public class UniversityService {
         log.info("대학 순위 스케줄링 실행");
 
         // 1위 대학 매핑
-        String firstUniversityName=universityList.get(0).getUniversityName(); //1위 대학 이름
-        String firstTotalPoint= String.format("%,d",  top5UniversityList.get(0).getUniversityPoint())+"포인트"; //1위 대학 총 포인트
+        String firstUniversityName = universityList.get(0).getUniversityName(); // 1위 대학 이름
+        String firstTotalPoint = String.format("%,d", top5UniversityList.get(0).getUniversityPoint()) + "포인트"; // 1위 대학 총 포인트
 
-        List<User> firstUniversityUserList =userRepository.findByUniversity(top5UniversityList.get(0));  // 1위 대학의 모든 유저리스트
-        String firstProductCount = Integer.toString(productRepository.findUsersProductCount(firstUniversityUserList))+"번"; //1위 대학 거래횟수
+        List<User> firstUniversityUserList = getUsersByUniversity(top5UniversityList.get(0)); // 1위 대학의 모든 유저리스트
+        String firstProductCount = Integer.toString(productRepository.findUsersProductCount(firstUniversityUserList)) + "번"; // 1위 대학 거래횟수
         String firstDonationCount = Integer.toString(
-                donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList))+"번"; //1위 대학 기부횟수
+                donationApplyRepository.findUsersDonationApplyCount(firstUniversityUserList)) + "번"; // 1위 대학 기부횟수
 
-        log.info("거래횟수: "+firstProductCount+", 기부횟수: "+firstDonationCount);
+        log.info("거래횟수: " + firstProductCount + ", 기부횟수: " + firstDonationCount);
 
         return UniversityResponseDto.builder()
                 .date(date)

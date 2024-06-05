@@ -1,5 +1,6 @@
 package com.backend.wear.service;
 
+import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.dto.*;
 import com.backend.wear.dto.blockeduser.BlockedUserResponseDto;
 import com.backend.wear.dto.donation.DonationApplyResponseDto;
@@ -11,12 +12,14 @@ import com.backend.wear.entity.*;
 import com.backend.wear.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwt;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -45,6 +48,8 @@ public class UserService {
 
     private final ObjectMapper objectMapper;
 
+    private final JwtUtil jwtUtil;
+
     // JSON 문자열을 String[]으로 변환하는 메서드
     private  String[] convertImageJsonToArray(String productImageJson) {
         try {
@@ -60,7 +65,7 @@ public class UserService {
                        StyleRepository styleRepository,
                        UniversityRepository universityRepository, DonationApplyRepository donationApplyRepository,
                        WishRepository wishRepository, ProductRepository productRepository, BlockedUserRepository blockedUserRepository,
-                       ObjectMapper objectMapper){
+                       ObjectMapper objectMapper, JwtUtil jwtUtil){
         this.userRepository=userRepository;
         this.userStyleRepository=userStyleRepository;
         this.styleRepository=styleRepository;
@@ -70,6 +75,7 @@ public class UserService {
         this.productRepository=productRepository;
         this.blockedUserRepository=blockedUserRepository;
         this.objectMapper = objectMapper;
+        this.jwtUtil=jwtUtil;
     }
 
     // 마이페이지 사용자 정보
@@ -77,6 +83,7 @@ public class UserService {
     public UserResponseDto.MyPageDto getMyPageUserService(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         System.out.println("유저"+ user.getMyUserName());
 
         return mapToMyPageDto(user, userId);

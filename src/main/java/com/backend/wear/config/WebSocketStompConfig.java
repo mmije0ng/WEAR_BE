@@ -12,11 +12,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 // stomp 연결 config
 
+@RequiredArgsConstructor
 @Slf4j
 @EnableWebSocketMessageBroker
 @Configuration
-@RequiredArgsConstructor
 public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final FilterChannelInterceptor filterChannelInterceptor;
 
     // sockJS Fallback을 이용해 노출할 endpoint 설정
     @Override
@@ -26,6 +28,11 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new StompHandshakeInterceptor()) // StompHandshakeInterceptor 추가
                 .withSockJS();
+
+        // SockJS 지원 안 할시
+        registry.addEndpoint("/ws-stomp")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(new StompHandshakeInterceptor());
     }
 
     //메세지 브로커에 관한 설정
@@ -39,6 +46,6 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new FilterChannelInterceptor()); // FilterChannelInterceptor 추가
+        registration.interceptors(filterChannelInterceptor); // FilterChannelInterceptor 추가
     }
 }

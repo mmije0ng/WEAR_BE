@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableJpaAuditing
 @EnableScheduling //스케줄러
+@EnableAsync
 @SpringBootApplication
 @EntityScan("com.backend.wear.entity")
 public class WearApplication {
