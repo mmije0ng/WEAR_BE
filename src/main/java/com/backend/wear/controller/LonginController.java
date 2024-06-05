@@ -27,7 +27,7 @@ public class LonginController {
 
     // 로그인
     // api/auth/login
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception{
         try {
             LoginResponseDto loginResponseDto = loginService.login(loginRequestDto);
@@ -41,7 +41,7 @@ public class LonginController {
 
     // 로그아웃
     // api/auth/logout
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody TokenRequestDto logoutRequestDto) throws Exception{
         try {
             loginService.logout(logoutRequestDto);
@@ -66,7 +66,7 @@ public class LonginController {
     }
 
     //대학 인증 메일 발송
-    @GetMapping("/certify")
+    @PostMapping("/certify")
     public ResponseEntity<?> certifyUniversity(@RequestBody UniversityCertifyRequestDto.CertifyDto certifyDto) {
         try {
             return ResponseEntity.ok().body(loginService.certifyUniversity(certifyDto));

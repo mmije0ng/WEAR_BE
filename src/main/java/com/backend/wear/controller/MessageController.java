@@ -23,7 +23,6 @@ public class MessageController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final MessageService messageService;
-    private final TokenService tokenService;
 
     // 새로운 사용자가 웹 소켓을 연결할 때 실행됨
     // @EventListener은 한개의 매개변수만 가질 수 있다.
@@ -36,8 +35,7 @@ public class MessageController {
     // /pub/api/chat/message/{chatRoomId}
     @MessageMapping(value="/api/chat/message/{chatRoomId}")
     public void sendMyMessage (@DestinationVariable("chatRoomId")Long chatRoomId,
-                               ChatMessageDto.ChatRoomMessageDto dto,
-                               @RequestHeader("Authorization") String authorizationHeader) throws Exception{
+                               ChatMessageDto.ChatRoomMessageDto dto) throws Exception{
 
         log.info("채팅방 아이디: "+chatRoomId);
 

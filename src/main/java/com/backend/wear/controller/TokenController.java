@@ -23,7 +23,7 @@ public class TokenController {
     }
 
     // accessToken 재발급
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<?> getRefresh(@RequestBody TokenRequestDto tokenRequestDto) {
         try{
             TokenResponseDto tokenResponseDto = tokenService.getNewAccessToken(tokenRequestDto);
@@ -33,8 +33,6 @@ public class TokenController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("refreshToken 만료. 재로그인 필요.");
         } catch (IllegalArgumentException e){
-
-            // 유저의 토큰이 아닐 시
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(e.getMessage());
         }

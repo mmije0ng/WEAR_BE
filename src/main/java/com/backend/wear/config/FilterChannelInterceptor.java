@@ -52,10 +52,12 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         log.info("full message:" + message);
 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
+        System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
 
-        if (StompCommand.CONNECT.equals(headerAccessor.getCommand()) || StompCommand.SEND.equals(headerAccessor.getCommand())){
+        // stomp 연결시 jwt 검사 수행
+        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())){
 
-            log.info("preSend 토큰 검사");
+            log.info("preSend 메서드 stomp connect 연결 시 토큰 검사");
 
             // 헤더에서 토큰 얻기
             List<String> authorizationHeaders = headerAccessor.getNativeHeader("Authorization");
