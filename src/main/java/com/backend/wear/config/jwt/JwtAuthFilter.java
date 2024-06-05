@@ -3,6 +3,7 @@ package com.backend.wear.config.jwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.lang.Assert;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.cors.*;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -37,6 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter { // OncePerRequestFilte
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException{
+
         String authorizationHeader = request.getHeader("Authorization");
 
         //JWT가 헤더에 있는 경우
