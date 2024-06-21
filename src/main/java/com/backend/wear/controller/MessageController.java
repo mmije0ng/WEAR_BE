@@ -57,9 +57,7 @@ public class MessageController {
 
         // 구독자들에게 메시지 전달
         // /sub/api/chat/message/{chatRoomId}
-        simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);
-        log.info("상대편 입장 보낸건지 여부: "+ dto.isMine());
-    }
+        simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);}
 
     // 상품 등록 5일후 보내는 메시지
     @MessageMapping(value="/api/chat/message/wear/{chatRoomId}")

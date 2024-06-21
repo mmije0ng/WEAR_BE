@@ -41,7 +41,7 @@ public class SecurityConfig  {
     private static final String[] AUTH_WHITELIST = {
             "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
             "/test","/ws-stomp/**",
-            "/api/university/**","/api/auth/**","/api/token/**",
+            "/api/university/**","/api/auth/**",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
         };
 
@@ -89,50 +89,33 @@ public class SecurityConfig  {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsconfiguration = new CorsConfiguration();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsconfiguration.addAllowedOrigin("http://localhost:8080");
-        corsconfiguration.addAllowedOrigin("http://localhost:5173");
-        corsconfiguration.addAllowedOrigin("http://43.201.189.171:8080");
-        corsconfiguration.addAllowedOrigin("http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com");
+//        corsconfiguration.addAllowedOrigin("http://localhost:8080");
+//        corsconfiguration.addAllowedOrigin("http://localhost:5173");
+//        corsconfiguration.addAllowedOrigin("http://43.201.189.171:8080");
+//        corsconfiguration.addAllowedOrigin("http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com");
  //       configuration.addAllowedOrigin("https://jiangxy.github.io");
 
-//        configuration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
-//                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
-//        ));
+        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
+                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
+        ));
 
         //허용할 헤더 설정
-        corsconfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedHeader("*");
 
         //허용할 http method
-        corsconfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedMethod("*");
 
         // 클라이언트가 접근 할 수 있는 서버 응답 헤더
-        corsconfiguration.addExposedHeader("Authorization");
+        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh"));
 
         //사용자 자격 증명이 지원되는지 여부
-        corsconfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsconfiguration);
+        source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
-
-//        CorsConfiguration corsConfiguration = new CorsConfiguration();
-//
-//        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
-//                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
-//        ));
-//
-//        corsConfiguration.setAllowedOriginPatterns(List.of("*"));
-//
-//        corsConfiguration.setAllowedMethods(List.of("*"));
-//        corsConfiguration.setAllowedHeaders(List.of("*"));
-//        corsConfiguration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", corsConfiguration); // 모든 경로에 대해서 CORS 설정을 적용
-//
-//        return source;
     }
 }

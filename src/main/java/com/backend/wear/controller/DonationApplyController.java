@@ -25,7 +25,8 @@ public class DonationApplyController {
     // api/donations/{userId}?charity={charity}
     @PostMapping("/{userId}")
     public ResponseEntity<?> postDonationApply(@PathVariable(name="userId")Long userId,@RequestParam(name="charity") Integer charity,
-                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto, @RequestHeader("Authorization") String authorizationHeader){
+                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto,
+                                               @RequestHeader("Authorization") String authorizationHeader){
         if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("accessToken의 userId 불일치");

@@ -1,21 +1,13 @@
 package com.backend.wear.service;
 
 import com.backend.wear.config.jwt.*;
-import com.backend.wear.dto.jwt.TokenRequestDto;
-import com.backend.wear.dto.jwt.TokenResponseDto;
 import com.backend.wear.entity.User;
 import com.backend.wear.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.ExpressionException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -48,15 +40,18 @@ public class TokenService {
 
     // accessToken 재발급
     @Transactional
-    public TokenResponseDto getNewAccessToken(TokenRequestDto dto) throws ExpiredJwtException{
-        Long userId = dto.getUserId();
+    public String getNewAccessToken(Long id, String authorizationHeader, String authorizationRefreshHeader )
+            throws ExpiredJwtException{
+
+        Long userId = id;
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         log.info("재발급");
 
-        String requestAccessToken= dto.getAccessToken();
-        String requestRefreshToken= dto.getRefreshToken();
+        // JWT 토큰에서 "Bearer " 접두사 제거
+        String requestAccessToken = authorizationHeader.substring(7);
+        String requestRefreshToken = authorizationRefreshHeader.substring(7);
 
         // token 만료기간 검증
         jwtUtil.validateToken(requestRefreshToken);
@@ -74,9 +69,7 @@ public class TokenService {
             // 새로운 accessToken 발급
             String newAccessToken = jwtUtil.createAccessToken(mapToCustomUser(user));
 
-            return TokenResponseDto.builder()
-                    .newAccessToken(newAccessToken)
-                    .build();
+            return newAccessToken;
         }
 
         else

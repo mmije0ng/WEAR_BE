@@ -390,7 +390,6 @@ public class ProductController {
         }
     }
 
-    // REST API 메서드
     // 인기 검색어 조회
     // /api/products/search/rank
     @GetMapping("/search/rank")
@@ -399,7 +398,7 @@ public class ProductController {
             try {
                 return ResponseEntity.ok().body(searchNameRankFuture.get());
             } catch (InterruptedException | ExecutionException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching search name rank");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인기 검색어 스케줄링 실패");
             }
         } else {
             return ResponseEntity.ok().body(productService.getSearchNameRank());
