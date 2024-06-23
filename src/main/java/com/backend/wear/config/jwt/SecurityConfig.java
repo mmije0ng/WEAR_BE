@@ -3,15 +3,17 @@ package com.backend.wear.config.jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,14 +21,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+
 @Configuration
 @EnableWebSecurity
-//@RequiredArgsConstructor
 public class SecurityConfig  {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private org.springframework.core.Ordered Ordered;
 
     @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtil jwtUtil,
@@ -39,7 +42,8 @@ public class SecurityConfig  {
 
     // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
-            "/api/upload/**", "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
+            "/api/upload","/api/upload/**",
+            "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
             "/test","/ws-stomp/**",
             "/api/university/**","/api/auth/**",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
@@ -54,7 +58,14 @@ public class SecurityConfig  {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
         // CSRF
-        http.csrf((csrf) -> csrf.disable());
+        http.csrf(csrf -> csrf
+                .ignoringRequestMatchers(
+                        new AntPathRequestMatcher("/api/upload"), // 단일 엔드포인트에 대해 예외 처리
+                        new AntPathRequestMatcher("/api/upload/**") // 경로 패턴에 대해 예외 처리
+                )
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .disable()
+        );
 
         // CORS
         http.cors(httpSecurityCorsConfigurer ->
@@ -80,8 +91,8 @@ public class SecurityConfig  {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-             //           .anyRequest().permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
+            //            .anyRequest().authenticated()
         );
 
         return http.build();
@@ -90,12 +101,6 @@ public class SecurityConfig  {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-
-//        corsconfiguration.addAllowedOrigin("http://localhost:8080");
-//        corsconfiguration.addAllowedOrigin("http://localhost:5173");
-//        corsconfiguration.addAllowedOrigin("http://43.201.189.171:8080");
-//        corsconfiguration.addAllowedOrigin("http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com");
- //       configuration.addAllowedOrigin("https://jiangxy.github.io");
 
         corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
                 "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
@@ -108,7 +113,7 @@ public class SecurityConfig  {
         corsConfiguration.addAllowedMethod("*");
 
         // 클라이언트가 접근 할 수 있는 서버 응답 헤더
-        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh", "files"));
 
         //사용자 자격 증명이 지원되는지 여부
         corsConfiguration.setAllowCredentials(true);

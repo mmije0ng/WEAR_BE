@@ -7,9 +7,12 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -33,8 +36,7 @@ public class JwtUtil {
             @Value("${jwt.secret}") String secretKey,
             @Value("${jwt.access_token.expiration_time}") long accessTokenExpTime,
             @Value("${jwt.refresh_token.expiration_time}") long refreshTokenExpTime,
-            UserRepository userRepository, TokenRepository tokenRepository
-    ) {
+            UserRepository userRepository, TokenRepository tokenRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenExpTime = accessTokenExpTime;
@@ -140,4 +142,44 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public void validateUserIdWithHeader (String authorizationHeader, Long userId) throws java.security.SignatureException {
+        // 헤더의 토큰에서 userId 추출
+        String token = resolveToken(authorizationHeader);
+        Long tokenUserId = getTokenUserId(token);
+
+        // 토큰 만료 기간 검증
+        validateToken(token);
+
+        // 토큰의 userId와 현재 인증된 사용자의 userId 비교
+        if(!userId.equals(tokenUserId))
+            throw new SignatureException("accessToken의 userId 불일치");
+    }
+
+//    // Authorization header의 userId와 로그인한 userId 일치 여부 검증
+//    // SignatureException :  JWT의 기존 서명을 확인하지 못했을 때
+//    public void validateUserIdWithHeader(String authorizationHeader) throws Exception {
+//        String token = resolveToken(authorizationHeader);
+//
+//        // 토큰 만료 기간 검증
+//        validateToken(token);
+//
+//        // 토큰에서 userId 추출
+//        Long tokenUserId = getTokenUserId(token);
+//
+//        // SecurityContext에서 현재 인증된 사용자 정보 가져오기
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new SignatureException("authentication 오류");
+//        }
+//
+//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+//        Long currentUserId = Long.parseLong(userDetails.getUsername());
+//
+//        log.info("tokenUserId: "+tokenUserId+" currentUserId: "+currentUserId);
+//
+//        // 토큰의 userId와 현재 인증된 사용자의 userId 비교
+//        if(!tokenUserId.equals(currentUserId))
+//            throw new SignatureException("accessToken의 userId 불일치");
+//    }
 }

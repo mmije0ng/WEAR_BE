@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwt;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 public class UserService {
     private static final int PAGE_SIZE=12;
@@ -407,21 +410,33 @@ public class UserService {
         // userId에 해당하는 모든 UserStyle 조회
         List<UserStyle> allUserStyles = userStyleRepository.findByUserId(userId);
 
-        // Set으로 저장된 styleNameList 생성
+        // Set으로 저장된 styleNameList 생성, 변경할 스타일 태그 이름 리스트
         Set<String> styleNamesInList = new HashSet<>(styleNameList);
 
         // 사용자가 변경할 스타일 태그 리스트 중 포함되지 않는 스타일 태그 삭제
         allUserStyles.stream()
                 .filter(userStyle -> !styleNamesInList.contains(userStyle.getStyle().getStyleName()))
-                .forEach(userStyleRepository::delete);
+                .forEach(
+                        userStyle -> {
+                            log.info("삭제할 스타일 태그 유저 아이디, 이름: " + userStyle.getUser().getId() +", "+ userStyle.getStyle().getStyleName());
 
-        // 새로운 스타일 추가
-        styleNameList.stream()
-                .filter(styleName -> allUserStyles.stream()
-                        .noneMatch(userStyle -> userStyle.getStyle().getStyleName().equals(styleName)))
+                            // 스타일 태그 삭제
+                            userStyleRepository.deleteUsersStyleByUserIdAndStyleName(userStyle.getUser().getId(), userStyle.getStyle().getStyleName());
+                            // 변경할 스타일 태그 리스트에서도 스타일 태그 삭제
+                            styleNamesInList.remove(userStyle.getStyle().getStyleName());
+                            }
+                        );
+
+
+        // 새로운 스타일 추가, 기존에 존재하던 스타일 태그는 유지
+        styleNamesInList.stream()
+               .filter(styleName -> allUserStyles.stream()
+                      .noneMatch(userStyle -> userStyle.getStyle().getStyleName().equals(styleName)))
                 .forEach(styleName -> {
                     Style style = styleRepository.findByStyleName(styleName)
                             .orElseThrow(() -> new IllegalArgumentException("없는 스타일 태그 이름입니다."));
+
+                    log.info("추가할 스타일 태그 이름: "+ style.getStyleName());
 
                     UserStyle newUserStyle = UserStyle.builder()
                             .user(user)
