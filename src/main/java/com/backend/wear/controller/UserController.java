@@ -1,36 +1,34 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.config.jwt.Token;
+import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.dto.blockeduser.BlockedUserResponseDto;
 import com.backend.wear.dto.donation.DonationApplyResponseDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.dto.user.UserRequestDto;
 import com.backend.wear.dto.user.UserResponseDto;
-import com.backend.wear.service.TokenService;
 import com.backend.wear.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.SignatureException;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final TokenService tokenService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(UserService userService, TokenService tokenService){
+    public UserController(UserService userService, JwtUtil jwtUtil){
         this.userService=userService;
-        this.tokenService=tokenService;
+        this.jwtUtil=jwtUtil;
     }
 
     // 마이페이지 사용자 정보
@@ -38,16 +36,16 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId ,@RequestHeader("Authorization") String authorizationHeader)
             throws Exception {
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             UserResponseDto.MyPageDto myPageDto=userService.getMyPageUserService(userId);
             return ResponseEntity.ok(myPageDto);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -56,20 +54,20 @@ public class UserController {
     // /api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable(name="userId") Long userId, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         UserResponseDto.ProfileDto profileDto;
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
             profileDto =userService.getUserProfileService(userId);
+
+            return ResponseEntity.ok(profileDto);
 
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage());
         }
-
-        return ResponseEntity.ok(profileDto);
     }
 
     // 사용자 프로필 수정
@@ -79,15 +77,16 @@ public class UserController {
                                                @RequestBody UserRequestDto.ProfileDto profileDto, @RequestHeader("Authorization") String authorizationHeader)
     throws Exception
     {
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             userService.updateUserProfile(userId, profileDto);
             return ResponseEntity.ok().body("회원 정보가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -95,36 +94,37 @@ public class UserController {
     // 계정 정보
     // /api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
-    public ResponseEntity<?> getUserInfo(@PathVariable(name="userId") Long userId, @RequestHeader("Authorization") String authorizationHeader){
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
-        UserResponseDto.InfoDto userResponseDto;
+    public ResponseEntity<?> getUserInfo(@PathVariable(name="userId") Long userId, @RequestHeader("Authorization") String authorizationHeader) throws SignatureException {
         try{
-            userResponseDto=userService.getUserInfoService(userId);
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
+            UserResponseDto.InfoDto userResponseDto =userService.getUserInfoService(userId);
+            return ResponseEntity.ok(userResponseDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage());
         }
 
-        return ResponseEntity.ok(userResponseDto);
     }
 
     // 계정 정보 저장
     // /api/users/userInfo/update/{userId}
     @PutMapping("/userInfo/update/{userId}")
     public ResponseEntity<?> updateUserInfo(@PathVariable(name="userId") Long userId,@RequestBody UserRequestDto.InfoDto infodto
-    ,@RequestHeader("Authorization") String authorizationHeader){
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    ,@RequestHeader("Authorization") String authorizationHeader) throws SignatureException {
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             userService.updateUserInfoService(userId, infodto);
             return ResponseEntity.ok().body("사용자 이름이 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -134,15 +134,16 @@ public class UserController {
     @PutMapping ("/password/{userId}")
     public ResponseEntity<?> putPassword(@PathVariable(name="userId") Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto,
                                          @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             userService.updatePassword(userId, passwordDto);
             return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -153,15 +154,16 @@ public class UserController {
     public ResponseEntity<?> getWishList(@PathVariable(name="userId") Long userId,
                                          @RequestParam(name="pageNumber") Integer pageNumber ,
                                          @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page <ProductResponseDto.ScreenDto> myWishPage = userService.getMyWishPage(userId, pageNumber);
             return ResponseEntity.ok(myWishPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -170,17 +172,19 @@ public class UserController {
     // /api/users/myProducts/onSale/{userId}?pageNumber={}
     @GetMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> getMyProductsOnSale(@PathVariable(name="userId") Long userId,
-                                                 @RequestParam(name="pageNumber")Integer pageNumber, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+                                                 @RequestParam(name="pageNumber")Integer pageNumber,
+                                                 @RequestHeader("Authorization") String authorizationHeader) throws Exception{
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"onSale", pageNumber);
             return ResponseEntity.ok(myProductsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -190,15 +194,16 @@ public class UserController {
     @PutMapping("/myProducts/onSale/{userId}")
     public ResponseEntity<?> updatePostStatusSoldOut(@PathVariable(name="userId") Long userId,
                                                  @RequestBody @Valid ProductRequestDto requestDto, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             userService.changePostStatus(userId, requestDto);
             return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -208,16 +213,17 @@ public class UserController {
     @GetMapping("/myProducts/soldOut/{userId}")
     public ResponseEntity<?> getMyProductsSoldOut(@PathVariable(name="userId") Long userId,
                                                   @RequestParam(name="pageNumber")Integer pageNumber, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"soldOut", pageNumber);
             return ResponseEntity.ok(myProductsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -228,16 +234,17 @@ public class UserController {
     public ResponseEntity<?> getMyProductsPrivate(@PathVariable(name="userId") Long userId,
                                                   @RequestParam(name="pageNumber")Integer pageNumber,
                                                   @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try{
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page<ProductResponseDto.PrivateDto> myPrivateProductsPage
                     = userService.getMyPrivateProductsPage(userId, pageNumber);
             return ResponseEntity.ok(myPrivateProductsPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }  catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -245,19 +252,20 @@ public class UserController {
     // 내 기부 내역 불러오기
     // /api/users/myDonations/{userId}?pageNumber={pageNumber}
     @GetMapping ("/myDonations/{userId}")
-    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber
-            , @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber,
+                                                @RequestHeader("Authorization") String authorizationHeader) throws Exception{
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page <DonationApplyResponseDto> myDonationApplyPage
                     =userService.myDonationApplysPage(userId, pageNumber);
             return ResponseEntity.ok().body(myDonationApplyPage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -267,17 +275,18 @@ public class UserController {
     @GetMapping ("/myDonations/complete/{userId}")
     public ResponseEntity<?> getMyDonationApplyComplete(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber,
                                                         @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page <DonationApplyResponseDto>  myDonationApplyCompletePage
                     =userService.myDonationApplysCompletePage(userId, pageNumber);
             return ResponseEntity.ok().body(myDonationApplyCompletePage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -287,16 +296,17 @@ public class UserController {
     @GetMapping("/blockedUsers/{userId}")
     public ResponseEntity<?> getBlockedUsersList(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber,
                                                  @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             Page<BlockedUserResponseDto> blockedUserPage = userService.getBlockedUsersPage(userId, pageNumber);
             return ResponseEntity.ok().body(blockedUserPage);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
@@ -307,15 +317,16 @@ public class UserController {
     public ResponseEntity<?> deleteBlockedUser(@PathVariable(name="userId") Long userId,
                                                @PathVariable(name="blockedUserId")Long blockedUserId,
                                                @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try {
+            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
+
             userService.deleteBlockedUser(userId,blockedUserId);
             return ResponseEntity.ok().body("차단이 해제되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (SignatureException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }

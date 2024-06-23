@@ -44,6 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter { // OncePerRequestFilte
 
         //JWT가 헤더에 있는 경우
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+
             String token = authorizationHeader.substring(7);
 
             //JWT 유효성 검증

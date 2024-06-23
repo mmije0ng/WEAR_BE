@@ -1,21 +1,16 @@
 package com.backend.wear.config;
 
-
 import com.backend.wear.config.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -23,21 +18,17 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.login.AccountException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.amazonaws.util.AWSRequestMetrics.Field.StatusCode;
-
 
 // 메시지를 주고 받으면서 메시지 전송과 관련한 추가 로직을 처리할 때 사용
 @RequiredArgsConstructor
 
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 99)
+@Order(Ordered.HIGHEST_PRECEDENCE + 99) // 우선순위 올리기
 public class FilterChannelInterceptor implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
@@ -57,7 +48,7 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         // stomp 연결시 jwt 검사 수행
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())){
 
-            log.info("preSend 메서드 stomp connect 연결 시 토큰 검사");
+            log.info("preSend 메서드에서 stomp connect 연결 시 토큰 검사");
 
             // 헤더에서 토큰 얻기
             List<String> authorizationHeaders = headerAccessor.getNativeHeader("Authorization");
@@ -65,7 +56,7 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
             String authorizationHeader = (authorizationHeaders != null && !authorizationHeaders.isEmpty()) ? authorizationHeaders.get(0) : null;
 
             if (authorizationHeader == null || authorizationHeader.equals("null")) {
-                log.info("토큰 없음");
+                log.info("헤더에 토큰 없음");
                 return buildErrorMessage(headerAccessor.getSessionId(), "토큰이 없습니다");
             }
 
@@ -74,7 +65,7 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
             // 토큰 인증
             try {
                 jwtUtil.validateToken(token);
-            } catch (ExpiredJwtException e) {
+            } catch (ExpiredJwtException e) { // 토큰 만료시
                 log.info("Expired JWT Token", e);
                 return buildErrorMessage(headerAccessor.getSessionId(), "AccessToken 만료");
             } catch (MalformedJwtException e) {

@@ -6,12 +6,14 @@ import com.backend.wear.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Slf4j
 @RestController
@@ -28,11 +30,20 @@ public class LonginController {
     // 로그인
     // api/auth/login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception{
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception {
         try {
             LoginResponseDto loginResponseDto = loginService.login(loginRequestDto);
             log.info("로그인");
-            return ResponseEntity.ok(loginResponseDto);
+
+            // 헤더를 생성하고 토큰을 추가합니다.
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", loginResponseDto.getAccessToken());
+            headers.add("Authorization-Refresh", loginResponseDto.getRefreshToken());
+
+            // 헤더와 userId를 포함한 응답을 반환합니다.
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(Collections.singletonMap("userId", loginResponseDto.getUserId()));
         } catch (IllegalArgumentException | BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
