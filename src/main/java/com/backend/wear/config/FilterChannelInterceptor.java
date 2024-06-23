@@ -102,17 +102,4 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
                 .setHeaders(headerAccessor)
                 .build();
     }
-
-
-//    // 발생한 예외에 관계없이 전송이 완료된 후 호출
-//    // 클라이언트 -> 서버 메시지 전송 완료 후
-//    @Override
-//    public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex){
-//        System.out.println(this.getClass().getName()+" 호출 완료");
-//
-//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-//        System.out.println("full message:" + message);
-//        System.out.println("auth:" + headerAccessor.getNativeHeader("Authorization"));
-//        System.out.println(headerAccessor.getHeader("nativeHeaders").getClass());
-//    }
 }
