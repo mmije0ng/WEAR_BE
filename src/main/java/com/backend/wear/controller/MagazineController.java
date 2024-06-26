@@ -14,34 +14,26 @@ import java.security.SignatureException;
 public class MagazineController {
 
     private final MagazineService magazineService;
-    private final JwtUtil jwtUtil;
 
     @Autowired
-    public MagazineController(MagazineService magazineService, JwtUtil jwtUtil){
+    public MagazineController(MagazineService magazineService){
         this.magazineService=magazineService;
-        this.jwtUtil=jwtUtil;
     }
 
     //퀴즈 정답만큼 환경 점수 올리기
     //api/magazine/{userId}?score=score
     @PostMapping("/{userId}")
-    public ResponseEntity<?> quizPoint(@PathVariable("userId")Long userId,
-                                       @RequestParam Integer score,
-                                       @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> quizPoint(@RequestHeader("Authorization") String authorizationHeader,
+                                       @PathVariable("userId")Long userId,
+                                       @RequestParam Integer score) {
 
         try {
-            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
-            
             magazineService.updatePoint(userId, score);
+
             return ResponseEntity.ok().body("포인트 제공 완료.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
-        } catch (SignatureException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(e.getMessage());
         }
-
     }
-
 }

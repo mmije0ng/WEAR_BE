@@ -49,7 +49,7 @@ public class ImageUploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
         List<String> fileUrls = new ArrayList<>();
         try {
             for (MultipartFile file : files) {

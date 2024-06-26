@@ -14,31 +14,25 @@ import java.security.SignatureException;
 @RequestMapping("/api/donations")
 public class DonationApplyController {
     private final DonationApplyService donationApplyService;
-    private final JwtUtil jwtUtil;
 
     @Autowired
-    public DonationApplyController(DonationApplyService donationApplyService, JwtUtil jwtUtil){
+    public DonationApplyController(DonationApplyService donationApplyService){
         this.donationApplyService=donationApplyService;
-        this.jwtUtil=jwtUtil;
     }
 
     // 기부 등록하기
     // api/donations/{userId}?charity={charity}
     @PostMapping("/{userId}")
-    public ResponseEntity<?> postDonationApply(@PathVariable(name="userId")Long userId,@RequestParam(name="charity") Integer charity,
-                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto,
-                                               @RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity<?> postDonationApply( @RequestHeader("Authorization") String authorizationHeader,
+                                                @PathVariable(name="userId")Long userId,
+                                               @RequestParam(name="charity") Integer charity,
+                                               @RequestBody DonationApplyRequestDto donationApplyRequestDto){
         try{
-            jwtUtil.validateUserIdWithHeader (authorizationHeader,userId);
-
             donationApplyService.donationApplyService(userId, charity, donationApplyRequestDto);
             return ResponseEntity.ok().body("기부가 완료되었습니다.");
         }
         catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        } catch (SignatureException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
     }
