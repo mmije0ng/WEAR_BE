@@ -1,52 +1,45 @@
 package com.backend.wear.controller;
 
-import com.backend.wear.config.jwt.Token;
+import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.dto.blockeduser.BlockedUserResponseDto;
 import com.backend.wear.dto.donation.DonationApplyResponseDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
 import com.backend.wear.dto.user.UserRequestDto;
 import com.backend.wear.dto.user.UserResponseDto;
-import com.backend.wear.service.TokenService;
 import com.backend.wear.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.SignatureException;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final TokenService tokenService;
 
     @Autowired
-    public UserController(UserService userService, TokenService tokenService){
+    public UserController(UserService userService){
         this.userService=userService;
-        this.tokenService=tokenService;
     }
 
     // 마이페이지 사용자 정보
     // /api/users/{userId}
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyPageUser(@PathVariable(name="userId") Long userId ,@RequestHeader("Authorization") String authorizationHeader)
+    public ResponseEntity<?> getMyPageUser( @RequestHeader("Authorization") String authorizationHeader,
+                                            @PathVariable(name="userId") Long userId)
             throws Exception {
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
         try{
             UserResponseDto.MyPageDto myPageDto=userService.getMyPageUserService(userId);
+
             return ResponseEntity.ok(myPageDto);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
@@ -55,36 +48,29 @@ public class UserController {
     // 사용자 프로필
     // /api/users/profile/{userId}
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable(name="userId") Long userId, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
-        UserResponseDto.ProfileDto profileDto;
+    public ResponseEntity<?> getUserProfile( @RequestHeader("Authorization") String authorizationHeader,
+                                             @PathVariable(name="userId") Long userId)
+            throws Exception{
         try{
-            profileDto =userService.getUserProfileService(userId);
+            UserResponseDto.ProfileDto profileDto =userService.getUserProfileService(userId);
+
+            return ResponseEntity.ok(profileDto);
 
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-
-        return ResponseEntity.ok(profileDto);
     }
 
     // 사용자 프로필 수정
     // /api/users/profile/{userId}
     @PutMapping("/profile/{userId}")
-    public ResponseEntity<?> updateUserProfile(@PathVariable(name="userId") Long userId,
-                                               @RequestBody UserRequestDto.ProfileDto profileDto, @RequestHeader("Authorization") String authorizationHeader)
-    throws Exception
-    {
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> updateUserProfile(@RequestHeader("Authorization") String authorizationHeader,
+                                               @PathVariable(name="userId") Long userId,
+                                               @RequestBody UserRequestDto.ProfileDto profileDto) throws Exception {
         try {
             userService.updateUserProfile(userId, profileDto);
+
             return ResponseEntity.ok().body("회원 정보가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -95,33 +81,26 @@ public class UserController {
     // 계정 정보
     // /api/users/userInfo/{userId}
     @GetMapping("/userInfo/{userId}")
-    public ResponseEntity<?> getUserInfo(@PathVariable(name="userId") Long userId, @RequestHeader("Authorization") String authorizationHeader){
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
-        UserResponseDto.InfoDto userResponseDto;
+    public ResponseEntity<?> getUserInfo( @RequestHeader("Authorization") String authorizationHeader,
+                                          @PathVariable(name="userId") Long userId) throws Exception {
         try{
-            userResponseDto=userService.getUserInfoService(userId);
+            UserResponseDto.InfoDto userResponseDto =userService.getUserInfoService(userId);
+            return ResponseEntity.ok(userResponseDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
-
-        return ResponseEntity.ok(userResponseDto);
     }
 
     // 계정 정보 저장
     // /api/users/userInfo/update/{userId}
     @PutMapping("/userInfo/update/{userId}")
-    public ResponseEntity<?> updateUserInfo(@PathVariable(name="userId") Long userId,@RequestBody UserRequestDto.InfoDto infodto
-    ,@RequestHeader("Authorization") String authorizationHeader){
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> updateUserInfo( @RequestHeader("Authorization") String authorizationHeader,
+                                             @PathVariable(name="userId") Long userId,
+                                            @RequestBody UserRequestDto.InfoDto infodto) throws Exception {
         try {
             userService.updateUserInfoService(userId, infodto);
+
             return ResponseEntity.ok().body("사용자 이름이 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -132,14 +111,12 @@ public class UserController {
     // 비밀번호 변경하기
     // /api/users/password/{userId}
     @PutMapping ("/password/{userId}")
-    public ResponseEntity<?> putPassword(@PathVariable(name="userId") Long userId, @RequestBody UserRequestDto.PasswordDto passwordDto,
-                                         @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> putPassword(@RequestHeader("Authorization") String authorizationHeader,
+                                         @PathVariable(name="userId") Long userId,
+                                         @RequestBody UserRequestDto.PasswordDto passwordDto) throws Exception{
         try {
             userService.updatePassword(userId, passwordDto);
+
             return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -150,15 +127,12 @@ public class UserController {
     // 찜한 상품 불러오기
     // /api/users/wishList/{userId}?pageNumber={}
     @GetMapping("/wishList/{userId}")
-    public ResponseEntity<?> getWishList(@PathVariable(name="userId") Long userId,
-                                         @RequestParam(name="pageNumber") Integer pageNumber ,
-                                         @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
+    public ResponseEntity<?> getWishList(@RequestHeader("Authorization") String authorizationHeader,
+                                         @PathVariable(name="userId") Long userId,
+                                         @RequestParam(name="pageNumber") Integer pageNumber) throws Exception{
         try {
             Page <ProductResponseDto.ScreenDto> myWishPage = userService.getMyWishPage(userId, pageNumber);
+
             return ResponseEntity.ok(myWishPage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -169,12 +143,9 @@ public class UserController {
     // 판매 중 상품 불러오기
     // /api/users/myProducts/onSale/{userId}?pageNumber={}
     @GetMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> getMyProductsOnSale(@PathVariable(name="userId") Long userId,
-                                                 @RequestParam(name="pageNumber")Integer pageNumber, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyProductsOnSale(@RequestHeader("Authorization") String authorizationHeader,
+                                                 @PathVariable(name="userId") Long userId,
+                                                 @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
         try{
             Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"onSale", pageNumber);
@@ -188,12 +159,9 @@ public class UserController {
     // 판매 중인 상품 판매 완료하기
     // /api/users/myProducts/onSale/{userId}
     @PutMapping("/myProducts/onSale/{userId}")
-    public ResponseEntity<?> updatePostStatusSoldOut(@PathVariable(name="userId") Long userId,
-                                                 @RequestBody @Valid ProductRequestDto requestDto, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> updatePostStatusSoldOut(@RequestHeader("Authorization") String authorizationHeader,
+                                                     @PathVariable(name="userId") Long userId,
+                                                 @RequestBody @Valid ProductRequestDto requestDto) throws Exception{
         try{
             userService.changePostStatus(userId, requestDto);
             return ResponseEntity.ok().body("상품 판매가 완료되었습니다.");
@@ -206,12 +174,9 @@ public class UserController {
     // 판매 완료 상품 불러오기
     // /api/users/myProducts/soldOut/{userId}?pageNumber={pageNumber}
     @GetMapping("/myProducts/soldOut/{userId}")
-    public ResponseEntity<?> getMyProductsSoldOut(@PathVariable(name="userId") Long userId,
-                                                  @RequestParam(name="pageNumber")Integer pageNumber, @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyProductsSoldOut( @RequestHeader("Authorization") String authorizationHeader,
+                                                   @PathVariable(name="userId") Long userId,
+                                                  @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
         try{
             Page<ProductResponseDto.MyPageScreenDto> myProductsPage =
                     userService.getMyProductsPage(userId,"soldOut", pageNumber);
@@ -225,13 +190,9 @@ public class UserController {
     // 숨김 처리 상품 불러오기
     // /api/users/myProducts/private/{userId}?pageNumber={}
     @GetMapping("/myProducts/private/{userId}")
-    public ResponseEntity<?> getMyProductsPrivate(@PathVariable(name="userId") Long userId,
-                                                  @RequestParam(name="pageNumber")Integer pageNumber,
-                                                  @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyProductsPrivate( @RequestHeader("Authorization") String authorizationHeader,
+                                                   @PathVariable(name="userId") Long userId,
+                                                  @RequestParam(name="pageNumber")Integer pageNumber) throws Exception{
         try{
             Page<ProductResponseDto.PrivateDto> myPrivateProductsPage
                     = userService.getMyPrivateProductsPage(userId, pageNumber);
@@ -245,12 +206,9 @@ public class UserController {
     // 내 기부 내역 불러오기
     // /api/users/myDonations/{userId}?pageNumber={pageNumber}
     @GetMapping ("/myDonations/{userId}")
-    public ResponseEntity<?> getMyDonationApply(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber
-            , @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyDonationApply( @RequestHeader("Authorization") String authorizationHeader,
+                                                 @PathVariable(name="userId") Long userId,
+                                                 @RequestParam(name="pageNumber") Integer pageNumber) throws Exception{
         try {
             Page <DonationApplyResponseDto> myDonationApplyPage
                     =userService.myDonationApplysPage(userId, pageNumber);
@@ -265,12 +223,9 @@ public class UserController {
     // 내 기부 내역 중 기부 완료 된 상품만 불러오기
     // /api/users/complete/{userId}?pageNumber={pageNumber}
     @GetMapping ("/myDonations/complete/{userId}")
-    public ResponseEntity<?> getMyDonationApplyComplete(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber,
-                                                        @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getMyDonationApplyComplete( @RequestHeader("Authorization") String authorizationHeader,
+                                                         @PathVariable(name="userId") Long userId,
+                                                         @RequestParam(name="pageNumber") Integer pageNumber) throws Exception{
         try {
             Page <DonationApplyResponseDto>  myDonationApplyCompletePage
                     =userService.myDonationApplysCompletePage(userId, pageNumber);
@@ -285,12 +240,9 @@ public class UserController {
     // 차단한 사용자 리스트 불러오기
     // /api/users/blockedUsers/{userId}?pageNumber={pageNumber}
     @GetMapping("/blockedUsers/{userId}")
-    public ResponseEntity<?> getBlockedUsersList(@PathVariable(name="userId") Long userId, @RequestParam(name="pageNumber") Integer pageNumber,
-                                                 @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> getBlockedUsersList( @RequestHeader("Authorization") String authorizationHeader,
+                                                  @PathVariable(name="userId") Long userId,
+                                                 @RequestParam(name="pageNumber") Integer pageNumber) throws Exception{
         try {
             Page<BlockedUserResponseDto> blockedUserPage = userService.getBlockedUsersPage(userId, pageNumber);
             return ResponseEntity.ok().body(blockedUserPage);
@@ -304,13 +256,9 @@ public class UserController {
     // 차단 사용자 해제하기
     // /api/users/blockedUsers/unBlock/{userId}/{blockedUserId}
     @DeleteMapping("/blockedUsers/unBlock/{userId}/{blockedUserId}")
-    public ResponseEntity<?> deleteBlockedUser(@PathVariable(name="userId") Long userId,
-                                               @PathVariable(name="blockedUserId")Long blockedUserId,
-                                               @RequestHeader("Authorization") String authorizationHeader) throws Exception{
-        if(!tokenService.isEqualsUserIdJWT(authorizationHeader,userId))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("accessToken의 userId 불일치");
-
+    public ResponseEntity<?> deleteBlockedUser(@RequestHeader("Authorization") String authorizationHeader,
+                                               @PathVariable(name="userId") Long userId,
+                                               @PathVariable(name="blockedUserId")Long blockedUserId) throws Exception{
         try {
             userService.deleteBlockedUser(userId,blockedUserId);
             return ResponseEntity.ok().body("차단이 해제되었습니다.");

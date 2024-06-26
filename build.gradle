@@ -75,6 +75,8 @@ dependencies {
 
     // AWS S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+//    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.619'
+
 
     //json
     implementation 'org.json:json:20231013'
@@ -91,6 +93,9 @@ dependencies {
 
     //ModelMapper
     implementation 'org.modelmapper:modelmapper:3.1.0'
+
+    //aop
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {

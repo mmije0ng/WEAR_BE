@@ -1,6 +1,8 @@
 package com.backend.wear.controller;
 
 
+import com.backend.wear.service.TokenService;
+import com.backend.wear.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import com.backend.wear.service.ImageUploadService;
@@ -38,10 +40,13 @@ public class ImageUploadController {
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
 public class ImageUploadController {
 
     private final ImageUploadService imageUploadService;
+    @Autowired
+    public ImageUploadController(ImageUploadService imageUploadService){
+        this.imageUploadService=imageUploadService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") MultipartFile[] files) {

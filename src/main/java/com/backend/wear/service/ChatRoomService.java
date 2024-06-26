@@ -176,8 +176,15 @@ public class ChatRoomService {
 
         // 내간 차단한 유저 아이디 리스트
         List<Long> blockedUserIdList = blockedUserRepository.findByUserId(userId);
+        for(Long id: blockedUserIdList){
+            log.info("내가 차단한 유저 아이디 "+id);
+        }
+
         // 나를 차단한 유저 아이디 리스트
         List<Long> userIdListBlocked = blockedUserRepository.findByUserIdBlocked(userId);
+        for(Long id: userIdListBlocked){
+            log.info("나를 차단한 유저 아이디 "+id);
+        }
 
         // 사용자와의 채팅방
         Page<ChatRoom> chatRoomsPage = chatRoomRepository.findByUserId(userId, blockedUserIdList, userIdListBlocked, pageRequest(pageNumber));

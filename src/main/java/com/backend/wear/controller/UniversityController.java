@@ -38,7 +38,6 @@ public class UniversityController {
         }
     }
 
-    // REST API 메서드
     // 대학 순위
     // /api/university/rank
     @GetMapping("/rank")
@@ -47,7 +46,7 @@ public class UniversityController {
             try {
                 return ResponseEntity.ok().body(universityRankFuture.get());
             } catch (InterruptedException | ExecutionException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching university rank");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("대학 순위 스케줄링 실패");
             }
         } else {
             return ResponseEntity.ok().body(universityService.getUniversityRank());
