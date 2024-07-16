@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// 메시지를 주고 받으면서 메시지 전송과 관련한 추가 로직을 처리할 때 사용
 @RequiredArgsConstructor
-
 @Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 99) // 우선순위 올리기

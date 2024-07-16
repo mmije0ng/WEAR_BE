@@ -7,13 +7,15 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
 public class SchedulerConfig implements SchedulingConfigurer {
-    private final static int POOL_SIZE = 4;
+//    private final static int POOL_SIZE = 4;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 
-        threadPoolTaskScheduler.setPoolSize(POOL_SIZE);
+        // Thread 개수 설정
+        int threadPoolSize = Runtime.getRuntime().availableProcessors();
+        threadPoolTaskScheduler.setPoolSize(threadPoolSize);
         threadPoolTaskScheduler.setThreadNamePrefix("hello-");
         threadPoolTaskScheduler.initialize();
 
