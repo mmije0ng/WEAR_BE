@@ -4,6 +4,8 @@ import com.backend.wear.config.jwt.JwtUtil;
 import com.backend.wear.dto.product.ProductPostRequestDto;
 import com.backend.wear.dto.product.ProductRequestDto;
 import com.backend.wear.dto.product.ProductResponseDto;
+import com.backend.wear.dto.product.SearchResponseDto;
+import com.backend.wear.dto.university.UniversityResponseDto;
 import com.backend.wear.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,7 @@ import java.util.concurrent.ExecutionException;
 public class ProductController {
 
     private final ProductService productService;
-    private CompletableFuture<Object> searchNameRankFuture;
-
+    private CompletableFuture< ResponseEntity<SearchResponseDto.RankDto> > searchNameRankFuture;
 
     @Autowired
     public ProductController(ProductService productService){
@@ -329,16 +330,16 @@ public class ProductController {
         }
     }
 
-    // 매일 정각에 스케줄링된 작업 실행
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") // 매일 정각에 실행
- //   @Scheduled(cron = "* * * * * *", zone = "Asia/Seoul") // 매일 정각에 실행
-    @Async
+    // 매일 정각에 스케줄링된 작업, 인기 검색어 리스틉 불러오기 실행
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+    @Async("customAsyncExecutor")
     public void searchNameRankListSchedule() {
         try {
-            searchNameRankFuture = CompletableFuture.completedFuture(productService.getSearchNameRank());
+            SearchResponseDto.RankDto rankDto = productService.getSearchNameRank();
+            searchNameRankFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(rankDto));
         } catch (Exception e) {
             System.err.println("Error during scheduled task: " + e.getMessage());
-            searchNameRankFuture = CompletableFuture.completedFuture(e.getMessage());
+            searchNameRankFuture = null;
         }
     }
 
@@ -348,7 +349,7 @@ public class ProductController {
     public ResponseEntity<?> getSearchNameRank() {
         if (searchNameRankFuture != null && searchNameRankFuture.isDone()) {
             try {
-                return ResponseEntity.ok().body(searchNameRankFuture.get());
+                return ResponseEntity.ok().body(searchNameRankFuture.get().getBody());
             } catch (InterruptedException | ExecutionException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인기 검색어 스케줄링 실패");
             }

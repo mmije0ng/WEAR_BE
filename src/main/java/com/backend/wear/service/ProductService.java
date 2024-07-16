@@ -44,7 +44,6 @@ public class ProductService {
     private final BlockedUserRepository blockedUserRepository;
 
     private final RedisTemplate<String, String> searchLogRedisTemplate;
-    private ZSetOperations<String, String> zSetOperations;
 
     // ObjectMapper 생성
     ObjectMapper objectMapper = new ObjectMapper();

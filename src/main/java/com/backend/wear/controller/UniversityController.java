@@ -18,37 +18,40 @@ import java.util.concurrent.ExecutionException;
 public class UniversityController {
 
     private final UniversityService universityService;
-    private CompletableFuture<ResponseEntity<?>> universityRankFuture;
+    private CompletableFuture<ResponseEntity<UniversityResponseDto>> universityRankFuture;
 
     @Autowired
     public UniversityController(UniversityService universityService){
         this.universityService=universityService;
     }
 
-    // 매월 1일 12시에 스케줄링된 작업 실행
+    // 매월 1일 12시에 스케줄링된 작업, 대학 순위 불러오기 실행
     @Scheduled(cron = "0 0 12 1 * *", zone = "Asia/Seoul")
- //   @Scheduled(cron = "* * * * * *", zone = "Asia/Seoul")
-    @Async
+    @Async("customAsyncExecutor")
     public void universityRankSchedule() {
         try {
             UniversityResponseDto universityRank = universityService.getUniversityRank();
             universityRankFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(universityRank));
         } catch (Exception e) {
-            universityRankFuture = CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()));
+            universityRankFuture = null;
         }
     }
 
     // 대학 순위
+    // 완료된 작업이 있다면 해당 작업(순위)을, 그렇지 않으면 사용자가 접속했을 때의 순위를 가져옴
     // /api/university/rank
     @GetMapping("/rank")
     public ResponseEntity<?> getUniversityRank() throws Exception {
+        // 이미 정해진 시간에 스케줄링 되어 완료된 작업이 있다면
         if (universityRankFuture != null && universityRankFuture.isDone()) {
             try {
-                return ResponseEntity.ok().body(universityRankFuture.get());
+                return ResponseEntity.ok().body(universityRankFuture.get().getBody());
             } catch (InterruptedException | ExecutionException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("대학 순위 스케줄링 실패");
             }
-        } else {
+        }
+
+        else {
             return ResponseEntity.ok().body(universityService.getUniversityRank());
         }
     }

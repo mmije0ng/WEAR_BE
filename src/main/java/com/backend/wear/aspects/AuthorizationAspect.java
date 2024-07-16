@@ -15,7 +15,6 @@ import java.security.SignatureException;
 @Aspect
 @Component
 public class AuthorizationAspect {
-
     private final JwtUtil jwtUtil;
 
     @Autowired
@@ -24,8 +23,7 @@ public class AuthorizationAspect {
     }
 
     @Pointcut("execution(* com.backend.wear.controller..*(..))")
-    public void aspectJWT() {
-    }
+    public void aspectJWT() {}
 
     // jwt 토큰 userId 검증 aop
     @Around(value = "aspectJWT() && args(authorizationHeader,userId,  ..)", argNames = "joinPoint,authorizationHeader,userId")
@@ -39,5 +37,4 @@ public class AuthorizationAspect {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
-
 }

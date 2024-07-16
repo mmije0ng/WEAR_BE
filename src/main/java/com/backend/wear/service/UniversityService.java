@@ -112,8 +112,4 @@ public class UniversityService {
                 .universityImage(universityImageArray)
                 .build();
     }
-
-    public static String formatIntegerWithCommas(int number) {
-        return String.format("%,d", number);
-    }
 }
