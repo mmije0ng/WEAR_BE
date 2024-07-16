@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableJpaAuditing
-@EnableScheduling //스케줄러
+@EnableScheduling
 @EnableAsync
 @SpringBootApplication
 @EntityScan("com.backend.wear.entity")
