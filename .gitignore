@@ -44,7 +44,7 @@ out/
 /src/main/resources/application-prod.yml
 
 # Ignore GitHub Actions workflow files
-.github/workflows/github-actions.yml
+#.github/workflows/github-actions.yml
 
 
 
