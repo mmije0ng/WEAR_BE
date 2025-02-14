@@ -35,7 +35,7 @@ public class ProductController {
     // 카테고리별 최신순 조회
     // api/products/category?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category")
-    public ResponseEntity<?> findProductsByCategory(@RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId,
+    public ResponseEntity<?> findProductsByCategory(@RequestHeader("Authorization") String authorizationHeader, @RequestParam(name="categoryName") String categoryName, @RequestParam(name="userId") Long userId,
                                                     @RequestParam(name="pageNumber") Integer pageNumber) throws Exception {
         try {
             Page <ProductResponseDto.ScreenDto> productsPage = productService.findProductsByCategory(categoryName, userId, pageNumber);
@@ -49,7 +49,8 @@ public class ProductController {
     // 카테고리별 최신순, 판매 상태
     // api/products/category/sale?categoryName={}&userId={}&pageNumber={pageNumber}
     @GetMapping("/category/sale")
-    public ResponseEntity<?> findProductsByCategoryOnSale(@RequestParam(name="categoryName") String categoryName,
+    public ResponseEntity<?> findProductsByCategoryOnSale(@RequestHeader("Authorization") String authorizationHeader,
+                                                          @RequestParam(name="categoryName") String categoryName,
                                                           @RequestParam(name="userId") Long userId,
                                                           @RequestParam(name="pageNumber") Integer pageNumber) throws Exception
     {
@@ -66,7 +67,8 @@ public class ProductController {
     //상품 리스트 검색어별, 카테고리별 , 최신순(default)으로 조회하기
     //  /products/search/category?searchName={searchName}&userId={userId}&pageNumber={pageNumber}
     @GetMapping("/search/category")
-    public ResponseEntity<?> searchProductsByCategory(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
+    public ResponseEntity<?> searchProductsByCategory(@RequestHeader("Authorization") String authorizationHeader,
+                                                      @RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
                                                       @RequestParam(name="userId") Long userId,
                                                       @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 
@@ -84,7 +86,8 @@ public class ProductController {
     // 검색어별, 카테고리별, 판매중인 상품 최신순(default)으로 조회하기
     //   /products/search/category/sale?searchName={}&categoryName={}&userId=1{}&pageNumber={}
     @GetMapping("/search/category/sale")
-    public ResponseEntity<?> searchProductsByCategoryOnSale(@RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
+    public ResponseEntity<?> searchProductsByCategoryOnSale(@RequestHeader("Authorization") String authorizationHeader,
+                                                            @RequestParam(name="searchName") String searchName, @RequestParam(name="categoryName")String categoryName,
                                                             @RequestParam(name="userId") Long userId,
                                                             @RequestParam(name="pageNumber")Integer pageNumber) throws Exception {
 

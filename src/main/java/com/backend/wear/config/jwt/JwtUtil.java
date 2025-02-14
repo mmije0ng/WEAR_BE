@@ -146,6 +146,7 @@ public class JwtUtil {
     public void validateUserIdWithHeader (String authorizationHeader, Long userId) throws java.security.SignatureException {
         // 헤더의 토큰에서 userId 추출
         String token = resolveToken(authorizationHeader);
+        log.info(token);
         Long tokenUserId = getTokenUserId(token);
 
         // 토큰 만료 기간 검증

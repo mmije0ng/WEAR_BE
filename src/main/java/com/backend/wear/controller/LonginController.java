@@ -33,7 +33,7 @@ public class LonginController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) throws Exception {
         try {
             LoginResponseDto loginResponseDto = loginService.login(loginRequestDto);
-            log.info("로그인");
+            log.info("로그인 userId: "+ loginResponseDto.getUserId());
 
             // 헤더를 생성하고 토큰을 추가합니다.
             HttpHeaders headers = new HttpHeaders();

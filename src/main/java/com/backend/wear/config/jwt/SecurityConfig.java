@@ -29,7 +29,6 @@ public class SecurityConfig  {
     private final JwtUtil jwtUtil;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-    private org.springframework.core.Ordered Ordered;
 
     @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtil jwtUtil,
@@ -43,10 +42,10 @@ public class SecurityConfig  {
     // 인가가 필요하지 않는 경로
     private static final String[] AUTH_WHITELIST = {
             "/api/upload","/api/upload/**",
-            "/api/products/category/**", "/api/products/search/category/**", "/api/products/search/rank/**",
+            "/api/products/**", "/api/products/search/category/**", "/api/products/search/rank/**",
             "/test","/ws-stomp/**",
             "/api/university/**","/api/auth/**",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**"
+            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui/**",
         };
 
     // 비밀번호 암호화
@@ -67,10 +66,10 @@ public class SecurityConfig  {
                 .disable()
         );
 
-        // CORS
-        http.cors(httpSecurityCorsConfigurer ->
-                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
-        );
+//        // CORS
+//        http.cors(httpSecurityCorsConfigurer ->
+//                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
+//        );
 
         //세션 관리 상태 없음으로 구성, Spring Security가 세션 생성 or 사용 X
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
@@ -98,29 +97,29 @@ public class SecurityConfig  {
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-
-        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
-                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
-        ));
-
-        //허용할 헤더 설정
-        corsConfiguration.addAllowedHeader("*");
-
-        //허용할 http method
-        corsConfiguration.addAllowedMethod("*");
-
-        // 클라이언트가 접근 할 수 있는 서버 응답 헤더
-        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh", "files"));
-
-        //사용자 자격 증명이 지원되는지 여부
-        corsConfiguration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration corsConfiguration = new CorsConfiguration();
+//
+//        corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:8080",  "http://localhost:5173",
+//                "http://43.201.189.171:8080", "http://wear-frontend.s3-website.ap-northeast-2.amazonaws.com"
+//        ));
+//
+//        //허용할 헤더 설정
+//        corsConfiguration.addAllowedHeader("*");
+//
+//        //허용할 http method
+//        corsConfiguration.addAllowedMethod("*");
+//
+//        // 클라이언트가 접근 할 수 있는 서버 응답 헤더
+//        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh", "files"));
+//
+//        //사용자 자격 증명이 지원되는지 여부
+//        corsConfiguration.setAllowCredentials(true);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", corsConfiguration);
+//
+//        return source;
+//    }
 }

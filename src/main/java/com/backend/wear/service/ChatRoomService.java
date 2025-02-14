@@ -192,6 +192,8 @@ public class ChatRoomService {
         if(chatRoomsPage.isEmpty())
             throw new IllegalArgumentException("채팅 내역이 없습니다.");
 
+        System.out.println(chatRoomsPage.map(chatRoom -> mapToScreenDto(chatRoom, userId)));
+
         return chatRoomsPage.map(chatRoom -> mapToScreenDto(chatRoom, userId));
     }
 

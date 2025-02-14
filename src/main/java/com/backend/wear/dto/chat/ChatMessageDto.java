@@ -34,7 +34,7 @@ public class ChatMessageDto {
         //채팅 메시지 - 사진
         private String[] messageImage;
 
-        //보낸시간
+        // 보낸시간
         private String timestamp;
 
         // 내가 보낸건지 여부
